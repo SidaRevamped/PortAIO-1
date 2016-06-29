@@ -14,6 +14,7 @@ namespace Azir_Creator_of_Elo
     class JumpLogic
     {
         AzirMain azir;
+        Obj_AI_Minion soldier;
 
         public JumpLogic(AzirMain azir)
         {
@@ -65,26 +66,27 @@ namespace Azir_Creator_of_Elo
 
             if (azir.Hero.LSDistance(target) <= azir.Spells.R.Range)
             {
-                EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, target);
-                if (azir.Hero.LSDistance(target) < 220)
+
+                var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(it => it.IsAlly && it.LSIsValidTarget(1000));
+
+                if (tower != null)
                 {
-                    var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(it => it.IsAlly && it.LSIsValidTarget(1000));
-
-                    if (tower != null)
-                    {
-                        if (azir.Spells.R.Cast(tower.ServerPosition)) return;
-                    }
-
-                    if (azir.Spells.R.Cast(Game.CursorPos)) return;
+                    if (azir.Spells.R.Cast(tower.ServerPosition)) return;
                 }
+
+                if (azir.Spells.R.Cast(Game.CursorPos)) return;
+
 
 
             }
             else
             {
+                azir.Orbwalk(Game.CursorPos);
                 var pos = Game.CursorPos.LSExtend(target.Position, Game.CursorPos.LSDistance(target.Position) - 250);
-
-                fleeTopos(pos);
+                if (pos.LSDistance(azir.Hero.ServerPosition) <= 1300)
+                {
+                    fleeTopos(pos);
+                }
             }
 
         }

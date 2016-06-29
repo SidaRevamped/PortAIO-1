@@ -1,7 +1,6 @@
 ﻿using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using LeagueSharp;
 using LeagueSharp.Common;
 using System;
 using System.Collections.Generic;
@@ -24,23 +23,24 @@ namespace Azir_Creator_of_Elo
             base.Update(azir);
 
 
+
             if (Menu._jumpMenu["fleekey"].Cast<KeyBind>().CurrentValue)
             {
                 azir.Orbwalk(Game.CursorPos);
                 Jump(azir);
             }
-        }
 
-        /* if (Menu._jumpMenu["inseckey"].Cast<KeyBind>().CurrentValue)
-         {
-             Insec(azir);
-         }
-     } */
+            if (Menu._jumpMenu["inseckey"].Cast<KeyBind>().CurrentValue)
+            {
+                Insec(azir);
+            }
+        }
         public void Insec(AzirMain azir)
         {
             var ts = TargetSelector.GetTarget(azir.Spells.Q.Range, DamageType.Magical);
             if (ts != null)
             {
+
                 if (azir.Spells.R.IsReady())
                     jump.insec(ts);
 
@@ -65,6 +65,7 @@ namespace Azir_Creator_of_Elo
             if (target != null)
             {
 
+
                 if (target.Distance(azir.Hero.ServerPosition) < 450)
                 {
                     var pred = azir.Spells.W.GetPrediction(target);
@@ -83,11 +84,13 @@ namespace Azir_Creator_of_Elo
                 }
                 else
                 {
-                    if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady() && !(savew && (wCount == 0)))
-                        if (useW)
-                            azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
+                    if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady())
+                        if ((!savew && (savew && (wCount > 0))))
+                            if (useW)
+                                azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
                 }
                 azir.Spells.castQ(azir, target, useQ, nSoldiersToQ);
+
             }
         }
         public override void Laneclear(AzirMain azir)
