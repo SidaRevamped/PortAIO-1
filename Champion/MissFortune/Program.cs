@@ -80,6 +80,9 @@ namespace OneKeyToWin_AIO_Sebby
             farmMenu.Add("farmE", new CheckBox("LaneClear E"));
             farmMenu.Add("LCminions", new Slider("LaneClear minimum minions", 2, 0, 10));
             farmMenu.Add("Mana", new Slider("LaneClear  Mana", 80, 0, 100));
+            farmMenu.Add("jungleQ", new CheckBox("Jungle clear Q"));
+            farmMenu.Add("jungleW", new CheckBox("Jungle clear W"));
+            farmMenu.Add("jungleE", new CheckBox("Jungle clear E"));
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -187,17 +190,17 @@ namespace OneKeyToWin_AIO_Sebby
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
-                    if (Q.IsReady() && Q.GetDamage(mob) > mob.Health)
+                    if (Q.IsReady() && getCheckBoxItem(farmMenu, "jungleQ") && !SebbyLib.Orbwalking.CanAttack() && !Player.Spellbook.IsAutoAttacking)
                     {
                         Q.Cast(mob);
                         return;
                     }
-                    if (W.IsReady())
+                    if (W.IsReady() && getCheckBoxItem(farmMenu, "jungleQ"))
                     {
                         W.Cast();
                         return;
                     }
-                    if (E.IsReady())
+                    if (E.IsReady() && getCheckBoxItem(farmMenu, "jungleQ"))
                     {
                         E.Cast(mob.ServerPosition);
                         return;
