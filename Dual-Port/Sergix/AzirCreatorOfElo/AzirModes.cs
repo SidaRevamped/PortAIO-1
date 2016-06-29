@@ -91,7 +91,11 @@ namespace Azir_Creator_of_Elo
                                 azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
                 }
                 azir.Spells.castQ(azir, target, useQ, nSoldiersToQ);
-
+                if (Menu._comboMenu["CR"].Cast<CheckBox>().CurrentValue)
+                {
+                    if (target.Health < azir.Spells.R.GetDamage(target))
+                        azir.Spells.R.Cast(target);
+                }
             }
         }
         public override void Laneclear(AzirMain azir)

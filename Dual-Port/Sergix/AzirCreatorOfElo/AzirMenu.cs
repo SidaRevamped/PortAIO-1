@@ -41,6 +41,7 @@ namespace Azir_Creator_of_Elo
                 _comboMenu.Add("SoldiersToQ", new Slider("Soldiers to Q", 1, 1, 3));
                 _comboMenu.Add("CQ", new CheckBox("Use Q"));
                 _comboMenu.Add("CW", new CheckBox("Use W"));
+                _comboMenu.Add("CR", new CheckBox("Use R killeable"));
             }
         }
         public void loadLaneClearMenu()
