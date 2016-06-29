@@ -39,14 +39,14 @@ namespace OneKeyToWin_AIO_Sebby
             Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 1250f);
             Qc = new LeagueSharp.Common.Spell(SpellSlot.Q, 1250f);
             W = new LeagueSharp.Common.Spell(SpellSlot.W, 800f);
-            E = new LeagueSharp.Common.Spell(SpellSlot.E, 750f);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 770f);
             R = new LeagueSharp.Common.Spell(SpellSlot.R, 3000f);
 
 
             Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
             Qc.SetSkillshot(0.65f, 60f, 2200f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(1.5f, 20f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.35f, 70f, 1600f, true, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.30f, 70f, 2000f, true, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
