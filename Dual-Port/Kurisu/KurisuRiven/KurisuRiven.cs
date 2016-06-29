@@ -106,6 +106,10 @@ namespace KurisuRiven
         private static void TryIgnote(Obj_AI_Base target)
         {
             var ignote = player.GetSpellSlot("summonerdot");
+            if (ignote != SpellSlot.Summoner1 || ignote != SpellSlot.Summoner2)
+            {
+                return;
+            }
             if (player.Spellbook.CanUseSpell(ignote) == SpellState.Ready)
             {
                 if (target.LSDistance(player.ServerPosition) <= 600)
