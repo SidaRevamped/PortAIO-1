@@ -120,9 +120,11 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (W.IsReady())
             {
-                if (target is AIHeroClient)
+                var t = target as AIHeroClient;
+                if (t != null)
                 {
-                    var t = target as AIHeroClient;
+                    if (Player.LSGetAutoAttackDamage(t) * 3 > t.Health - OktwCommon.GetIncomingDamage(t))
+                        W.Cast();
                     if (Program.Combo && Player.Mana > RMANA + WMANA)
                         W.Cast();
                     else if (getCheckBoxItem(wMenu, "harasW") && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && getCheckBoxItem(wMenu, "haras" + t.NetworkId))
@@ -132,8 +134,8 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else
                 {
-                    var t = TargetSelector.GetTarget(900, DamageType.Physical);
-                    if (t.LSIsValidTarget() && getCheckBoxItem(wMenu, "harasW") && getCheckBoxItem(wMenu, "haras" + t.NetworkId) && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t.LSDistance(target.Position) < 500)
+                    var t2 = TargetSelector.GetTarget(900, DamageType.Physical);
+                    if (t2.LSIsValidTarget() && getCheckBoxItem(wMenu, "harasW") && getCheckBoxItem(wMenu, "haras" + t2.NetworkId) && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t2.LSDistance(target.Position) < 500)
                     {
                         W.Cast();
                     }
