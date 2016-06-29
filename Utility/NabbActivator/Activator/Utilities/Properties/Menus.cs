@@ -63,11 +63,11 @@ namespace NabbActivator
                 Vars.TypesMenu.Add("offensives", new CheckBox("Offensives Damage"));
                 Vars.TypesMenu.Add("defensives", new CheckBox("Defensives"));
                 Vars.TypesMenu.Add("spells", new CheckBox("Spells"));
-                Vars.TypesMenu.Add("cleansers", new CheckBox("Cleansers"));
                 Vars.TypesMenu.Add("potions", new CheckBox("Potions"));
                 Vars.TypesMenu.Add("resetters", new CheckBox("Tiamat/Hydra/Titanic"));
-                Vars.TypesMenu.Add("randomizer", new CheckBox("Humanizer"));
                 Vars.TypesMenu.Add("heal1", new CheckBox("Heal Ally?", false));
+                Vars.TypesMenu.Add("cleansers", new Slider("Cleansers / Delay", 0, 0, 300));
+
             }
         }
     }

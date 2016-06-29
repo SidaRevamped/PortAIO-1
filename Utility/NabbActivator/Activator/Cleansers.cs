@@ -33,8 +33,9 @@ namespace NabbActivator
                         Bools.ShouldCleanse(a) &&
                         a.LSIsValidTarget(750f, false)))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3222, ally);
                     });
                 }
@@ -49,8 +50,9 @@ namespace NabbActivator
                 /// </summary>
                 if (Items.CanUseItem(3140))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3140);
                         return;
                     });
@@ -61,8 +63,9 @@ namespace NabbActivator
                 /// </summary>
                 if (Items.CanUseItem(3137))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3137);
                         return;
                     });
@@ -73,8 +76,9 @@ namespace NabbActivator
                 /// </summary>
                 if (Items.CanUseItem(3139))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3139);
                     });
                 }
@@ -87,8 +91,9 @@ namespace NabbActivator
                 /// </summary>
                 if (Items.CanUseItem(3137))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3137);
                         return;
                     });
@@ -99,8 +104,9 @@ namespace NabbActivator
                 /// </summary>
                 if (Items.CanUseItem(3139))
                 {
-                    DelayAction.Add(Vars.Delay, () =>
-                    {
+                    DelayAction.Add(
+                        Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
+                        {
                         Items.UseItem(3139);
                     });
                 }
