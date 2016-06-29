@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static AIHeroClient Player { get { return ObjectManager.Player; } }
 
-        public static Menu qMenu, eMenu, wMenu, rMenu, drawMenu, miscMenu;
+        public static Menu qMenu, eMenu, wMenu, rMenu, drawMenu, miscMenu, farmMenu;
 
         public static void LoadOKTW()
         {
@@ -68,6 +68,15 @@ namespace OneKeyToWin_AIO_Sebby
             miscMenu.Add("sheen", new CheckBox("Sheen logic", true));
             miscMenu.Add("AApriority", new CheckBox("AA priority over spell", true));
 
+            farmMenu = Config.AddSubMenu("Farm Config");
+            farmMenu.Add("farmW", new CheckBox("LaneClear W", true));
+            farmMenu.Add("farmE", new CheckBox("LaneClear E", true));
+            farmMenu.Add("LCminions", new Slider("LaneClear minimum minions", 2, 0, 10));
+            farmMenu.Add("Mana", new Slider("LaneClear minimum minions", 80, 0, 100));
+            farmMenu.Add("jungleW", new CheckBox("Jungle clear W", true));
+            farmMenu.Add("jungleE", new CheckBox("Jungle clear E", true));
+
+
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalker.OnPreAttack += BeforeAttack;
@@ -112,6 +121,16 @@ namespace OneKeyToWin_AIO_Sebby
         private static void afterAttack(AttackableUnit target, EventArgs args)
         {
             attackNow = true;
+            if (Program.LaneClear && W.IsReady() && Player.ManaPercent > getSliderItem(farmMenu, "Mana"))
+            {
+                var minions = Cache.GetMinions(Player.ServerPosition, 650);
+
+                if (minions.Count >= getSliderItem(farmMenu, "LCminions"))
+                {
+                    if (getCheckBoxItem(farmMenu, "farmW") && minions.Count > 1)
+                        W.Cast();
+                }
+            }
         }
 
         private static void BeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
@@ -126,7 +145,7 @@ namespace OneKeyToWin_AIO_Sebby
                 R.Range = 800 + 300 * Player.Spellbook.GetSpell(SpellSlot.R).Level;
                 W.Range = 650 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
                 SetMana();
-
+                Jungle();
             }
             if (Program.LagFree(1) && E.IsReady() && !Player.Spellbook.IsAutoAttacking && getCheckBoxItem(eMenu, "autoE"))
                 LogicE();
@@ -140,6 +159,29 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(4) && R.IsReady() && !Player.Spellbook.IsAutoAttacking)
                 LogicR();
 
+        }
+
+        private static void Jungle()
+        {
+            if (Program.LaneClear && Player.Mana > RMANA + QMANA)
+            {
+                var mobs = Cache.GetMinions(Player.ServerPosition, 650, MinionTeam.Neutral);
+                if (mobs.Count > 0)
+                {
+                    var mob = mobs[0];
+                    if (E.IsReady() && getCheckBoxItem(farmMenu, "jungleE"))
+                    {
+                        E.Cast(mob.ServerPosition);
+                        return;
+                    }
+                    else if (W.IsReady() && getCheckBoxItem(farmMenu, "jungleW"))
+                    {
+                        W.Cast();
+                        return;
+                    }
+
+                }
+            }
         }
 
         private static void LogicR()
@@ -242,6 +284,14 @@ namespace OneKeyToWin_AIO_Sebby
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.LSIsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                             E.Cast(enemy, true);
                     }
+                }
+                else if (Program.LaneClear && Player.ManaPercent > getSliderItem(farmMenu, "Mana") && getCheckBoxItem(farmMenu, "farmE") && Player.Mana > RMANA + EMANA)
+                {
+                    var minionList = Cache.GetMinions(Player.ServerPosition, E.Range);
+                    var farmPosition = E.GetLineFarmLocation(minionList, E.Width);
+
+                    if (farmPosition.MinionsHit >= getSliderItem(farmMenu, "LCminions"))
+                        E.Cast(farmPosition.Position);
                 }
             }
         }
