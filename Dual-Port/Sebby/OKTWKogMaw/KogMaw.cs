@@ -72,7 +72,7 @@ namespace OneKeyToWin_AIO_Sebby
             farmMenu.Add("farmW", new CheckBox("LaneClear W", true));
             farmMenu.Add("farmE", new CheckBox("LaneClear E", true));
             farmMenu.Add("LCminions", new Slider("LaneClear minimum minions", 2, 0, 10));
-            farmMenu.Add("Mana", new Slider("LaneClear minimum minions", 80, 0, 100));
+            farmMenu.Add("Mana", new Slider("LaneClear Mana", 80, 0, 100));
             farmMenu.Add("jungleW", new CheckBox("Jungle clear W", true));
             farmMenu.Add("jungleE", new CheckBox("Jungle clear E", true));
 
