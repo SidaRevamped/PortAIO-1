@@ -26,20 +26,24 @@ namespace PrideStalker_Rengar.Handlers
                 }
                 if (Mode.getBoxItem(MenuConfig.comboMenu, "ComboMode") != 2)
                 {
-                    if (Spells.Q.IsReady() && Player.HealthPercent >= 80 && Player.Mana == 5)
+                    if (Spells.Q.IsReady() && Player.HealthPercent >= 35 && Player.Mana == 5)
                     {
-                        Spells.Q.Cast(Target);
+                        Spells.Q.Cast();
                     }
-                    if (Player.Mana < 5)
+                    var mob = ObjectManager.Get<Obj_AI_Minion>().Where(m => !m.IsDead && !m.IsZombie && m.Team == GameObjectTeam.Neutral && m.LSIsValidTarget(Spells.W.Range)).ToList();
+                    foreach(var m in mob)
                     {
-                        Spells.Q.Cast(Target);
+                        if (Player.Mana < 5 && m.Health > Player.GetAutoAttackDamage(m))
+                        {
+                            Spells.Q.Cast();
+                        }
                     }
                 }
                 if(Mode.getBoxItem(MenuConfig.comboMenu, "ComboMode") == 2)
                 {
                     if(Player.Mana < 5)
                     {
-                        Spells.Q.Cast(Target);
+                        Spells.Q.Cast();
                     }
                 }
             }
