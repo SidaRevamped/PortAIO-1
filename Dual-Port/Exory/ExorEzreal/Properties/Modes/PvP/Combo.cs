@@ -40,11 +40,6 @@ namespace ExorAIO.Champions.Ezreal
                     }
                 }
 
-                if (!Targets.Target.LSIsValidTarget())
-                {
-                    return;
-                }
-
                 /// <summary>
                 ///     The Automatic R Logic.
                 /// </summary>
@@ -60,8 +55,8 @@ namespace ExorAIO.Champions.Ezreal
             }
 
 
-            if (Invulnerable.Check(Targets.Target) ||
-                Targets.Target.LSIsValidTarget(Vars.AARange))
+            if (!Targets.Target.LSIsValidTarget() ||
+                Invulnerable.Check(Targets.Target))
             {
                 return;
             }
@@ -88,7 +83,7 @@ namespace ExorAIO.Champions.Ezreal
                 !Targets.Target.LSIsValidTarget(Vars.AARange) &&
                 Vars.getCheckBoxItem(Vars.WMenu, "combo"))
             {
-                if (GameObjects.Player.CountAllyHeroesInRange(Vars.W.Range) < 2 ||
+                if (GameObjects.Player.CountAllyHeroesInRange(Vars.W.Range) < 2 &&
                     GameObjects.Player.TotalAttackDamage <
                         GameObjects.Player.TotalMagicalDamage)
                 {

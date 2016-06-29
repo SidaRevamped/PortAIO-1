@@ -191,7 +191,25 @@ namespace ExorAIO.Champions.Caitlyn
             {
                 Vars.W.Cast(Vars.W.GetPrediction(args.Sender).CastPosition);
             }
-            
+        }
+
+        /// <summary>
+        ///     Called on spellcast process.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="GameObjectProcessSpellCastEventArgs" /> instance containing the event data.</param>
+        public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe &&
+                (args.Target as AIHeroClient).LSIsValidTarget())
+            {
+                if (args.SData.Name.Equals("CaitlynHeadshotMissile") &&
+                    GameObjects.Player.HasBuff("caitlynheadshotrangecheck") &&
+                    (args.Target as AIHeroClient).HasBuff("caitlynyordletrapdebuff"))
+                {
+                    Orbwalker.ResetAutoAttack();
+                }
+            }
         }
     }
 }

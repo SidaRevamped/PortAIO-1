@@ -139,7 +139,8 @@ namespace ExorAIO.Champions.Sivir
                     case SpellDataTargetType.Self:
                     case SpellDataTargetType.LocationAoe:
 
-                        if (args.SData.Name.Equals("GangplankE") ||
+                        if (args.SData.Name.Equals("NasusE") ||
+                            args.SData.Name.Equals("GangplankE") ||
                             args.SData.Name.Equals("TrundleCircle") ||
                             args.SData.Name.Equals("TormentedSoil") ||
                             args.SData.Name.Equals("SwainDecrepify") ||

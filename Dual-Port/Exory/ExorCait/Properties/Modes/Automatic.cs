@@ -53,7 +53,7 @@ namespace ExorAIO.Champions.Caitlyn
                         Bools.IsImmobile(t) &&
                         !Invulnerable.Check(t) &&
                         t.LSIsValidTarget(Vars.Q.Range) &&
-                        t.HasBuff("caitlynyordletrapinternal")))
+                        t.HasBuff("caitlynyordletrapsight")))
                 {
                     Vars.Q.Cast(target.ServerPosition);
                 }

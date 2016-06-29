@@ -19,6 +19,7 @@ namespace ExorAIO.Champions.Caitlyn
             Events.OnGapCloser += Caitlyn.OnGapCloser;
             Events.OnInterruptableTarget += Caitlyn.OnInterruptableTarget;
             Obj_AI_Base.OnSpellCast += Caitlyn.OnDoCast;
+            Obj_AI_Base.OnProcessSpellCast += Caitlyn.OnProcessSpellCast;
         }
     }
 }
