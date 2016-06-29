@@ -81,7 +81,6 @@ namespace Azir_Creator_of_Elo
             }
             else
             {
-                azir.Orbwalk(Game.CursorPos);
                 var pos = Game.CursorPos.LSExtend(target.Position, Game.CursorPos.LSDistance(target.Position) - 250);
                 if (pos.LSDistance(azir.Hero.ServerPosition) <= 1300)
                 {

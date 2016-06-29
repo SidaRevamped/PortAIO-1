@@ -49,7 +49,7 @@ namespace Azir_Creator_of_Elo
             //      walker = new AzirWalker(Menu.GetMenu.SubMenu("Orbwalker"));
         }
 
-        public void Orbwalk(Vector3 pos, AIHeroClient target = null)
+        public void Orbwalk(Vector3 pos)
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, pos);
         }

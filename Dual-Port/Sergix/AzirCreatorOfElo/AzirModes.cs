@@ -32,6 +32,7 @@ namespace Azir_Creator_of_Elo
 
             if (Menu._jumpMenu["inseckey"].Cast<KeyBind>().CurrentValue)
             {
+                azir.Orbwalk(Game.CursorPos);
                 Insec(azir);
             }
         }
