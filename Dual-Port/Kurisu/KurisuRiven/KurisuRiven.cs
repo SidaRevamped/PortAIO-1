@@ -811,7 +811,7 @@ namespace KurisuRiven
 
                 if (IsLethal(target))
                 {
-                    if (canhd) return;
+                    //if (canhd) return;
                 }
 
                 if (getBoxItem(r2Menu, "wsmode") == 1 && IsLethal(target))
