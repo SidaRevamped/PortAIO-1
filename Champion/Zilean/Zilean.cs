@@ -417,14 +417,13 @@
 
                 if (getCheckBoxItem(comboMenu, "ElZilean.Combo.W"))
                 {
-                    W.Cast();
+                    Utility.DelayAction.Add(300, () => W.Cast());
                 }
             }
 
             if (getCheckBoxItem(comboMenu, "ElZilean.Combo.W") && getCheckBoxItem(comboMenu, "ElZilean.Combo.W2") && W.IsReady() && !Q.IsReady())
             {
-                if (Q.Instance.CooldownExpires - Game.Time < 3
-                    || HeroManager.Enemies.Any(x => x.Health > Q.GetDamage(x) && x.LSIsValidTarget(Q.Range)))
+                if (HeroManager.Enemies.Any(x => x.Health > Q.GetDamage(x) && x.LSIsValidTarget(Q.Range)))
                 {
                     return;
                 }
@@ -525,7 +524,7 @@
             {
                 if (getCheckBoxItem(harassMenu, "ElZilean.Harass.W"))
                 {
-                    W.Cast();
+                    Utility.DelayAction.Add(100, () => W.Cast());
                 }
             }
         }
