@@ -244,8 +244,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(bonusRange() + 60, DamageType.Physical);
             if (t.LSIsValidTarget())
             {
-                if (!FishBoneActive && (!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) > 2) &&
-                    Orbwalker.LastTarget == null)
+                if (!FishBoneActive && (!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) > 2) && Orbwalker.LastTarget == null)
                 {
                     var distance = GetRealDistance(t);
                     if (Program.Combo &&
@@ -270,6 +269,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 Q.Cast();
             }
+            Orbwalker.ForcedTarget = null;
         }
 
         private static void LogicW()

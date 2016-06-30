@@ -557,6 +557,7 @@ namespace Jinx_Genesis
                     }
                 }
             }
+            Orbwalker.ForcedTarget = null;
         }
 
         private static int CountMinionsInRange(float range, Vector3 pos)
