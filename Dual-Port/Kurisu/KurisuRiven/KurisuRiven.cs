@@ -131,15 +131,15 @@ namespace KurisuRiven
 
         private static void useinventoryitems(Obj_AI_Base target)
         {
-            if (Items.HasItem(3142) && Items.CanUseItem(3142))
-                Items.UseItem(3142);
+            if (Item.HasItem(3142) && Item.CanUseItem(3142))
+                Item.UseItem(3142);
 
             if (target.LSDistance(player.ServerPosition, true) <= 450 * 450)
             {
-                if (Items.HasItem(3144) && Items.CanUseItem(3144))
-                    Items.UseItem(3144, target);
-                if (Items.HasItem(3153) && Items.CanUseItem(3153))
-                    Items.UseItem(3153, target);
+                if (Item.HasItem(3144) && Item.CanUseItem(3144))
+                    Item.UseItem(3144, target);
+                if (Item.HasItem(3153) && Item.CanUseItem(3153))
+                    Item.UseItem(3153, target);
             }
         }
 
@@ -231,6 +231,11 @@ namespace KurisuRiven
         {
             Obj_AI_Base.OnSpellCast += (sender, args) =>
             {
+                if ((args.Slot == SpellSlot.W) && sender.IsMe)
+                {
+                    Orbwalker.ResetAutoAttack();
+                }
+
                 if (sender.IsMe && args.SData.IsAutoAttack())
                 {
                     if (Getkeybindvalue(keybindsMenu, "shycombo"))
@@ -253,12 +258,12 @@ namespace KurisuRiven
                         if (riventarget().LSIsValidTarget() && !riventarget().IsZombie &&
                            !riventarget().HasBuff("kindredrnodeathbuff"))
                         {
-                            if (Items.CanUseItem(3077))
-                                Items.UseItem(3077);
-                            if (Items.CanUseItem(3074))
-                                Items.UseItem(3074);
-                            if (Items.CanUseItem(3748))
-                                Items.UseItem(3748);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
                         }
                     }
 
@@ -297,12 +302,12 @@ namespace KurisuRiven
                         {
                             if (qtarg.NetworkId == riventarget().NetworkId)
                             {
-                                if (Items.CanUseItem(3077))
-                                    Items.UseItem(3077);
-                                if (Items.CanUseItem(3074))
-                                    Items.UseItem(3074);
-                                if (Items.CanUseItem(3748))
-                                    Items.UseItem(3748);
+                                if (Item.CanUseItem(3077))
+                                    Item.UseItem(3077);
+                                if (Item.CanUseItem(3074))
+                                    Item.UseItem(3074);
+                                if (Item.CanUseItem(3748))
+                                    Item.UseItem(3748);
                             }
                         }
                     }
@@ -321,20 +326,15 @@ namespace KurisuRiven
 
                             if (qtarg.IsValid<Obj_AI_Minion>() && !qtarg.Name.StartsWith("Minion"))
                             {
-                                if (Items.CanUseItem(3077))
-                                    Items.UseItem(3077);
-                                if (Items.CanUseItem(3074))
-                                    Items.UseItem(3074);
-                                if (Items.CanUseItem(3748))
-                                    Items.UseItem(3748);
+                                if (Item.CanUseItem(3077))
+                                    Item.UseItem(3077);
+                                if (Item.CanUseItem(3074))
+                                    Item.UseItem(3074);
+                                if (Item.CanUseItem(3748))
+                                    Item.UseItem(3748);
                             }
                         }
                     }
-                }
-
-                if (args.Slot == SpellSlot.W && sender.IsMe)
-                {
-                    Orbwalker.ResetAutoAttack();
                 }
 
                 if (sender.IsMe && args.SData.IsAutoAttack())
@@ -768,19 +768,19 @@ namespace KurisuRiven
 
                     if (!canburst() && canhd && uo)
                     {
-                        if (Items.CanUseItem(3077))
-                            Items.UseItem(3077);
-                        if (Items.CanUseItem(3074))
-                            Items.UseItem(3074);
+                        if (Item.CanUseItem(3077))
+                            Item.UseItem(3077);
+                        if (Item.CanUseItem(3074))
+                            Item.UseItem(3074);
                     }
                 }
 
                 if (!canburst() && canhd)
                 {
-                    if (Items.CanUseItem(3077))
-                        Items.UseItem(3077);
-                    if (Items.CanUseItem(3074))
-                        Items.UseItem(3074);
+                    if (Item.CanUseItem(3077))
+                        Item.UseItem(3077);
+                    if (Item.CanUseItem(3074))
+                        Item.UseItem(3074);
                 }
             }
 
@@ -1125,10 +1125,10 @@ namespace KurisuRiven
                 {
                     if (unit.LSDistance(player.ServerPosition) <= w.Range + 45)
                     {
-                        if (Items.CanUseItem(3077))
-                            Items.UseItem(3077);
-                        if (Items.CanUseItem(3074))
-                            Items.UseItem(3074);
+                        if (Item.CanUseItem(3077))
+                            Item.UseItem(3077);
+                        if (Item.CanUseItem(3074))
+                            Item.UseItem(3074);
                     }
                 }
 
@@ -1191,10 +1191,10 @@ namespace KurisuRiven
                     {
                         if (canw && Getcheckboxvalue(farmMenu, "uselanew"))
                         {
-                            if (Items.CanUseItem(3077))
-                                Items.UseItem(3077);
-                            if (Items.CanUseItem(3074))
-                                Items.UseItem(3074);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
 
                             w.Cast();
                         }
@@ -1247,7 +1247,7 @@ namespace KurisuRiven
                     if (Utils.GameTimeTickCount - lastwd >= 1000 && didq)
                     {
                         Utility.DelayAction.Add(100,
-                            () => Items.UseItem((int)Items.GetWardSlot().Id, attacker.ServerPosition));
+                            () => Item.UseItem((int)Items.GetWardSlot().Id, attacker.ServerPosition));
                     }
                 }
             }
@@ -1870,23 +1870,23 @@ namespace KurisuRiven
                 ? player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite)
                 : 0);
 
-            var tmt = Items.HasItem(3077) && Items.CanUseItem(3077)
+            var tmt = Item.HasItem(3077) && Item.CanUseItem(3077)
                 ? player.GetItemDamage(target, Damage.DamageItems.Tiamat)
                 : 0;
 
-            var hyd = Items.HasItem(3074) && Items.CanUseItem(3074)
+            var hyd = Item.HasItem(3074) && Item.CanUseItem(3074)
                 ? player.GetItemDamage(target, Damage.DamageItems.Hydra)
                 : 0;
 
-            var tdh = Items.HasItem(3748) && Items.CanUseItem(3748)
+            var tdh = Item.HasItem(3748) && Item.CanUseItem(3748)
                 ? player.GetItemDamage(target, Damage.DamageItems.Hydra)
                 : 0;
 
-            var bwc = Items.HasItem(3144) && Items.CanUseItem(3144)
+            var bwc = Item.HasItem(3144) && Item.CanUseItem(3144)
                 ? player.GetItemDamage(target, Damage.DamageItems.Bilgewater)
                 : 0;
 
-            var brk = Items.HasItem(3153) && Items.CanUseItem(3153)
+            var brk = Item.HasItem(3153) && Item.CanUseItem(3153)
                 ? player.GetItemDamage(target, Damage.DamageItems.Botrk)
                 : 0;
 
