@@ -475,7 +475,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[63]))
                 {
-                    Miscc.Add("jinx", new ComboBox("Use addon for Jinx : ", 0, "OKTW", "Marksman II", "GENESIS Jinx"));
+                    Miscc.Add("jinx", new ComboBox("Use addon for Jinx : ", 0, "OKTW", "Marksman II", "GENESIS Jinx", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[64]))
                 {

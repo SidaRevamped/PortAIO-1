@@ -25,6 +25,7 @@ using ExorAIO.Champions.MissFortune;
 using ExorAIO.Utilities;
 using LeagueSharp;
 using LeagueSharp.SDK;
+using ExorAIO.Champions.Jinx;
 
 namespace ExorAIO.Core
 {
@@ -114,6 +115,9 @@ namespace ExorAIO.Core
                     break;
                 case "MissFortune":
                     new MissFortune().OnLoad();
+                    break;
+                case "Jinx":
+                    new Jinx().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
