@@ -128,26 +128,6 @@ namespace Marksman.Champions
 
         public override void Game_OnGameUpdate(EventArgs args)
         {
-            //var t1 = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Physical);
-            //if (t1.LSIsValidTarget())
-            //{
-            //    if (t1.IsFacing(ObjectManager.Player))
-            //    {
-            //        Console.WriteLine("--> Face " + t1.ChampionName);
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine(t1.ChampionName + " <-- Back");
-            //    }
-            //}
-            /*
-            var x = HeroManager.Enemies.Find(e => !e.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null)) && e.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + QAddRange));
-            if (x != null && !FishBoneActive && Q.IsReady())
-            {
-                Q.Cast();
-                Program.ChampionClass.Orbwalker.ForceTarget(x);
-            }
-            */
             if (Q.IsReady() && Program.misc["SwapDistance"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 var activeQ = ObjectManager.Player.Spellbook.GetSpell(SpellSlot.Q).Level * 25 + 650;
@@ -158,7 +138,6 @@ namespace Marksman.Champions
                     if (!FishBoneActive)
                     {
                         Q.Cast();
-                        Orbwalker.ForcedTarget = t;
                         return;
                     }
                 }
