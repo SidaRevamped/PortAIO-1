@@ -1442,7 +1442,7 @@ namespace EvadeSharp
                 var heropos = Drawing.WorldToScreen(ObjectManager.Player.Position);
                 if (getKeyBindItem(Config.Menu, "Enabled"))
                 {
-                    Drawing.DrawText(heropos.X, heropos.Y, Color.Red, "Evade: ON");
+                    Drawing.DrawText(heropos.X, heropos.Y, Color.White, "Evade: ON");
                 }
             }
 
