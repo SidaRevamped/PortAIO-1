@@ -517,7 +517,7 @@
                        .OrderByDescending(x => x.LSDistance(ObjectManager.Player))
                        .FirstOrDefault();
 
-                if (bestMinion != null && ObjectManager.Player.LSIsFacing(bestMinion) && Q.IsReady() && Q.GetDamage(bestMinion) > bestMinion.Health)
+                if (bestMinion != null && ObjectManager.Player.LSIsFacing(bestMinion) && getCheckBoxItem(fleeMenu, "FleeQ") && Q.IsReady() && Q.GetDamage(bestMinion) > bestMinion.Health)
                 {
                     Q.CastOnUnit(bestMinion, true);
                 }
@@ -831,7 +831,7 @@
 
             // Flee
             fleeMenu = Menu.AddSubMenu("Flee Settimgs", "cmFlee");
-            fleeMenu.Add("FleeQ1", new CheckBox("Use Q only if minion is killable"));
+            fleeMenu.Add("FleeQ", new CheckBox("Use Q"));
             fleeMenu.Add("FleeE", new CheckBox("Use E"));
             fleeMenu.Add("FleeR", new CheckBox("Use R", false));
 
