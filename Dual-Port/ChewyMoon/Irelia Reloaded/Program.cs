@@ -497,33 +497,30 @@
 
                     R.Cast(rprediction.CastPosition);
                 }
-
-                if (Q.IsReady() && getCheckBoxItem(fleeMenu, "FleeQ"))
-                {
-                    var target =
-                        HeroManager.Enemies
-                            .FindAll(
-                                enemy =>
-                                    enemy.LSIsValidTarget() && Player.LSDistance(enemy.Position) <= R.Range)
-                            .MinOrDefault(e => e.LSDistance(Player) <= R.Range);
-
-                    if (target == null) goto WALK;
-
-                    var qminion =
-                        MinionManager
-                            .GetMinions(Q.Range, MinionTypes.All, MinionTeam.NotAlly)
-                            .Where(
-                                m =>
-                                    m.LSIsValidTarget(Q.Range) &&
-                                    m.LSDistance(target) > Player.LSDistance(target))
-                            .MaxOrDefault(m => m.LSDistance(target));
-
-                    if (qminion != null)
-                        Q.CastOnUnit(qminion);
-                }
-
                 WALK:
                 Orbwalker.MoveTo(Game.CursorPos);
+            }
+
+            Flee();
+        }
+
+
+        public static void Flee()
+        {
+            var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range);
+            if (Q.IsReady())
+            {
+                var bestMinion =
+                   ObjectManager.Get<Obj_AI_Base>()
+                       .Where(x => x.LSIsValidTarget(Q.Range))
+                       .Where(x => x.LSDistance(Game.CursorPos) < ObjectManager.Player.LSDistance(Game.CursorPos))
+                       .OrderByDescending(x => x.LSDistance(ObjectManager.Player))
+                       .FirstOrDefault();
+
+                if (bestMinion != null && ObjectManager.Player.LSIsFacing(bestMinion) && Q.IsReady() && Q.GetDamage(bestMinion) > bestMinion.Health)
+                {
+                    Q.CastOnUnit(bestMinion, true);
+                }
             }
         }
 
@@ -834,7 +831,7 @@
 
             // Flee
             fleeMenu = Menu.AddSubMenu("Flee Settimgs", "cmFlee");
-            fleeMenu.Add("FleeQ", new CheckBox("Use Q"));
+            fleeMenu.Add("FleeQ1", new CheckBox("Use Q only if minion is killable"));
             fleeMenu.Add("FleeE", new CheckBox("Use E"));
             fleeMenu.Add("FleeR", new CheckBox("Use R", false));
 
