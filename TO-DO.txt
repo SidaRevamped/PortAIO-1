@@ -1,5 +1,4 @@
 ﻿-To-Do
-EzEvade Problem (tired of fixing up the evade addons. if something goes wrong just remove it, it doesn't work the same as L# anyways and theres to much code to look at)
 iLucian Q Orbwalker problem
 YasuoPro Evade
 Slutty Ryze Crash
