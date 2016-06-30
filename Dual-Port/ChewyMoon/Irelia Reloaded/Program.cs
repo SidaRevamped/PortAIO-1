@@ -467,6 +467,64 @@
             {
                 Harass();
             }
+
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
+            {
+                if (E.IsReady() && getCheckBoxItem(fleeMenu, "FleeE"))
+                {
+                    var etarget =
+                        HeroManager.Enemies
+                            .FindAll(
+                                enemy =>
+                                    enemy.LSIsValidTarget() && Player.LSDistance(enemy.Position) <= E.Range)
+                            .OrderBy(e => e.LSDistance(Player));
+
+                    if (etarget.FirstOrDefault() != null)
+                        E.CastOnUnit(etarget.FirstOrDefault());
+                }
+
+                if (R.IsReady() && getCheckBoxItem(fleeMenu, "FleeR"))
+                {
+                    var rtarget =
+                        HeroManager.Enemies
+                            .FindAll(
+                                enemy =>
+                                    enemy.LSIsValidTarget() && Player.LSDistance(enemy.Position) <= R.Range)
+                            .OrderBy(e => e.LSDistance(Player));
+                    if (rtarget.FirstOrDefault() == null) goto WALK;
+                    var rprediction = LeagueSharp.Common.Prediction.GetPrediction(rtarget.FirstOrDefault(), R.Delay,
+                        R.Width, R.Speed);
+
+                    R.Cast(rprediction.CastPosition);
+                }
+
+                if (Q.IsReady() && getCheckBoxItem(fleeMenu, "FleeQ"))
+                {
+                    var target =
+                        HeroManager.Enemies
+                            .FindAll(
+                                enemy =>
+                                    enemy.LSIsValidTarget() && Player.LSDistance(enemy.Position) <= R.Range)
+                            .MinOrDefault(e => e.LSDistance(Player) <= R.Range);
+
+                    if (target == null) goto WALK;
+
+                    var qminion =
+                        MinionManager
+                            .GetMinions(Q.Range, MinionTypes.All, MinionTeam.NotAlly)
+                            .Where(
+                                m =>
+                                    m.LSIsValidTarget(Q.Range) &&
+                                    m.LSDistance(target) > Player.LSDistance(target))
+                            .MaxOrDefault(m => m.LSDistance(target));
+
+                    if (qminion != null)
+                        Q.CastOnUnit(qminion);
+                }
+
+                WALK:
+                Orbwalker.MoveTo(Game.CursorPos);
+            }
         }
 
         private static void Harass()
@@ -692,7 +750,7 @@
             return m[item].Cast<ComboBox>().CurrentValue;
         }
 
-        public static Menu comboMenu, harassMenu, ksMenu, lastHitMenu, waveClearMenu, jungleClearMenu, drawMenu, miscMenu;
+        public static Menu comboMenu, harassMenu, ksMenu, lastHitMenu, waveClearMenu, jungleClearMenu, drawMenu, miscMenu, fleeMenu;
 
         /// <summary>
         ///     Setups the menu.
@@ -773,6 +831,13 @@
             miscMenu.Add("interruptE", new CheckBox("E to Interrupt"));
             miscMenu.Add("interruptQE", new CheckBox("Use Q & E to Interrupt"));
             miscMenu.Add("gapcloserE", new CheckBox("Use E on Gapcloser"));
+
+            // Flee
+            fleeMenu = Menu.AddSubMenu("Flee Settimgs", "cmFlee");
+            fleeMenu.Add("FleeQ", new CheckBox("Use Q"));
+            fleeMenu.Add("FleeE", new CheckBox("Use E"));
+            fleeMenu.Add("FleeR", new CheckBox("Use R", false));
+
         }
 
         /// <summary>
