@@ -14,7 +14,6 @@ namespace Azir_Creator_of_Elo
     class JumpLogic
     {
         AzirMain azir;
-        Obj_AI_Minion soldier;
 
         public JumpLogic(AzirMain azir)
         {
