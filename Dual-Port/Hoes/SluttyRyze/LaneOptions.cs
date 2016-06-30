@@ -35,7 +35,7 @@ namespace Slutty_ryze
             return m[item].Cast<ComboBox>().CurrentValue;
         }
 
-        private static bool QSpell  { get { return getCheckBoxItem(MenuManager.combo1Menu, "useQ"); } }
+        private static bool QSpell { get { return getCheckBoxItem(MenuManager.combo1Menu, "useQ"); } }
         private static bool ESpell { get { return getCheckBoxItem(MenuManager.combo1Menu, "useE"); } }
         private static bool WSpell { get { return getCheckBoxItem(MenuManager.combo1Menu, "useW"); } }
         private static bool RSpell { get { return getCheckBoxItem(MenuManager.combo1Menu, "useR"); } }
@@ -98,7 +98,7 @@ namespace Slutty_ryze
                 MinionTeam.NotAlly);
             if (GlobalManager.GetHero.ManaPercent <= minMana)
                 return;
-            
+
             foreach (var minion in minionCount)
             {
                 if (!GlobalManager.CheckMinion(minion)) continue;
@@ -144,7 +144,7 @@ namespace Slutty_ryze
             //Convert to use new system later
             var mSlider = getSliderItem(MenuManager.jungleMenu, "useJM");
 
-          //  if (GlobalManager.GetHero.ManaPercent < mSlider)
+            //  if (GlobalManager.GetHero.ManaPercent < mSlider)
             //    return;
 
 
@@ -260,7 +260,7 @@ namespace Slutty_ryze
                     Champion.Q.Cast(minion);
                 }
             }
-#endregion
+            #endregion
 
 
         }
@@ -498,17 +498,21 @@ namespace Slutty_ryze
             }
         }
 
-        public static
-            void ImprovedCombo()
+        public static void ImprovedCombo()
         {
-            Champion.SetIgniteSlot(GlobalManager.GetHero.GetSpellSlot("summonerdot"));
+            if (GlobalManager.GetHero.GetSpellSlot("summonerdot") == SpellSlot.Summoner1 || GlobalManager.GetHero.GetSpellSlot("summonerdot") == SpellSlot.Summoner2)
+            {
+                Champion.SetIgniteSlot(GlobalManager.GetHero.GetSpellSlot("summonerdot"));
+            }
             var target = TargetSelector.GetTarget(Champion.W.Range, DamageType.Magical);
 
             if (!target.LSIsValidTarget(Champion.Q.Range) || !GlobalManager.CheckTarget(target)) return;
 
-            if (target.LSIsValidTarget(Champion.W.Range) &&
-                (target.Health < Champion.IgniteDamage(target) + Champion.W.GetDamage(target)))
-                GlobalManager.GetHero.Spellbook.CastSpell(Champion.GetIgniteSlot(), target);
+            if (GlobalManager.GetHero.GetSpellSlot("summonerdot") == SpellSlot.Summoner1 || GlobalManager.GetHero.GetSpellSlot("summonerdot") == SpellSlot.Summoner2)
+            {
+                if (target.LSIsValidTarget(Champion.W.Range) && (target.Health < Champion.IgniteDamage(target) + Champion.W.GetDamage(target)))
+                    GlobalManager.GetHero.Spellbook.CastSpell(Champion.GetIgniteSlot(), target);
+            }
 
             var bSpells = new bool[5];
             var qSpell = getCheckBoxItem(MenuManager.combo1Menu, "useQ");
