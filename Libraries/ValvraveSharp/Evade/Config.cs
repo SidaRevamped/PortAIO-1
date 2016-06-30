@@ -40,6 +40,8 @@
 
         public static void CreateMenu(Menu mainMenu)
         {
+            SpellDatabase.Init();
+
             evadeMenu = mainMenu.AddSubMenu("Evade", "Evade Skillshot");
 
             evadeMenu.AddGroupLabel("Settings ::::::::::::::::::::::");
