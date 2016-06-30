@@ -63,7 +63,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.W)
+            if (args.Slot == SpellSlot.W && getCheckBoxItem(wMenu, "overrideW"))
             {
                 if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.LSDistance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower())))
                     args.Process = false;
@@ -92,6 +92,7 @@ namespace OneKeyToWin_AIO_Sebby
             qMenu.Add("autoQ", new CheckBox("Reduce Q use", true));
 
             wMenu = Config.AddSubMenu("W Config");
+            wMenu.Add("overrideW", new CheckBox("Override Manual W?", true));
             wMenu.Add("autoW", new CheckBox("Auto W on hard CC", true));
             wMenu.Add("telE", new CheckBox("Auto W teleport", true));
             wMenu.Add("bushW", new CheckBox("Auto W bush after enemy enter", true));
