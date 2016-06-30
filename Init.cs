@@ -29,7 +29,7 @@ namespace PortAIO
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            if ((!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen) && Orbwalker.ForcedTarget != null)
+            if ((!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.LSDistance(Orbwalker.ForcedTarget) > ObjectManager.Player.GetAutoAttackRange()) && Orbwalker.ForcedTarget != null)
             {
                 Orbwalker.ForcedTarget = null;
             }
