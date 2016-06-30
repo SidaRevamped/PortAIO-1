@@ -64,6 +64,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             rMenu = Config.AddSubMenu("R Config");
             rMenu.Add("autoR", new CheckBox("Auto R"));
+            rMenu.Add("preventRCast", new CheckBox("Allow manual R'ing", false));
             rMenu.Add("useR", new KeyBind("Fast combo key", false, KeyBind.BindTypes.HoldActive, 'T')); //32 == space
             foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
                 rMenu.Add("gapcloser" + enemy.NetworkId, new CheckBox("Gapclose : " + enemy.ChampionName, false));
@@ -90,7 +91,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.R)
+            if (args.Slot == SpellSlot.R && sender.Owner.IsMe && !getCheckBoxItem(rMenu, "preventRCast"))
             {
                 var t = TargetSelector.GetTarget(R.Range - 20, DamageType.Magical);
 
