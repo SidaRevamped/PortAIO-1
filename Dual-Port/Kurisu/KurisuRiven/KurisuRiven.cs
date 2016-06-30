@@ -1153,8 +1153,6 @@ namespace KurisuRiven
                 {
                     if (unit.LSDistance(player.ServerPosition) <= q.Range + 90)
                     {
-                        if (canhd) return;
-
                         if (qtarg != null && qtarg.NetworkId == unit.NetworkId)
                             q.Cast(unit.ServerPosition);
                     }

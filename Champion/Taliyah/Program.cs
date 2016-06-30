@@ -269,6 +269,7 @@ namespace Taliyah
 
         private static void CheckKeyBindings()
         {
+            Orbwalker.OrbwalkTo(Game.CursorPos);
             if (!pull_push_enemy && TargetSelector.SelectedTarget != null && TargetSelector.SelectedTarget.IsValidTarget(W.Range))
             {
                 Vector3 push_position = ObjectManager.Player.ServerPosition;
