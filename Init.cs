@@ -999,6 +999,9 @@ namespace PortAIO
                             case 3:
                                 HastaKalistaBaby.Program.OnGameLoad();
                                 break;
+                            case 4:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 Marksman.Program.Game_OnGameLoad();
                                 break;

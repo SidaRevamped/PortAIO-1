@@ -26,6 +26,7 @@ using ExorAIO.Utilities;
 using LeagueSharp;
 using LeagueSharp.SDK;
 using ExorAIO.Champions.Jinx;
+using ExorAIO.Champions.Kalista;
 
 namespace ExorAIO.Core
 {
@@ -118,6 +119,9 @@ namespace ExorAIO.Core
                     break;
                 case "Jinx":
                     new Jinx().OnLoad();
+                    break;
+                case "Kalista":
+                    new Kalista().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
