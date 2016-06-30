@@ -227,7 +227,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[1]))
                 {
-                    Miscc.Add("kogmaw", new ComboBox("Use addon for Kog'Maw : ", 0, "Sharpshooter", "ChallengerSeries", "OKTW", "Marksman II"));
+                    Miscc.Add("kogmaw", new ComboBox("Use addon for Kog'Maw : ", 0, "Sharpshooter", "ChallengerSeries", "OKTW", "Marksman II", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[2]))
                 {

@@ -1110,6 +1110,9 @@ namespace PortAIO
                             case 3:
                                 Marksman.Program.Game_OnGameLoad();
                                 break;
+                            case 4:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 Challenger_Series.Program.Main();
                                 break;

@@ -17,7 +17,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the menu for the Q Whitelist.
             /// </summary>
-            Vars.QMenu = Vars.Menu.AddSubMenu("q", "Use Q to:");
+            Vars.QMenu = Vars.Menu.AddSubMenu("Use Q to:");
             {
                 Vars.QMenu.Add("combo", new CheckBox("Combo", true));
                 Vars.QMenu.Add("killsteal", new CheckBox("KillSteal", true));
@@ -28,7 +28,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the menu for the W Whitelist.
             /// </summary>
-            Vars.WMenu = Vars.Menu.AddSubMenu("w", "Use W to:");
+            Vars.WMenu = Vars.Menu.AddSubMenu("Use W to:");
             {
                 Vars.WMenu.Add("logical", new Slider("Logical / if Mana >= x%", 50, 0, 101));
             }
@@ -36,7 +36,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the menu for the E Whitelist.
             /// </summary>
-            Vars.EMenu = Vars.Menu.AddSubMenu("e", "Use E to:");
+            Vars.EMenu = Vars.Menu.AddSubMenu("Use E to:");
             {
                 Vars.EMenu.Add("killsteal", new CheckBox("KillSteal", true));
                 Vars.EMenu.Add("junglesteal", new CheckBox("JungleSteal", true));
@@ -48,7 +48,7 @@ namespace ExorAIO.Champions.Kalista
                     /// <summary>
                     ///     Sets the menu for the E Whitelist.
                     /// </summary>
-                    Vars.WhiteListMenu = Vars.Menu.AddSubMenu("whitelist", "Minion Harass: Whitelist");
+                    Vars.WhiteListMenu = Vars.Menu.AddSubMenu("Minion Harass: Whitelist");
                     {
                         foreach (var target in GameObjects.EnemyHeroes)
                         {
@@ -61,7 +61,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the menu for the R Whitelist.
             /// </summary>
-            Vars.RMenu = Vars.Menu.AddSubMenu("r", "Use R to:");
+            Vars.RMenu = Vars.Menu.AddSubMenu("Use R to:");
             {
                 Vars.RMenu.Add("lifesaver", new CheckBox("Lifesaver", true));
             }
@@ -69,7 +69,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the miscellaneous menu.
             /// </summary>
-            Vars.MiscMenu = Vars.Menu.AddSubMenu("miscellaneous", "Miscellaneous");
+            Vars.MiscMenu = Vars.Menu.AddSubMenu("Miscellaneous");
             {
                 Vars.MiscMenu.Add("minionsorbwalk", new CheckBox("Orbwalk on Minions in Combo", true));
             }
@@ -77,7 +77,7 @@ namespace ExorAIO.Champions.Kalista
             /// <summary>
             ///     Sets the drawings menu.
             /// </summary>
-            Vars.DrawingsMenu = Vars.Menu.AddSubMenu("drawings", "Drawings");
+            Vars.DrawingsMenu = Vars.Menu.AddSubMenu("Drawings");
             {
                 Vars.DrawingsMenu.Add("q", new CheckBox("Q Range"));
                 Vars.DrawingsMenu.Add("e", new CheckBox("E Range"));

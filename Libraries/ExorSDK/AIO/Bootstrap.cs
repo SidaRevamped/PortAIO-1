@@ -27,6 +27,7 @@ using LeagueSharp;
 using LeagueSharp.SDK;
 using ExorAIO.Champions.Jinx;
 using ExorAIO.Champions.Kalista;
+using ExorAIO.Champions.KogMaw;
 
 namespace ExorAIO.Core
 {
@@ -122,6 +123,9 @@ namespace ExorAIO.Core
                     break;
                 case "Kalista":
                     new Kalista().OnLoad();
+                    break;
+                case "KogMaw":
+                    new ExorAIO.Champions.KogMaw.KogMaw().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
