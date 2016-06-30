@@ -24,11 +24,15 @@ namespace PortAIO
         private static void Main()
         {
             Loading.OnLoadingComplete += Initialize;
+            Game.OnUpdate += Game_OnUpdate;
         }
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            //Console.WriteLine(Orbwalker.ActiveModesFlags.ToString());
+            if ((!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen) && Orbwalker.ForcedTarget != null)
+            {
+                Orbwalker.ForcedTarget = null;
+            }
         }
 
         //private static LeagueSharp.Common.Render.Sprite Intro;
