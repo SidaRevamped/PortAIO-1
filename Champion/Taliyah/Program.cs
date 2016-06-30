@@ -269,13 +269,13 @@ namespace Taliyah
 
         private static void CheckKeyBindings()
         {
-            Orbwalker.OrbwalkTo(Game.CursorPos);
             if (!pull_push_enemy && TargetSelector.SelectedTarget != null && TargetSelector.SelectedTarget.IsValidTarget(W.Range))
             {
                 Vector3 push_position = ObjectManager.Player.ServerPosition;
 
                 if (main_menu["taliyah.pullenemy"].Cast<KeyBind>().CurrentValue || main_menu["taliyah.pushenemy"].Cast<KeyBind>().CurrentValue)
                 {
+                    Orbwalker.OrbwalkTo(Game.CursorPos);
                     if (main_menu["taliyah.pushenemy"].Cast<KeyBind>().CurrentValue)
                     {
                         if (selectedGObj != null && selectedGObj.Distance(ObjectManager.Player) < 1000)
