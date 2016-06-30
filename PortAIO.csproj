@@ -500,7 +500,6 @@
     <Compile Include="Dual-Port\Nathan\ElEkko\Drawings.cs" />
     <Compile Include="Dual-Port\Nathan\ElEkko\ElEkko.cs" />
     <Compile Include="Dual-Port\Nathan\ElEkko\ElEkkoMenu.cs" />
-    <Compile Include="Dual-Port\Nathan\ElEkko\Program.cs" />
     <Compile Include="Dual-Port\Nathan\ElLux\ElLux.cs" />
     <Compile Include="Dual-Port\Nathan\ElLux\ElLuxMenu.cs" />
     <Compile Include="Dual-Port\Nathan\ElLux\Program.cs" />

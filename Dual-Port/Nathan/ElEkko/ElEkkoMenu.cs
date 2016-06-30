@@ -56,9 +56,9 @@ namespace ElEkko
 
             Misc = Config.AddSubMenu("Misc", "Misc && Draws");
             Misc.Add("ElEkko.R.text", new CheckBox("Display how many people in R"));
-            Misc.Add("ElEkko.Draw.off", new CheckBox("Turn drawings off",false));
+            Misc.Add("ElEkko.Draw.off", new CheckBox("Turn drawings off", false));
             Misc.Add("ElEkko.Draw.Q", new CheckBox("Draw Q"));
-            Misc.Add("ElEkko.Draw.W", new CheckBox("Draw E"));
+            Misc.Add("ElEkko.Draw.E", new CheckBox("Draw E"));
             Misc.Add("ElEkko.Draw.R", new CheckBox("Draw R"));
             Misc.Add("ElEkko.DrawComboDamage", new CheckBox("Draw combo damage"));
 
