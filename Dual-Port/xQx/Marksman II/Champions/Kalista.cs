@@ -150,7 +150,7 @@ namespace Marksman.Champions
             var killableMinionCount = 0;
             foreach (var m in
                 MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range)
-                    .Where(x => E.CanCast(x) && x.Health < E.GetDamage(x)))
+                    .Where(x => E.CanCast(x) && x.Health < EDamage(x)))
             {
                 if (m.BaseSkinName.ToLower() == "sru_chaosminionsiege" || m.BaseSkinName.ToLower() == "sru_chaosminionsuper")
                     killableMinionCount += 2;
@@ -164,7 +164,7 @@ namespace Marksman.Champions
                     ObjectManager.Player.ServerPosition,
                     E.Range,
                     MinionTypes.All,
-                    MinionTeam.Neutral).Where(m => E.CanCast(m) && m.Health < E.GetDamage(m)))
+                    MinionTeam.Neutral).Where(m => E.CanCast(m) && m.Health < EDamage(m)))
             {
                 if (m.BaseSkinName.ToLower().Contains("baron") || m.BaseSkinName.ToLower().Contains("dragon") && E.CanCast(m))
                     E.Cast(m);
@@ -277,9 +277,73 @@ namespace Marksman.Champions
             }
         }
 
+        private static float EDamage(Obj_AI_Base target)
+        {
+            if (target.IsMinion || target.IsMonster)
+            {
+                int stacksMin = GetMinionStacks(target);
+                var indexMin = E.Level - 1;
+
+                var EDamageMinion = new float[] { 20, 30, 40, 50, 60 }[indexMin] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+
+                if (stacksMin > 1)
+                {
+                    EDamageMinion += ((new float[] { 10, 14, 19, 25, 32 }[indexMin] + (new float[] { 0.2f, 0.225f, 0.25f, 0.275f, 0.3f }[indexMin] * ObjectManager.Player.TotalAttackDamage)) * (stacksMin - 1));
+                }
+
+                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageMinion) * 0.9f;
+            }
+            else
+            {
+                if (GetStacks(target) == 0) return 0;
+
+                int stacksChamps = GetStacks(target);
+                var indexChamp = E.Level - 1;
+
+                var EDamageChamp = new[] { 0, 20, 30, 40, 50, 60 }[indexChamp] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+
+                if (stacksChamps > 1)
+                {
+                    EDamageChamp += ((new[] { 0, 10, 14, 19, 25, 32 }[indexChamp] + (new[] { 0, 0.2, 0.225, 0.25, 0.275, 0.3 }[indexChamp] * ObjectManager.Player.TotalAttackDamage)) * (stacksChamps - 1));
+                }
+
+                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageChamp);
+            }
+        }
+
+        private static int GetMinionStacks(Obj_AI_Base minion)
+        {
+            int stacks = 0;
+            foreach (var rendbuff in minion.Buffs.Where(x => x.Name.ToLower().Contains("kalistaexpungemarker")))
+            {
+                stacks = rendbuff.Count;
+            }
+
+            if (stacks == 0 || !minion.HasBuff("kalistaexpungemarker")) return 0;
+            return stacks;
+        }
+
+        private static int GetStacks(Obj_AI_Base target)
+        {
+            int stacks = 0;
+
+            if (target.HasBuff("kalistaexpungemarker"))
+            {
+                foreach (var rendbuff in target.Buffs.Where(x => x.Name.ToLower().Contains("kalistaexpungemarker")))
+                {
+                    stacks = rendbuff.Count;
+                }
+            }
+            else
+            {
+                return 0;
+            }
+            return stacks;
+        }
+
         private static float GetEDamage(Obj_AI_Base t)
         {
-            return E.IsReady() && E.CanCast(t) ? E.GetDamage(t) : 0;
+            return E.IsReady() && E.CanCast(t) ? EDamage(t) : 0;
         }
 
         public override void Game_OnGameUpdate(EventArgs args)
@@ -290,7 +354,7 @@ namespace Marksman.Champions
             {
                 foreach (var b in e.Buffs.Where(buff => buff.Name.Contains("kalistaexpungemarker")))
                 {
-                    if (E.IsReady() && e.Health < GetEDamage(e))
+                    if (E.IsReady() && e.Health < EDamage(e))
                     {
                         E.Cast();
                     }
@@ -348,8 +412,8 @@ namespace Marksman.Champions
 
             if (args.Slot == SpellSlot.E)
             {
-                var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range).Find(m => m.Health < E.GetDamage(m) + 10 && E.CanCast(m) && E.Cooldown < 0.0001);
-                var enemy = HeroManager.Enemies.Find(e => e.Buffs.Any(b => b.Name.ToLower() == kalistaEBuffName && e.LSIsValidTarget(E.Range) && e.Health < E.GetDamage(e)));
+                var minion = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range).Find(m => m.Health < EDamage(m) + 10 && E.CanCast(m) && E.Cooldown < 0.0001);
+                var enemy = HeroManager.Enemies.Find(e => e.Buffs.Any(b => b.Name.ToLower() == kalistaEBuffName && e.LSIsValidTarget(E.Range) && e.Health < EDamage(e)));
                 if (enemy == null && minion == null)
                 {
                     //args.Process = false;
@@ -535,7 +599,7 @@ namespace Marksman.Champions
                         ? Utils.Utils.MobTypes.All
                         : Utils.Utils.MobTypes.BigBoys);
 
-                if (jungleMobs != null && E.CanCast(jungleMobs) && jungleMobs.Health < E.GetDamage(jungleMobs))
+                if (jungleMobs != null && E.CanCast(jungleMobs) && jungleMobs.Health < EDamage(jungleMobs))
                     E.CastOnUnit(jungleMobs);
             }
         }
@@ -630,7 +694,7 @@ namespace Marksman.Champions
                     var killableMinionCount = 0;
                     foreach (var m in
                         MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range)
-                            .Where(x => E.CanCast(x) && x.Health < E.GetDamage(x)))
+                            .Where(x => E.CanCast(x) && x.Health < EDamage(x)))
                     {
                         if (m.BaseSkinName.ToLower().Contains("siege") || m.BaseSkinName.ToLower().Contains("super"))
                         {
@@ -661,7 +725,7 @@ namespace Marksman.Champions
                         Game.Ping / 2 + 100);
                     if (xH < 0)
                     {
-                        if (n.Health < E.GetDamage(n) && E.CanCast(n))
+                        if (n.Health < EDamage(n) && E.CanCast(n))
                         {
                             E.Cast(n);
                         }
@@ -703,7 +767,7 @@ namespace Marksman.Champions
             {
                 var minion =
                     MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range)
-                        .Find(m => m.Health < E.GetDamage(m) + 10 && E.CanCast(m) && E.Cooldown < 0.0001);
+                        .Find(m => m.Health < EDamage(m) + 10 && E.CanCast(m) && E.Cooldown < 0.0001);
                 var enemy =
                     HeroManager.Enemies.Find(
                         e => e.Buffs.Any(b => b.Name.ToLower() == kalistaEBuffName && e.LSIsValidTarget(E.Range)));
@@ -722,6 +786,70 @@ namespace Marksman.Champions
         private static readonly float[] RawRendDamage = { 20, 30, 40, 50, 60 };
         private static readonly float[] RawRendDamagePerSpear = { 10, 14, 19, 25, 32 };
         private static readonly float[] RawRendDamagePerSpearMultiplier = { 0.2f, 0.225f, 0.25f, 0.275f, 0.3f };
+
+        private static float EDamage(Obj_AI_Base target)
+        {
+            if (target.IsMinion || target.IsMonster)
+            {
+                int stacksMin = GetMinionStacks(target);
+                var indexMin = Kalista.E.Level - 1;
+
+                var EDamageMinion = new float[] { 20, 30, 40, 50, 60 }[indexMin] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+
+                if (stacksMin > 1)
+                {
+                    EDamageMinion += ((new float[] { 10, 14, 19, 25, 32 }[indexMin] + (new float[] { 0.2f, 0.225f, 0.25f, 0.275f, 0.3f }[indexMin] * ObjectManager.Player.TotalAttackDamage)) * (stacksMin - 1));
+                }
+
+                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageMinion) * 0.9f;
+            }
+            else
+            {
+                if (GetStacks(target) == 0) return 0;
+
+                int stacksChamps = GetStacks(target);
+                var indexChamp = Kalista.E.Level - 1;
+
+                var EDamageChamp = new[] { 0, 20, 30, 40, 50, 60 }[indexChamp] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+
+                if (stacksChamps > 1)
+                {
+                    EDamageChamp += ((new[] { 0, 10, 14, 19, 25, 32 }[indexChamp] + (new[] { 0, 0.2, 0.225, 0.25, 0.275, 0.3 }[indexChamp] * ObjectManager.Player.TotalAttackDamage)) * (stacksChamps - 1));
+                }
+
+                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageChamp);
+            }
+        }
+
+        private static int GetMinionStacks(Obj_AI_Base minion)
+        {
+            int stacks = 0;
+            foreach (var rendbuff in minion.Buffs.Where(x => x.Name.ToLower().Contains("kalistaexpungemarker")))
+            {
+                stacks = rendbuff.Count;
+            }
+
+            if (stacks == 0 || !minion.HasBuff("kalistaexpungemarker")) return 0;
+            return stacks;
+        }
+
+        private static int GetStacks(Obj_AI_Base target)
+        {
+            int stacks = 0;
+
+            if (target.HasBuff("kalistaexpungemarker"))
+            {
+                foreach (var rendbuff in target.Buffs.Where(x => x.Name.ToLower().Contains("kalistaexpungemarker")))
+                {
+                    stacks = rendbuff.Count;
+                }
+            }
+            else
+            {
+                return 0;
+            }
+            return stacks;
+        }
 
         static Damages()
         {
@@ -759,12 +887,7 @@ namespace Marksman.Champions
                 }
             }
 
-            Console.WriteLine("AD : " + GetActualDamage(hero));
-            Console.WriteLine("TT : " + GetTotalHealthWithShieldsApplied(hero));
-            Console.WriteLine("HP : " + hero.Health);
-            Console.WriteLine(GetActualDamage(hero) > GetTotalHealthWithShieldsApplied(hero));
-
-            return GetActualDamage(hero) > GetTotalHealthWithShieldsApplied(hero);
+            return EDamage(hero) > GetTotalHealthWithShieldsApplied(hero);
         }
 
         private static double GetTotalHealthWithShieldsApplied(AIHeroClient target)
@@ -778,52 +901,9 @@ namespace Marksman.Champions
             if (!Kalista.E.IsReady() || !target.HasRendBuff())
                 return 0f;
 
-            var damage = GetRendDamage(target);
-
-            if (target.Name.Contains("Baron"))
-            {
-                damage = Player.Instance.HasBuff("barontarget")
-                    ? damage * 0.5f
-                    : damage;
-            }
-
-            else if (target.Name.Contains("Dragon"))
-            {
-                // DragonSlayer: Reduces damage dealt by 7% per a stack
-                damage = Player.Instance.HasBuff("s5test_dragonslayerbuff")
-                    ? damage * (1 - (.07f * Player.Instance.GetBuffCount("s5test_dragonslayerbuff")))
-                    : damage;
-            }
-
-            if (Player.Instance.HasBuff("summonerexhaust"))
-            {
-                damage = damage * 0.6f;
-            }
-
-            if (target.HasBuff("FerociousHowl"))
-            {
-                damage = damage * 0.7f;
-            }
+            var damage = EDamage(target);
 
             return damage;
-        }
-
-        public static float GetRendDamage(Obj_AI_Base target)
-        {
-            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, GetRawRendDamage(target)) * 0.9f;
-        }
-
-        public static float GetRawRendDamage(Obj_AI_Base target)
-        {
-            var stacks = (target.HasRendBuff() ? target.GetRendBuff().Count : 0) - 1;
-            if (stacks > -1)
-            {
-                var index = Kalista.E.Level - 1;
-                return (RawRendDamage[index] + (0.6f * Player.Instance.TotalAttackDamage)) +
-                    ((stacks) * (RawRendDamagePerSpear[index] + (RawRendDamagePerSpearMultiplier[index] * Player.Instance.TotalAttackDamage)));
-            }
-
-            return 0;
         }
 
         public static bool HasRendBuff(this Obj_AI_Base target)

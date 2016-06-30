@@ -90,9 +90,7 @@ namespace ExorAIO.Champions.Kalista
                     Targets.Minions.Any(
 						m =>
 							Bools.IsPerfectRendTarget(m) &&
-							Vars.GetRealHealth(m) <
-								(float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) +
-								(float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Buff)))
+							Vars.GetRealHealth(m) < EDamage(m)))
                 {
                     /// <summary>
                     ///     Check for Mana Manager if not in combo mode and the killable minion is only one, else do not use it.
@@ -102,8 +100,7 @@ namespace ExorAIO.Champions.Kalista
                             m =>
                                 Bools.IsPerfectRendTarget(m) &&
                                 Vars.GetRealHealth(m) <
-                                    (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) +
-                                    (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Buff)) == 1)
+                                    EDamage(m)) == 1)
                     {
                         if (GameObjects.Player.ManaPercent <
                                 ManaManager.GetNeededMana(Vars.E.Slot, Vars.getSliderItem(Vars.EMenu, "harass")))
@@ -115,13 +112,7 @@ namespace ExorAIO.Champions.Kalista
                     /// <summary>
                     ///     Check for E Whitelist if the harassable target is only one and there is only one killable minion, else do not use the whitelist.
                     /// </summary>
-                    if (GameObjects.EnemyHeroes.Count(t => Bools.IsPerfectRendTarget(t)) == 1 &&
-                        Targets.Minions.Count(
-                            m =>
-                                Bools.IsPerfectRendTarget(m) &&
-                                Vars.GetRealHealth(m) <
-                                    (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) +
-                                    (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Buff)) == 1)
+                    if (GameObjects.EnemyHeroes.Count(t => Bools.IsPerfectRendTarget(t)) == 1 && Targets.Minions.Count(m => Bools.IsPerfectRendTarget(m) && Vars.GetRealHealth(m) < EDamage(m)) == 1)
                     {
                         if (!Vars.getCheckBoxItem(Vars.WhiteListMenu, GameObjects.EnemyHeroes.FirstOrDefault( t => Bools.IsPerfectRendTarget(t)).ChampionName.ToLower()))
                         {
@@ -151,9 +142,7 @@ namespace ExorAIO.Champions.Kalista
                     foreach (var minion in Targets.JungleMinions.Where(
                         m =>
                             Bools.IsPerfectRendTarget(m) &&
-                            m.Health <
-                                (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) +
-                                (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Buff)))
+                            m.Health < EDamage(m)))
                     {
                         Vars.E.Cast();
                     }
