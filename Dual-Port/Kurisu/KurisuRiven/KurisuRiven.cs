@@ -35,7 +35,6 @@ namespace KurisuRiven
         private static bool canaa;
         private static bool canws;
         private static bool canhd;
-        private static bool hashd;
 
         private static bool didq;
         private static bool didw;
@@ -364,8 +363,7 @@ namespace KurisuRiven
             uo = player.GetSpell(SpellSlot.R).Name != "RivenFengShuiEngine";
 
             // hydra check
-            hashd = Items.HasItem(3077) || Items.HasItem(3074) || Items.HasItem(3748);
-            canhd = Items.CanUseItem(3077) || Items.CanUseItem(3074) || Items.CanUseItem(3748);
+            canhd = Item.CanUseItem(3077) || Item.CanUseItem(3074) || Item.CanUseItem(3748);
 
             // my radius
             truerange = player.AttackRange + player.LSDistance(player.BBox.Minimum) + 1;

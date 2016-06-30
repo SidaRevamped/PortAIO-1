@@ -1,9 +1,6 @@
 ﻿-To-Do
 iLucian Q Orbwalker problem
-YasuoPro Evade
-Slutty Ryze Crash
 Check Nechrito Rengar Combo
-Fix Marksman II Jinx Q issue
 
 -Port [Will Port One at a time when I'm bored or there's nothing on the to-do]
 
