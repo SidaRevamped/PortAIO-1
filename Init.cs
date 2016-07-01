@@ -339,6 +339,20 @@ namespace PortAIO
                                 break;
                         }
                         break;
+                    case "annie":
+                        switch (Loader.annie)
+                        {
+                            case 0:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                            case 1:
+                                OAnnie.Annie.Load();
+                                break;
+                            default:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                        }
+                        break;
                     case "caitlyn":
                         switch (Loader.cait)
                         {
@@ -578,8 +592,7 @@ namespace PortAIO
                                 break;
                         }
                         break;
-                    case "annie": // OKTW - Sebby - All Seeby champs go down here
-                    case "karthus":
+                    case "karthus": // OKTW - Sebby - All Seeby champs go down here
                     case "malzahar":
                     case "orianna":
                     case "velkoz":
@@ -1624,9 +1637,6 @@ namespace PortAIO
                     case "singed": // ElSinged
                         ElSinged.Singed.Game_OnGameLoad();
                         break;
-                    case "zac": // Underrated AIO
-                        new UnderratedAIO.Champions.Zac();
-                        break;
                     case "tahmkench": // Underrated AIO
                         new UnderratedAIO.Champions.TahmKench();
                         break;
@@ -1677,6 +1687,20 @@ namespace PortAIO
                         break;
                     case "taric": // SkyLv_Taric
                         new SkyLv_Taric.SkyLv_Taric();
+                        break;
+                    case "zac": // Underrated Zac & Zac_The_Secret_Flubber
+                        switch (Loader.zac)
+                        {
+                            case 0:
+                                new UnderratedAIO.Champions.Zac();
+                                break;
+                            case 1:
+                                Zac_The_Secret_Flubber.Program.Game_OnGameLoad();
+                                break;
+                            default:
+                                new UnderratedAIO.Champions.Zac();
+                                break;
+                        }
                         break;
                     default:
                         Chat.Print("This champion is not supported yet but the utilities will still load! - Berb");

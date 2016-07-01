@@ -255,6 +255,7 @@
     <Compile Include="Champion\Zilean\IncomingDamageManager.cs" />
     <Compile Include="Champion\Zilean\Zilean.cs" />
     <Compile Include="Dual-Port\Danz\Thresh - The Chain Warden\Program.cs" />
+    <Compile Include="Dual-Port\Danz\Zac - The Secret Flubber\Program.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Akali.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Properties\Modes\Automatic.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Properties\Modes\PvM\Clear.cs" />
@@ -416,6 +417,11 @@
     <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Targets.cs" />
     <Compile Include="Dual-Port\Exory\ExorVayne\Vayne.cs" />
     <Compile Include="Dual-Port\God\EliseGod\Program.cs" />
+    <Compile Include="Dual-Port\Hoes\OAnnie\Annie.cs" />
+    <Compile Include="Dual-Port\Hoes\OAnnie\DrawManager.cs" />
+    <Compile Include="Dual-Port\Hoes\OAnnie\GlobalManager.cs" />
+    <Compile Include="Dual-Port\Hoes\OAnnie\MenuConfig.cs" />
+    <Compile Include="Dual-Port\Hoes\OAnnie\Tibbers.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\MenuConfig.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\Program.cs" />
     <Compile Include="Dual-Port\Hoola\HpBarIndicator.cs" />

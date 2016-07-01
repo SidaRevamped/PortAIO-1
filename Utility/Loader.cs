@@ -126,6 +126,8 @@ namespace PortAIO.Utility
         public static int azir { get { return Miscc["azir"].Cast<ComboBox>().CurrentValue; } }
         public static int kassadin { get { return Miscc["kassadin"].Cast<ComboBox>().CurrentValue; } }
         public static int tristana { get { return Miscc["tristana"].Cast<ComboBox>().CurrentValue; } }
+        public static int zac { get { return Miscc["zac"].Cast<ComboBox>().CurrentValue; } }
+        public static int annie { get { return Miscc["annie"].Cast<ComboBox>().CurrentValue; } }
         public static bool condemn { get { return Miscc["condemn"].Cast<CheckBox>().CurrentValue; } }
         public static bool randomult { get { return Miscc["randomult"].Cast<CheckBox>().CurrentValue; } }
 
@@ -213,6 +215,8 @@ namespace PortAIO.Utility
             "Azir", // 71
             "Kassadin", //72
             "Tristana", //73
+            "Zac", //74
+            "Annie", //75
         });
 
         public static void Menu()
@@ -520,6 +524,14 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[73]))
                 {
                     Miscc.Add("tristana", new ComboBox("Use addon for Tristana : ", 0, "ElTristana", "ExorAIO"));
+                }
+                if (Player.ChampionName.Equals(Champion[74]))
+                {
+                    Miscc.Add("zac", new ComboBox("Use addon for Zac : ", 0, "Underrated Zac", "The Secret Flubber"));
+                }
+                if (Player.ChampionName.Equals(Champion[75]))
+                {
+                    Miscc.Add("annie", new ComboBox("Use addon for Annie : ", 0, "OKTW Annie", "OAnnie"));
                 }
             }
             else
