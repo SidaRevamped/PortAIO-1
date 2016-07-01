@@ -253,6 +253,11 @@ namespace PortAIO
                     VCursor.Program.Game_OnGameLoad();
                 }
 
+                if (Loader.condemn)
+                {
+                    AsunaCondemn.Program.Main();
+                }
+
                 //if (Loader.orbwalker)
                 //{
                 //PuppyStandaloneOrbwalker.Program.Game_OnGameLoad();
@@ -1255,6 +1260,9 @@ namespace PortAIO
                                 break;
                             case 3:
                                 hVayne.Program.Load();
+                                break;
+                            case 4:
+                                ExorAIO.AIO.OnLoad();
                                 break;
                             default:
                                 Vayne1.Program.OnLoad();

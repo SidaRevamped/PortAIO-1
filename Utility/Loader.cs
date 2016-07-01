@@ -126,6 +126,7 @@ namespace PortAIO.Utility
         public static int azir { get { return Miscc["azir"].Cast<ComboBox>().CurrentValue; } }
         public static int kassadin { get { return Miscc["kassadin"].Cast<ComboBox>().CurrentValue; } }
         public static int tristana { get { return Miscc["tristana"].Cast<ComboBox>().CurrentValue; } }
+        public static bool condemn { get { return Miscc["condemn"].Cast<CheckBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -265,7 +266,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[10]))
                 {
-                    Miscc.Add("vayne", new ComboBox("Use addon for Vayne : ", 0, "ChallengerVayne", "VayneHunterReborn", "hi im gosu", "hVayne SDK"));
+                    Miscc.Add("vayne", new ComboBox("Use addon for Vayne : ", 0, "ChallengerVayne", "VayneHunterReborn", "hi im gosu", "hVayne SDK", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[11]))
                 {
@@ -571,6 +572,7 @@ namespace PortAIO.Utility
             Miscc.Add("dev", new CheckBox("Enable Developer Sharp?", false));
             Miscc.AddSeparator();
             Miscc.Add("cursor", new CheckBox("Enable VCursor?", false));
+            Miscc.Add("condemn", new CheckBox("Enable Asuna Condemn (Vayne Only)?", false));
 
             var credits = Miscc.AddSubMenu("Credits");
             credits.AddLabel("Nathan or jQuery");

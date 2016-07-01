@@ -402,6 +402,19 @@
     <Compile Include="Dual-Port\Exory\ExorTristana\Properties\Utilities\Spells.cs" />
     <Compile Include="Dual-Port\Exory\ExorTristana\Properties\Utilities\Targets.cs" />
     <Compile Include="Dual-Port\Exory\ExorTristana\Tristana.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\Automatic.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvM\Clear.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvM\LastHit.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvP\Combo.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvP\Harass.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvP\Killsteal.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Modes\PvP\Weaving.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Drawings.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Menus.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Methods.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Spells.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Properties\Utilities\Targets.cs" />
+    <Compile Include="Dual-Port\Exory\ExorVayne\Vayne.cs" />
     <Compile Include="Dual-Port\God\EliseGod\Program.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\MenuConfig.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\Program.cs" />
@@ -1569,6 +1582,13 @@
     <Compile Include="Utility\ActivatorSharp\Summoners\Hero\teleport.cs" />
     <Compile Include="Utility\Anti-Stealth\Anti-Stealth.cs" />
     <Compile Include="Utility\AntiAlistar\AntiAlistar.cs" />
+    <Compile Include="Utility\AsunaCondemn\AsunaCondemn.cs" />
+    <Compile Include="Utility\AsunaCondemn\Program.cs" />
+    <Compile Include="Utility\AsunaCondemn\Utilities\Helpers\Drawings.cs" />
+    <Compile Include="Utility\AsunaCondemn\Utilities\Properties\Menus.cs" />
+    <Compile Include="Utility\AsunaCondemn\Utilities\Properties\Methods.cs" />
+    <Compile Include="Utility\AsunaCondemn\Utilities\Properties\Spells.cs" />
+    <Compile Include="Utility\AsunaCondemn\Utilities\Variables.cs" />
     <Compile Include="Utility\AutoFF\Program.cs" />
     <Compile Include="Utility\AutoLevel\Program.cs" />
     <Compile Include="Utility\BlackFeeder2.0\ChampWrapper.cs" />
@@ -1992,7 +2012,6 @@
     <None Include="Resources\RecallBar.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Dual-Port\Exory\ExorVayne\" />
     <Folder Include="Libraries\ValvraveSharp\Plugin\" />
   </ItemGroup>
   <ItemGroup>
