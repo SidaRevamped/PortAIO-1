@@ -94,7 +94,15 @@ namespace Azir_Creator_of_Elo
                 if (Menu._comboMenu["CR"].Cast<CheckBox>().CurrentValue)
                 {
                     if (target.Health < azir.Spells.R.GetDamage(target))
-                        azir.Spells.R.Cast(target);
+                    {
+                        var pred = azir.Spells.R.GetPrediction(target);
+                        if (pred.Hitchance >= HitChance.High)
+                        {
+
+                            azir.Spells.R.Cast(pred.CastPosition);
+                        }
+                    }
+                    azir.Spells.R.Cast(target);
                 }
             }
         }
