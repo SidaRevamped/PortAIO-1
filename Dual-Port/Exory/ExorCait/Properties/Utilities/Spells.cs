@@ -25,7 +25,7 @@ namespace ExorAIO.Champions.Caitlyn
             Vars.Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
             Vars.Q2.SetSkillshot(0.65f, Vars.Q.Width * 2, 2200f, false, SkillshotType.SkillshotLine);
             Vars.W.SetSkillshot(1.1f, 67.5f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            Vars.E.SetSkillshot(0.35f, 70f, 1600f, true, SkillshotType.SkillshotLine);
+            Vars.E.SetSkillshot(0.30f, 70f, 2000f, true, SkillshotType.SkillshotLine);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace ExorAIO.Champions.Caitlyn
                 foreach (var target in
                     GameObjects.EnemyHeroes.Where(
                         t =>
-                            t.LSIsValidTarget(650f) &&
+                            t.LSIsValidTarget(700f) &&
                             !Invulnerable.Check(t) &&
                             !t.HasBuff("caitlynyordletrapinternal")))
                 {
