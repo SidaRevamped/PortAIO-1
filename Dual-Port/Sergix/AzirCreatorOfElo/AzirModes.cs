@@ -1,4 +1,5 @@
-﻿using EloBuddy;
+﻿using Azir_Free_elo_Machine;
+using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 using LeagueSharp.Common;
@@ -13,6 +14,9 @@ namespace Azir_Creator_of_Elo
     class AzirModes : Modes
     {
         public JumpLogic jump;
+        #pragma warning disable 0649
+        public Insec insec;
+        #pragma warning restore 0649
         public AzirModes(AzirMain azir)
         {
             jump = new JumpLogic(azir);
@@ -29,14 +33,8 @@ namespace Azir_Creator_of_Elo
                 azir.Orbwalk(Game.CursorPos);
                 Jump(azir);
             }
-
-            if (Menu._jumpMenu["inseckey"].Cast<KeyBind>().CurrentValue)
-            {
-                azir.Orbwalk(Game.CursorPos);
-                Insec(azir);
-            }
         }
-        public void Insec(AzirMain azir)
+        /*public void Insec(AzirMain azir)
         {
             var ts = TargetSelector.GetTarget(azir.Spells.Q.Range, DamageType.Magical);
             if (ts != null)
@@ -46,7 +44,7 @@ namespace Azir_Creator_of_Elo
                     jump.insec(ts);
 
             }
-        }
+        }*/
         public void Jump(AzirMain azir)
         {
             jump.updateLogic(Game.CursorPos);

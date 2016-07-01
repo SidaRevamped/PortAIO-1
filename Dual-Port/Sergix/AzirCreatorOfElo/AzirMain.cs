@@ -1,4 +1,5 @@
 ﻿using EloBuddy;
+using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -51,7 +52,7 @@ namespace Azir_Creator_of_Elo
 
         public void Orbwalk(Vector3 pos)
         {
-            Player.IssueOrder(GameObjectOrder.MoveTo, pos);
+            Orbwalker.OrbwalkTo(pos);
         }
 
         private void Ondraw(EventArgs args)

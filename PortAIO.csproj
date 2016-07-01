@@ -403,6 +403,7 @@
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\AzirMenu.cs" />
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\AzirModes.cs" />
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\Extensions.cs" />
+    <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\Insec.cs" />
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\Jump.cs" />
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\Menu.cs" />
     <Compile Include="Dual-Port\Sergix\AzirCreatorOfElo\Modes.cs" />

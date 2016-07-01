@@ -33,23 +33,6 @@ namespace Azir_Creator_of_Elo
             //  ignite = ObjectManager.Player.GetSpellSlot("SummonerDot");
         }
 
-        internal void flyToInsec(Vector3 pos, AzirMain azir, AIHeroClient ts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void flyToinsec(Vector3 position, AzirMain azir, AIHeroClient ts)
-        {
-            if (W.IsReady() && Q.IsReady() && E.IsReady())//&&R.IsReady())
-            {
-                W.Cast(HeroManager.Player.Position.LSExtend(position, 450));
-                LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + 150, () => E.Cast(azir.soldierManager.Soldiers[azir.soldierManager.Soldiers.Count - 1].ServerPosition));
-                LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + 200, () => Q.Cast(HeroManager.Player.Position.LSExtend(position, 1150)));
-                LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + 400, () => EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, position.LSExtend(HeroManager.Player.Position, 300)));
-                LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + 800, () => azir.Spells.R.Cast(position.LSExtend(ts.Position, 300)));
-
-            }
-        }
         public void castQ(AzirMain azir, AIHeroClient target, bool useQ, int nSoldiersToQ)
         {
             if (target.isRunningOfYou())
@@ -60,7 +43,7 @@ namespace Azir_Creator_of_Elo
                     if (pred.Hitchance >= HitChance.High)
                     {
                         if (useQ)
-                            azir.Spells.Q.Cast(pred.CastPosition);
+                            azir.Spells.Q.Cast(pred.CastPosition.LSExtend(target.ServerPosition, 80));
                     }
                 }
             }
