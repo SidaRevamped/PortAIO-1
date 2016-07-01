@@ -127,6 +127,7 @@ namespace PortAIO.Utility
         public static int kassadin { get { return Miscc["kassadin"].Cast<ComboBox>().CurrentValue; } }
         public static int tristana { get { return Miscc["tristana"].Cast<ComboBox>().CurrentValue; } }
         public static bool condemn { get { return Miscc["condemn"].Cast<CheckBox>().CurrentValue; } }
+        public static bool randomult { get { return Miscc["randomult"].Cast<CheckBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -573,6 +574,7 @@ namespace PortAIO.Utility
             Miscc.AddSeparator();
             Miscc.Add("cursor", new CheckBox("Enable VCursor?", false));
             Miscc.Add("condemn", new CheckBox("Enable Asuna Condemn (Vayne Only)?", false));
+            Miscc.Add("randomult", new CheckBox("Enable Random Ult?", false));
 
             var credits = Miscc.AddSubMenu("Credits");
             credits.AddLabel("Nathan or jQuery");
@@ -635,13 +637,7 @@ namespace PortAIO.Utility
             //Miscc.Add("VCursor", new CheckBox("Enable VCursor?", false));
             Miscc.Add("stream", new CheckBox("Enable StreamBuddy?", false));
             public static bool stream { get { return Miscc["stream"].Cast<CheckBox>().CurrentValue; } }
-            public static bool randomUlt { get { return Miscc["randomUlt"].Cast<CheckBox>().CurrentValue; } }
             public static bool baseUlt { get { return Miscc["baseUlt"].Cast<CheckBox>().CurrentValue; } }
-
-            if (RandomUltChampsList.Contains(ObjectManager.Player.ChampionName))
-            {
-                Miscc.Add("randomUlt", new CheckBox("Enable Random Ult?", false));
-            }
 
             if (BaseUltList.Contains(ObjectManager.Player.ChampionName))
             {

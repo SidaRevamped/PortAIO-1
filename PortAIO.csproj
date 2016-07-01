@@ -1791,6 +1791,8 @@
     <Compile Include="Utility\NabbActivator\Activator\Utilities\Vars.cs" />
     <Compile Include="Utility\NabbActivator\NabbActivator.cs" />
     <Compile Include="Utility\PastingSharp\Program.cs" />
+    <Compile Include="Utility\RandomUlt\Helpers\LastPositions.cs" />
+    <Compile Include="Utility\RandomUlt\Program.cs" />
     <Compile Include="Utility\SebbyBanWars\Program.cs" />
     <Compile Include="Utility\SkinHack\Program.cs" />
     <Compile Include="Utility\SkinSDK\MenuConfig.cs" />

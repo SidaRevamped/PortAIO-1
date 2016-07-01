@@ -41,8 +41,6 @@ namespace PortAIO
         //private static LeagueSharp.Common.Render.Sprite Intro;
         private static float IntroTimer = Game.Time;
         public static SCommon.PluginBase.Champion Champion;
-        public static List<string> RandomUltChampsList = new List<string>(new[] { "Ezreal", "Jinx", "Ashe", "Draven", "Gangplank", "Ziggs", "Lux", "Xerath" });
-        public static List<string> BaseUltList = new List<string>(new[] { "Jinx", "Ashe", "Draven", "Ezreal", "Karthus" });
 
         private static System.Drawing.Bitmap LoadImg(string imgName)
         {
@@ -256,6 +254,11 @@ namespace PortAIO
                 if (Loader.condemn)
                 {
                     AsunaCondemn.Program.Main();
+                }
+
+                if (Loader.randomult)
+                {
+                    RandomUlt.Program.Main();
                 }
 
                 //if (Loader.orbwalker)
