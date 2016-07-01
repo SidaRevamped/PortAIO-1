@@ -114,7 +114,8 @@ namespace Azir_Free_elo_Machine
         private void castWOnAngle(Vector2 playerPos, Vector2 targetPos, float ag)
         {
             var posW = playerPos.LSExtend(targetPos, azir.Spells.W.Range);
-            azir.Spells.W.Cast(RotatePoint(posW, playerPos, ag));
+            if (!RotatePoint(posW, playerPos, ag).LSIsWall())
+                azir.Spells.W.Cast(RotatePoint(posW, playerPos, ag));
         }
         public Vector2 RotatePoint(Vector2 pointToRotate, Vector2 centerPoint, float angleInRadians)
         {
