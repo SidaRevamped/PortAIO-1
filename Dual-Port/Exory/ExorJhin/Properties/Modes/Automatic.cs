@@ -50,7 +50,7 @@ namespace ExorAIO.Champions.Jhin
             /// </summary>
             if (Vars.W.IsReady() &&
                 !GameObjects.Player.IsUnderEnemyTurret() &&
-                Vars.getCheckBoxItem(Vars.WMenu, "logical"))
+                Vars.getCheckBoxItem(Vars.WMenu, "logical") && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 foreach (var target in GameObjects.EnemyHeroes.Where(
                     t =>
