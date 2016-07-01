@@ -519,11 +519,13 @@ namespace HastaKalistaBaby
 
                 var t = TargetSelector.GetTarget(E.Range, DamageType.Physical);
 
+                if (t == null)
+                    return;
+
                 if (Player.LSDistance(t) > Helper.GetAttackRange(t))
                 {
                     Render.Circle.DrawCircle(t.Position, Helper.GetAttackRange(t), Color.ForestGreen);
                 }
-
                 else
                 {
                     Render.Circle.DrawCircle(t.Position, Helper.GetAttackRange(t), Color.OrangeRed);

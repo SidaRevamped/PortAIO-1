@@ -54,6 +54,7 @@ namespace HoolaLucian
         private static int Humanizer => miscMenu["Humanizer"].Cast<Slider>().CurrentValue;
         static bool ForceR => comboMenu["ForceR"].Cast<KeyBind>().CurrentValue;
         static bool LT => laneMenu["LT"].Cast<KeyBind>().CurrentValue;
+        private static bool CY => comboMenu["CY"].Cast<CheckBox>().CurrentValue;
 
         public static void OnGameLoad()
         {
@@ -88,6 +89,7 @@ namespace HoolaLucian
             comboMenu.Add("CQ", new CheckBox("Use Q"));
             comboMenu.Add("CW", new CheckBox("Use W"));
             comboMenu.Add("CE", new ComboBox("Use E Mode", 0, "Side", "Cursor", "Enemy", "Never"));
+            comboMenu.Add("CY", new CheckBox("Use Yomuu's in R", false));
             comboMenu.Add("ForceR", new KeyBind("Force R On Target Selector", false, KeyBind.BindTypes.HoldActive, 'T'));
 
 
@@ -350,7 +352,8 @@ namespace HoolaLucian
         {
             if (args.Slot == SpellSlot.Q || args.Slot == SpellSlot.W || args.Slot == SpellSlot.E) AAPassive = true;
             if (args.Slot == SpellSlot.E) Orbwalker.ResetAutoAttack();
-            if (args.Slot == SpellSlot.R) ItemData.Youmuus_Ghostblade.GetItem().Cast();
+            if (args.Slot == SpellSlot.R && CY)
+                ItemData.Youmuus_Ghostblade.GetItem().Cast();
         }
 
         private static float getComboDamage(Obj_AI_Base enemy)

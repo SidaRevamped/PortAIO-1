@@ -108,7 +108,6 @@
             lcMenu.AddGroupLabel("E Settings");
             lcMenu.Add("E", new CheckBox("Use E"));
             lcMenu.Add("ELastHit", new CheckBox("Last Hit Only", false));
-            lcMenu.Add("ETower", new CheckBox("Under Tower", false));
 
             lhMenu = config.AddSubMenu("LastHit", "Last Hit");
             lhMenu.AddGroupLabel("Q Settings");
@@ -116,7 +115,6 @@
             lhMenu.Add("Q3", new CheckBox("Also Q3", false));
             lhMenu.AddGroupLabel("E Settings");
             lhMenu.Add("E", new CheckBox("Use E"));
-            lhMenu.Add("ETower", new CheckBox("Under Tower", false));
 
             ksMenu = config.AddSubMenu("KillSteal", "Kill Steal");
             ksMenu.Add("Q", new CheckBox("Use Q"));
@@ -156,8 +154,8 @@
                     {
                         if (isDash)
                         {
-                           isDash = false;
-                           posDash = new Vector2();
+                            isDash = false;
+                            posDash = new Vector2();
                         }
                         return;
                     }
@@ -548,9 +546,12 @@
                     .ToList();
         }
 
-        private static double GetEDmg(Obj_AI_Base target)
+        public static double GetEDmg(Obj_AI_Base target)
         {
-            return E.GetDamage(target) + E.GetDamage(target, DamageStage.Buff) - 5;
+            var stacksPassive = ObjectManager.Player.Buffs.Find(b => b.DisplayName.Equals("YasuoDashScalar"));
+            var Estacks = (stacksPassive != null) ? stacksPassive.Count : 0;
+            var damage = ((E.Level * 20) + 50) * (1 + 0.25 * Estacks) + (ObjectManager.Player.FlatMagicDamageMod * 0.6);
+            return LeagueSharp.Common.Damage.CalcDamage(ObjectManager.Player, target, DamageType.Magical, damage);
         }
 
         private static Vector3 GetPosAfterDash(Obj_AI_Base target)
@@ -615,18 +616,18 @@
             }
             if (!haveQ3)
             {
-                var state = Q.CastingBestTarget(true);
-                if (state.IsCasted())
+                foreach (Obj_AI_Base minion in LeagueSharp.Common.MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q3.Range, LeagueSharp.Common.MinionTypes.All, LeagueSharp.Common.MinionTeam.Enemy).OrderByDescending(m => m.Health))
                 {
-                    return;
-                }
-                if (state == CastStates.InvalidTarget && getCheckBoxItem(hybridMenu, "QLastHit") && Q.GetTarget(50) == null && !Player.Spellbook.IsAutoAttacking)
-                {
-                    var minion =
-                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(i => (i.IsMinion() || i.IsPet(false)) && IsInRangeQ(i) && Q.CanLastHit(i, GetQDmg(i))).MaxOrDefault(i => i.MaxHealth);
                     if (minion != null)
                     {
-                        Q.Casting(minion);
+                        if (!minion.IsDead && minion != null && getCheckBoxItem(hybridMenu, "QLastHit") && Q.IsReady() && minion.LSIsValidTarget(500) && !haveQ3 && Q.IsInRange(minion) && !IsDashing)
+                        {
+                            var predHealth = LeagueSharp.Common.HealthPrediction.GetHealthPrediction(minion, (int)(ObjectManager.Player.Distance(minion.Position) * 1000 / 2000));
+                            if (predHealth <= GetQDmg(minion))
+                            {
+                                Q.Cast(minion);
+                            }
+                        }
                     }
                 }
             }
@@ -726,6 +727,21 @@
             }
         }
 
+        public static bool CanCastE(Obj_AI_Base target)
+        {
+            return !target.HasBuff("YasuoDashWrapper");
+        }
+
+        public static bool isDangerous(Obj_AI_Base target, float range)
+        {
+            return LeagueSharp.Common.HeroManager.Enemies.Where(tar => tar.Distance(GetPosAfterDash(target)) < range).Any(tar => tar != null);
+        }
+
+        public static Vector2 PosAfterE(Obj_AI_Base target)
+        {
+            return ObjectManager.Player.ServerPosition.LSExtend(target.ServerPosition, ObjectManager.Player.Distance(target) < 410 ? E.Range : ObjectManager.Player.Distance(target) + 65).To2D();
+        }
+
         private static void LaneClear()
         {
             var useQ = getCheckBoxItem(lcMenu, "Q");
@@ -738,44 +754,25 @@
                     Q2.Cast(minions.FirstOrDefault());
                 }
             }
-            if (getCheckBoxItem(lcMenu, "E") && E.IsReady())
+
+            var allMinionsE = LeagueSharp.Common.MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, LeagueSharp.Common.MinionTypes.All, LeagueSharp.Common.MinionTeam.Enemy);
+            foreach (var minion in allMinionsE.Where(x => x.LSIsValidTarget(E.Range) && CanCastE(x)))
             {
-                var minions = Common.ListMinions().Where(i => i.LSIsValidTarget(E.Range) && !HaveE(i) && (!GetPosAfterDash(i).IsUnderEnemyTurret() || getCheckBoxItem(lcMenu, "ETower")) && Evade.IsSafePoint(GetPosAfterDash(i).ToVector2()).IsSafe).OrderByDescending(i => i.MaxHealth).ToList();
-                if (minions.Count > 0)
+                if (minion != null)
                 {
-                    var minion = minions.FirstOrDefault(i => E.CanLastHit(i, GetEDmg(i)));
-                    if (useQ && minion == null && Q.IsReady(50) && (!haveQ3 || useQ3))
+                    if (getCheckBoxItem(lcMenu, "E") && E.IsReady() && minion.LSIsValidTarget(E.Range) && CanCastE(minion))
                     {
-                        var sub = new List<Obj_AI_Minion>();
-                        foreach (var mob in minions)
+                        if (!UnderTower(PosAfterE(minion)))
                         {
-                            if ((E2.CanLastHit(mob, GetQDmg(mob), GetEDmg(mob)) || mob.Team == GameObjectTeam.Neutral)
-                                && mob.Distance(GetPosAfterDash(mob)) < Q3.Range)
+                            if (minion.Health <= GetEDmg(minion) && !isDangerous(minion, 600))
                             {
-                                sub.Add(mob);
-                            }
-                            if (getCheckBoxItem(lcMenu, "ELastHit"))
-                            {
-                                continue;
-                            }
-                            var nearMinion =
-                                Common.ListMinions()
-                                    .Where(i => i.LSIsValidTarget(Q3.Range, true, GetPosAfterDash(mob)))
-                                    .ToList();
-                            if (nearMinion.Count > 2 || nearMinion.Count(i => mob.Health <= GetQDmg(mob)) > 1)
-                            {
-                                sub.Add(mob);
+                                E.CastOnUnit(minion);
                             }
                         }
-                        minion = sub.FirstOrDefault();
-                    }
-                    if (minion != null && E.CastOnUnit(minion))
-                    {
-                        lastE = Variables.TickCount;
-                        return;
                     }
                 }
             }
+
             if (useQ && Q.IsReady() && (!haveQ3 || useQ3))
             {
                 if (IsDashing)
@@ -817,7 +814,6 @@
                         var pos = Q2.GetLineFarmLocation(minions);
                         if (pos.MinionsHit > 0)
                         {
-                            Console.WriteLine("ASKDJLAKSJDLKASJDKSAJD");
                             Q2.Cast(pos.Position);
                         }
                     }
@@ -825,48 +821,42 @@
             }
         }
 
+        public static bool UnderTower(Vector2 pos)
+        {
+            return ObjectManager.Get<Obj_AI_Turret>().Any(i => i.Health > 0 && i.Distance(pos) <= 950 && i.IsEnemy);
+        }
+
         private static void LastHit()
         {
-            if (getCheckBoxItem(lhMenu, "Q") && Q.IsReady() && !IsDashing && (!haveQ3 || getCheckBoxItem(lhMenu, "Q3")))
+            foreach (Obj_AI_Base minion in LeagueSharp.Common.MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q3.Range, LeagueSharp.Common.MinionTypes.All, LeagueSharp.Common.MinionTeam.Enemy).OrderByDescending(m => m.Health))
             {
-                if (!haveQ3)
+                if (minion != null)
                 {
-                    var minion =
-                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(
-                            i => (i.IsMinion() || i.IsPet(false)) && IsInRangeQ(i) && Q.CanLastHit(i, GetQDmg(i)))
-                            .MaxOrDefault(i => i.MaxHealth);
-                    if (minion != null && Q.Casting(minion).IsCasted())
+                    if (!minion.IsDead && minion != null && getCheckBoxItem(lhMenu, "Q") && Q.IsReady() && minion.LSIsValidTarget(500) && !haveQ3 && Q.IsInRange(minion) && !IsDashing)
                     {
-                        return;
+                        if (minion.Health <= GetQDmg(minion))
+                        {
+                            Q.Cast(minion);
+                        }
                     }
-                }
-                else
-                {
-                    var minion =
-                        EntityManager.MinionsAndMonsters.EnemyMinions.Where(
-                            i =>
-                            (i.IsMinion() || i.IsPet(false)) && i.LSIsValidTarget(Q2.Range - i.BoundingRadius / 2)
-                            && Q2.CanLastHit(i, GetQDmg(i))).MaxOrDefault(i => i.MaxHealth);
-                    if (minion != null && Q2.Casting(minion, false, CollisionableObjects.YasuoWall).IsCasted())
+                    if (!minion.IsDead && minion != null && getCheckBoxItem(lhMenu, "Q3") && Q.IsReady() && minion.LSIsValidTarget(1100) && haveQ3 && Q3.IsInRange(minion) && !IsDashing)
                     {
-                        return;
+                        if (minion.Health <= GetQDmg(minion))
+                        {
+                            Q2.Cast(minion);
+                        }
                     }
-                }
-            }
 
-            if (getCheckBoxItem(lhMenu, "E") && E.IsReady() && !Orbwalker.IsAutoAttacking)
-            {
-                var minion = EntityManager.MinionsAndMonsters.EnemyMinions.Where(i =>
-                (i.IsMinion() || i.IsPet(false)) &&
-                i.LSIsValidTarget(E.Range) &&
-                !HaveE(i) &&
-                E.CanLastHit(i, GetEDmg(i)) &&
-                Evade.IsSafePoint(GetPosAfterDash(i).ToVector2()).IsSafe &&
-                (!GetPosAfterDash(i).IsUnderEnemyTurret() || getCheckBoxItem(lhMenu, "ETower"))).MaxOrDefault(i => i.MaxHealth);
-
-                if (minion != null && E.CastOnUnit(minion))
-                {
-                    lastE = Variables.TickCount;
+                    if (getCheckBoxItem(lhMenu, "E") && E.IsReady() && minion.LSIsValidTarget(475))
+                    {
+                        if (!UnderTower(PosAfterE(minion)) && CanCastE(minion))
+                        {
+                            if (minion.Health <= GetEDmg(minion) && !isDangerous(minion, 600))
+                            {
+                                E.CastOnUnit(minion);
+                            }
+                        }
+                    }
                 }
             }
         }

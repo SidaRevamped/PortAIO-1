@@ -24,18 +24,23 @@ namespace PortAIO
         private static void Main()
         {
             Loading.OnLoadingComplete += Initialize;
+            Game.OnUpdate += Game_OnUpdate;
         }
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            //Console.WriteLine(Orbwalker.ActiveModesFlags.ToString());
+            if (Orbwalker.ForcedTarget != null)
+            {
+                if (!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.LSDistance(Orbwalker.ForcedTarget) > ObjectManager.Player.GetAutoAttackRange() || ObjectManager.Player.IsDead || ObjectManager.Player.LSIsRecalling())
+                {
+                    Orbwalker.ForcedTarget = null;
+                }
+            }
         }
 
         //private static LeagueSharp.Common.Render.Sprite Intro;
         private static float IntroTimer = Game.Time;
         public static SCommon.PluginBase.Champion Champion;
-        public static List<string> RandomUltChampsList = new List<string>(new[] { "Ezreal", "Jinx", "Ashe", "Draven", "Gangplank", "Ziggs", "Lux", "Xerath" });
-        public static List<string> BaseUltList = new List<string>(new[] { "Jinx", "Ashe", "Draven", "Ezreal", "Karthus" });
 
         private static System.Drawing.Bitmap LoadImg(string imgName)
         {
@@ -244,6 +249,16 @@ namespace PortAIO
                 if (Loader.cursor)
                 {
                     VCursor.Program.Game_OnGameLoad();
+                }
+
+                if (Loader.condemn)
+                {
+                    AsunaCondemn.Program.Main();
+                }
+
+                if (Loader.randomult)
+                {
+                    RandomUlt.Program.Main();
                 }
 
                 //if (Loader.orbwalker)
@@ -1186,6 +1201,9 @@ namespace PortAIO
                             case 5:
                                 HoolaLucian.Program.OnGameLoad();
                                 break;
+                            case 6:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 LCS_Lucian.Program.OnLoad();
                                 break;
@@ -1246,6 +1264,9 @@ namespace PortAIO
                             case 3:
                                 hVayne.Program.Load();
                                 break;
+                            case 4:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 Vayne1.Program.OnLoad();
                                 break;
@@ -1269,7 +1290,18 @@ namespace PortAIO
                         }
                         break;
                     case "tristana": // ElTristana
-                        ElTristana.Tristana.OnLoad();
+                        switch (Loader.tristana)
+                        {
+                            case 0:
+                                ElTristana.Tristana.OnLoad();
+                                break;
+                            case 1:
+                                ExorAIO.AIO.OnLoad();
+                                break;
+                            default:
+                                ElTristana.Tristana.OnLoad();
+                                break;
+                        }
                         break;
                     case "taliyah": // taliyah && tophsharp
                         switch (Loader.taliyah)

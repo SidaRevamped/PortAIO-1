@@ -23,7 +23,8 @@ namespace NabbActivator
                 /// <summary>
                 ///     The Smite Logics.
                 /// </summary>
-                if (Vars.Smite.IsReady() &&
+                if (Vars.Smite != null &&
+                    Vars.Smite.IsReady() &&
                     Vars.Smite.Slot != SpellSlot.Unknown)
                 {
                     if (!Vars.KeysMenu["smite"].Cast<KeyBind>().CurrentValue)
@@ -97,8 +98,8 @@ namespace NabbActivator
                     DelayAction.Add(
                         Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
 {
-                        Vars.W.Cast();
-                    });
+    Vars.W.Cast();
+});
                 }
             }
 
@@ -112,8 +113,8 @@ namespace NabbActivator
                     DelayAction.Add(
                         Vars.TypesMenu["cleansers"].Cast<Slider>().CurrentValue, () =>
                         {
-                        GameObjects.Player.Spellbook.CastSpell(SpellSlots.Cleanse);
-                    });
+                            GameObjects.Player.Spellbook.CastSpell(SpellSlots.Cleanse);
+                        });
                 }
             }
 
@@ -136,7 +137,7 @@ namespace NabbActivator
                 foreach (var target in GameObjects.EnemyHeroes.Where(t => t.LSIsValidTarget(600f)))
                 {
                     if (Vars.GetIgniteDamage > target.Health ||
-                        Health.GetPrediction(target, (int) (1000 + Game.Ping/2f)) <= 0)
+                        Health.GetPrediction(target, (int)(1000 + Game.Ping / 2f)) <= 0)
                     {
                         GameObjects.Player.Spellbook.CastSpell(SpellSlots.Ignite, target);
                     }
@@ -149,7 +150,7 @@ namespace NabbActivator
             if (SpellSlots.Barrier.IsReady())
             {
                 if (GameObjects.Player.CountEnemyHeroesInRange(700f) > 0 &&
-                    Health.GetPrediction(GameObjects.Player, (int) (1000 + Game.Ping/2f)) <= GameObjects.Player.MaxHealth/6)
+                    Health.GetPrediction(GameObjects.Player, (int)(1000 + Game.Ping / 2f)) <= GameObjects.Player.MaxHealth / 6)
                 {
                     GameObjects.Player.Spellbook.CastSpell(SpellSlots.Barrier);
                     return;
@@ -162,7 +163,7 @@ namespace NabbActivator
             if (SpellSlots.Heal.IsReady())
             {
                 if (GameObjects.Player.CountEnemyHeroesInRange(850f) > 0 &&
-                    Health.GetPrediction(GameObjects.Player, (int) (1000 + Game.Ping/2f)) <= GameObjects.Player.MaxHealth/6)
+                    Health.GetPrediction(GameObjects.Player, (int)(1000 + Game.Ping / 2f)) <= GameObjects.Player.MaxHealth / 6)
                 {
                     GameObjects.Player.Spellbook.CastSpell(SpellSlots.Heal);
                 }
@@ -172,7 +173,7 @@ namespace NabbActivator
                         a =>
                             a.LSIsValidTarget(850f, false) &&
                             a.CountEnemyHeroesInRange(850f) > 0 &&
-                            Health.GetPrediction(a, (int) (1000 + Game.Ping/2f)) <= a.MaxHealth/6))
+                            Health.GetPrediction(a, (int)(1000 + Game.Ping / 2f)) <= a.MaxHealth / 6))
                     {
                         GameObjects.Player.Spellbook.CastSpell(SpellSlots.Heal, ally);
                     }
@@ -197,7 +198,7 @@ namespace NabbActivator
                 /// </summary>
                 if (Vars.SmiteMiscMenu["combo"].Cast<CheckBox>().CurrentValue)
                 {
-                    if (Orbwalker.LastTarget as AIHeroClient != null) 
+                    if (Orbwalker.LastTarget as AIHeroClient != null)
                     {
                         Vars.Smite.CastOnUnit(Orbwalker.LastTarget as AIHeroClient);
                     }
@@ -249,7 +250,7 @@ namespace NabbActivator
                 foreach (var ally in GameObjects.AllyHeroes.Where(
                     a =>
                         a.Distance(Targets.Target) <= 650f &&
-                        Health.GetPrediction(a, (int) (1000 + Game.Ping/2f)) <= a.MaxHealth/6))
+                        Health.GetPrediction(a, (int)(1000 + Game.Ping / 2f)) <= a.MaxHealth / 6))
                 {
                     GameObjects.Player.Spellbook.CastSpell(SpellSlots.Exhaust, Targets.Target);
                 }
