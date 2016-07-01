@@ -1193,6 +1193,9 @@ namespace PortAIO
                             case 5:
                                 HoolaLucian.Program.OnGameLoad();
                                 break;
+                            case 6:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 LCS_Lucian.Program.OnLoad();
                                 break;

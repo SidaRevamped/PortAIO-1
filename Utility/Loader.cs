@@ -255,7 +255,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[8]))
                 {
-                    Miscc.Add("lucian", new ComboBox("Use addon for Lucian : ", 0, "LCS Lucian", "ChallengerSeries", "iLucian", "Marksman II", "OKTW", "Hoola Lucian"));
+                    Miscc.Add("lucian", new ComboBox("Use addon for Lucian : ", 0, "LCS Lucian", "ChallengerSeries", "iLucian", "Marksman II", "OKTW", "Hoola Lucian", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[9]))
                 {
