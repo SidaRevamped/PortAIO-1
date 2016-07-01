@@ -38,7 +38,7 @@ namespace ExorAIO.Champions.Vayne
                         t.LSIsValidTarget(Vars.E.Range) &&
                         !Invulnerable.Check(t, DamageType.True, false) &&
                         !t.LSIsValidTarget(GameObjects.Player.BoundingRadius) &&
-                        Vars.getCheckBoxItem(Vars.EMenu, "t.ChampionName.ToLower()")))
+                        Vars.getCheckBoxItem(Vars.WhiteListMenu, t.ChampionName.ToLower())))
                 {
                     for (var i = 1; i < 10; i++)
                     {

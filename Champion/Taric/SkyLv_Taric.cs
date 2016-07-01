@@ -235,7 +235,6 @@
             new OnUpdateFeatures();
             new OnProcessSpellCast();
             new Interrupter();
-            new CastOnDash();
             new AntiGapCLoser();
             new CastOnDash();
             new KillSteal();

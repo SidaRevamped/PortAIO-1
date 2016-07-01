@@ -49,7 +49,7 @@
         }
         #endregion
 
-        static CastOnDash()
+        public CastOnDash()
         {
             CustomEvents.Unit.OnDash += Unit_OnDash;
         }
