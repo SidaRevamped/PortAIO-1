@@ -29,6 +29,7 @@ using ExorAIO.Champions.Jinx;
 using ExorAIO.Champions.Kalista;
 using ExorAIO.Champions.KogMaw;
 using ExorAIO.Champions.Lucian;
+using ExorAIO.Champions.Tristana;
 
 namespace ExorAIO.Core
 {
@@ -130,6 +131,9 @@ namespace ExorAIO.Core
                     break;
                 case "Lucian":
                     new Lucian().OnLoad();
+                    break;
+                case "Tristana":
+                    new Tristana().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;

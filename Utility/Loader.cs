@@ -125,6 +125,7 @@ namespace PortAIO.Utility
         public static int amumu { get { return Miscc["amumu"].Cast<ComboBox>().CurrentValue; } }
         public static int azir { get { return Miscc["azir"].Cast<ComboBox>().CurrentValue; } }
         public static int kassadin { get { return Miscc["kassadin"].Cast<ComboBox>().CurrentValue; } }
+        public static int tristana { get { return Miscc["tristana"].Cast<ComboBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -209,6 +210,7 @@ namespace PortAIO.Utility
             "Amumu", //70
             "Azir", // 71
             "Kassadin", //72
+            "Tristana", //73
         });
 
         public static void Menu()
@@ -512,6 +514,10 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[72]))
                 {
                     Miscc.Add("kassadin", new ComboBox("Use addon for Kassadin : ", 0, "Kassawin", "Preserved Kassadin"));
+                }
+                if (Player.ChampionName.Equals(Champion[73]))
+                {
+                    Miscc.Add("tristana", new ComboBox("Use addon for Tristana : ", 0, "ElTristana", "ExorAIO"));
                 }
             }
             else

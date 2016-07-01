@@ -1279,7 +1279,18 @@ namespace PortAIO
                         }
                         break;
                     case "tristana": // ElTristana
-                        ElTristana.Tristana.OnLoad();
+                        switch (Loader.tristana)
+                        {
+                            case 0:
+                                ElTristana.Tristana.OnLoad();
+                                break;
+                            case 1:
+                                ExorAIO.AIO.OnLoad();
+                                break;
+                            default:
+                                ElTristana.Tristana.OnLoad();
+                                break;
+                        }
                         break;
                     case "taliyah": // taliyah && tophsharp
                         switch (Loader.taliyah)
