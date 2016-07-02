@@ -46,6 +46,7 @@ namespace iKalistaReborn
             {"SRU_Krug", "Krug"}
         };
 
+        public static float LastAutoAttack;
         public static Menu comboMenu, mixedMenu, laneclearMenu, jungleStealMenu, miscMenu, drawingMenu;
 
         public Kalista()
@@ -156,6 +157,7 @@ namespace iKalistaReborn
             miscMenu = Menu.AddSubMenu("iKalista: Reborn - Misc", "com.ikalista.Misc");
             miscMenu.Add("com.ikalista.misc.reduceE", new Slider("Reduce Rend Damage", 90, 0, 300));
             miscMenu.Add("com.ikalista.misc.forceW", new CheckBox("Focus Enemy With W"));
+            miscMenu.Add("com.ikalista.misc.exploit", new CheckBox("Exploit"));
             if (Game.MapId != GameMapId.SummonersRift)
             {
                 miscMenu.AddLabel("Sentinel Manager is only on Summoners Rift, sorry.");
@@ -315,6 +317,22 @@ namespace iKalistaReborn
 
         private void OnCombo()
         {
+            if (getCheckBoxItem(miscMenu, "com.ikalista.misc.exploit"))
+            {
+                var target = TargetSelector.GetTarget(
+                    ObjectManager.Player.AttackRange,
+                    DamageType.Physical);
+                if (target.IsValidTarget(ObjectManager.Player.AttackRange))
+                {
+                    if (Environment.TickCount - LastAutoAttack <= 250) EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                    if (Environment.TickCount - LastAutoAttack >= 50)
+                    {
+                        EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target);
+                        LastAutoAttack = Environment.TickCount;
+                    }
+                }
+            }
+
             if (getCheckBoxItem(comboMenu, "com.ikalista.combo.orbwalkMinions"))
             {
                 var targets =
@@ -348,14 +366,15 @@ namespace iKalistaReborn
                 return;
             }
 
-            var target = TargetSelector.GetTarget(SpellManager.Spell[SpellSlot.Q].Range, DamageType.Physical);
-
-            var prediction = SpellManager.Spell[SpellSlot.Q].GetPrediction(target);
-
-            if (prediction.Hitchance >= HitChance.High && target.LSIsValidTarget(SpellManager.Spell[SpellSlot.Q].Range) &&
-                !ObjectManager.Player.IsDashing() && !Orbwalker.IsAutoAttacking)
+            var spearTarget = TargetSelector.GetTarget(
+                SpellManager.Spell[SpellSlot.Q].Range,
+                DamageType.Physical);
+            var prediction = SpellManager.Spell[SpellSlot.Q].GetPrediction(spearTarget);
+            if (prediction.Hitchance >= HitChance.High
+                && spearTarget.IsValidTarget(SpellManager.Spell[SpellSlot.Q].Range) && !ObjectManager.Player.IsDashing()
+                && !ObjectManager.Player.Spellbook.IsAutoAttacking)
             {
-                SpellManager.Spell[SpellSlot.Q].Cast(target);
+                SpellManager.Spell[SpellSlot.Q].Cast(prediction.CastPosition);
             }
         }
 
@@ -419,7 +438,8 @@ namespace iKalistaReborn
                 if (minions.Count < 0)
                     return;
 
-                var siegeMinion = minions.FirstOrDefault(x => x.CharData.BaseSkinName == "MinionSiege" && x.IsRendKillable());
+                var siegeMinion =
+                    minions.FirstOrDefault(x => x.CharData.BaseSkinName == "MinionSiege" && x.IsRendKillable());
 
                 if (getCheckBoxItem(laneclearMenu, "com.ikalista.laneclear.eSiege") && siegeMinion != null)
                 {
