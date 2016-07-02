@@ -183,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private static void LogicW()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && getCheckBoxItem(wMenu, "damage" + ally.ChampionName) && Player.ServerPosition.LSDistance(ally.ServerPosition) < W.Range))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && ally.IsHPBarRendered && !ally.IsDead && getCheckBoxItem(wMenu, "damage" + ally.ChampionName) && Player.ServerPosition.LSDistance(ally.ServerPosition) < W.Range))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally);
 
@@ -204,7 +204,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (getCheckBoxItem(wMenu, "Poison" + ally.ChampionName) && ally.HasBuffOfType(BuffType.Poison))
                 {
-                    W.Cast(W.GetPrediction(ally).CastPosition);
+                    var pred = W.GetPrediction(ally);
+                    W.Cast(pred.CastPosition);
                 }
 
                 nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;

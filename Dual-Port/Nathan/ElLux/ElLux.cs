@@ -531,7 +531,7 @@
 
         private static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.Type == GameObjectType.AIHeroClient && sender.IsEnemy)
+            if (sender.IsValid<AIHeroClient>() && sender.LSIsValidTarget() && sender.Type == GameObjectType.AIHeroClient && sender.IsEnemy && sender.IsVisible && sender.IsHPBarRendered)
             {
                 var heroSender = ObjectManager.Get<AIHeroClient>().First(x => x.NetworkId == sender.NetworkId);
                 if (heroSender.GetSpellSlot(args.SData.Name) == SpellSlot.Unknown && args.Target.Type == Player.Type)
@@ -548,7 +548,7 @@
                 }
             }
 
-            if (sender.Type == GameObjectType.obj_AI_Turret && sender.IsEnemy)
+            if (sender.IsValid<Obj_AI_Turret>() && sender.IsStructure() && sender.Type == GameObjectType.obj_AI_Turret && sender.IsEnemy)
             {
                 if (args.Target.Type == Player.Type)
                 {

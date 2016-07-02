@@ -107,7 +107,7 @@ namespace MoonLux
                 return;
             }
 
-            if (obj.Type != GameObjectType.AIHeroClient || source.Type != GameObjectType.AIHeroClient)
+            if (obj.Type != GameObjectType.AIHeroClient || source.Type != GameObjectType.AIHeroClient || !source.IsValid<AIHeroClient>() || !obj.IsValid<AIHeroClient>())
             {
                 return;
             }
