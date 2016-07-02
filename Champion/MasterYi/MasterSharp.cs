@@ -56,6 +56,7 @@ namespace MasterSharp
                 //Combo
                 comboMenu = Config.AddSubMenu("Combo Sharp", "combo");
                 comboMenu.Add("comboWreset", new CheckBox("AA reset W"));
+                comboMenu.Add("wSmart", new CheckBox("Smart W AA Reset"));
                 comboMenu.Add("useQ", new CheckBox("Use Q to gap"));
                 comboMenu.Add("useE", new CheckBox("Use E"));
                 comboMenu.Add("useR", new CheckBox("Use R"));
@@ -64,6 +65,11 @@ namespace MasterSharp
                 //Extra
                 extraMenu = Config.AddSubMenu("Extra Sharp", "extra");
                 extraMenu.Add("packets", new CheckBox("Use Packet cast", false));
+                extraMenu.AddGroupLabel("Killsteal Q :");
+                foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
+                {
+                    extraMenu.Add("ks" + enemy.NetworkId, new CheckBox("KS Q : " + enemy.ChampionName, true));
+                }
 
                 //SmartW
                 evadeMenu = Config.AddSubMenu("Q & W Dodger");
@@ -95,18 +101,38 @@ namespace MasterSharp
 
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
+
             if (MasterYi.W.IsReady() && getCheckBoxItem(comboMenu, "comboWreset") && getSliderItem(evadeMenu, "useWatHP") >= MasterYi.player.HealthPercent && target is AIHeroClient && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                MasterYi.W.Cast();
-                Utility.DelayAction.Add(100,
-                    () =>
-                    {
-                        Orbwalker.ResetAutoAttack();
-                        Orbwalker.DisableMovement = false;
-                        Orbwalker.OrbwalkTo(Game.CursorPos);
-                        Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                    }
-                    );
+                var dmg = ObjectManager.Player.GetAutoAttackDamage(target as AIHeroClient);
+                var howmanyautos = (int)target.Health / dmg;
+
+                if (howmanyautos <= 3 && howmanyautos > 0 && getCheckBoxItem(comboMenu, "wSmart"))
+                {
+                    MasterYi.W.Cast();
+                    Utility.DelayAction.Add(100,
+                        () =>
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Orbwalker.DisableMovement = false;
+                            Orbwalker.OrbwalkTo(Game.CursorPos);
+                            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                        }
+                        );
+                }
+                else
+                {
+                    MasterYi.W.Cast();
+                    Utility.DelayAction.Add(100,
+                        () =>
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Orbwalker.DisableMovement = false;
+                            Orbwalker.OrbwalkTo(Game.CursorPos);
+                            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                        }
+                        );
+                }
             }
         }
 
@@ -227,6 +253,14 @@ namespace MasterSharp
                 foreach (var buf in MasterYi.player.Buffs)
                 {
                     //Console.WriteLine(buf.Name);
+                }
+            }
+
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy && enemy.Health < MasterYi.Q.GetDamage(enemy) && MasterYi.Q.IsInRange(enemy) && enemy.IsVisible && enemy.IsHPBarRendered))
+            {
+                if (getCheckBoxItem(extraMenu, "ks" + enemy.NetworkId))
+                {
+                    ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Q, enemy);
                 }
             }
 
