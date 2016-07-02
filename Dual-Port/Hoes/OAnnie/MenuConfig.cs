@@ -13,13 +13,14 @@ namespace OAnnie
     internal class MenuConfig
     {
         public static Menu Config;
-        public static Menu drawMenu, comboMenu, rMenu, flashMenu, tibbersMenu, ksMenu, laneMenu, miscMenu, harassMenu;
+        public static Menu drawMenu, comboMenu, flashMenu, tibbersMenu, ksMenu, laneMenu, miscMenu, harassMenu;
         public const string Menuname = "Annie";
 
         public static void CreateMenu()
         {
             #region General
 
+            Config = MainMenu.AddMenu("OAnnie", "OAnnie");
 
             drawMenu = Config.AddSubMenu("Drawings", "Drawings");
             {

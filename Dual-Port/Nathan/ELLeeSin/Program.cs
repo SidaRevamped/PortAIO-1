@@ -25,6 +25,8 @@
 
         #endregion
 
+        #pragma warning disable 0649
+        #pragma warning disable 414
         #region Static Fields
 
         public static bool CheckQ = true;
@@ -118,6 +120,8 @@
         private static bool wardJumped;
 
         #endregion
+        #pragma warning restore 0649    
+        #pragma warning restore 414
 
         #region Enums
 
@@ -285,10 +289,12 @@
         {
             try
             {
+                var jumpRange = 265;
+
                 if (ClicksecEnabled && getCheckBoxItem(InitMenu.insecMenu, "clickInsec"))
                 {
                     InsecLinePos = Drawing.WorldToScreen(InsecClickPos);
-                    return V2E(InsecClickPos, target.Position, target.ELDistance(InsecClickPos) + 230).To3D();
+                    return V2E(InsecClickPos, target.Position, target.ELDistance(InsecClickPos) + jumpRange).To3D();
                 }
                 if (isNullInsecPos)
                 {
@@ -299,36 +305,25 @@
                 if (GetAllyHeroes(target, 2000 + getSliderItem(InitMenu.insecMenu, "bonusRangeA")).Count > 0
                     && getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Insec.Ally"))
                 {
-                    var insecPosition =
-                        InterceptionPoint(
-                            GetAllyInsec(
-                                GetAllyHeroes(target, 2000 + getSliderItem(InitMenu.insecMenu, "bonusRangeA"))));
-
+                    var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + getSliderItem(InitMenu.insecMenu, "bonusRangeA"))));
                     InsecLinePos = Drawing.WorldToScreen(insecPosition);
-                    return V2E(insecPosition, target.Position, target.ELDistance(insecPosition) + 230).To3D();
+                    return V2E(insecPosition, target.Position, target.ELDistance(insecPosition) + jumpRange).To3D();
                 }
 
                 if (getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Insec.Tower"))
                 {
-                    var tower =
-                        ObjectManager.Get<Obj_AI_Turret>()
-                            .Where(
-                                turret =>
-                                turret.ELDistance(target) - 725 <= 950 && turret.IsAlly && turret.IsVisible
-                                && turret.Health > 0 && turret.ELDistance(target) <= 1300 && turret.ELDistance(target) > 400)
-                            .MinOrDefault(i => target.ELDistance(Player));
-
+                    var tower =ObjectManager.Get<Obj_AI_Turret>().Where(turret => turret.ELDistance(target) - 725 <= 950 && turret.IsAlly && turret.IsVisible && turret.Health > 0 && turret.ELDistance(target) <= 1300 && turret.ELDistance(target) > 400).MinOrDefault(i => target.ELDistance(Player));
                     if (tower != null)
                     {
                         InsecLinePos = Drawing.WorldToScreen(tower.Position);
-                        return V2E(tower.Position, target.Position, target.ELDistance(tower.Position) + 230).To3D();
+                        return V2E(tower.Position, target.Position, target.ELDistance(tower.Position) + jumpRange).To3D();
                     }
                 }
 
                 if (getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Insec.Original.Pos"))
                 {
                     InsecLinePos = Drawing.WorldToScreen(insecPos);
-                    return V2E(insecPos, target.Position, target.ELDistance(insecPos) + 230).To3D();
+                    return V2E(insecPos, target.Position, target.ELDistance(insecPos) + jumpRange).To3D();
                 }
                 return new Vector3();
             }
@@ -421,9 +416,9 @@
                     }
                 }
 
-            if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.AAStacks")
-                    && PassiveStacks > getSliderItem(InitMenu.comboMenu, "ElLeeSin.Combo.PassiveStacks")
-                    && Player.GetAutoAttackRange() > Player.ELDistance(minions))
+                if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.AAStacks")
+                        && PassiveStacks > getSliderItem(InitMenu.comboMenu, "ElLeeSin.Combo.PassiveStacks")
+                        && Player.GetAutoAttackRange() > Player.ELDistance(minions))
                 {
                     return;
                 }
@@ -569,7 +564,7 @@
                 CastQ(target);
             }
 
-            if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.AAStacks") 
+            if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.AAStacks")
                 && PassiveStacks > getSliderItem(InitMenu.comboMenu, "ElLeeSin.Combo.PassiveStacks")
                 && Player.GetAutoAttackRange() > Player.ELDistance(target))
             {
