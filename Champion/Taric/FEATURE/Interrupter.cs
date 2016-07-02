@@ -56,7 +56,7 @@
         {
             var PacketCast = getCheckBoxItem(SkyLv_Taric.Misc, "Taric.UsePacketCast");
 
-            if (Player.LSIsRecalling()) return;
+            if (Player.LSIsRecalling() || sender.IsAlly) return;
 
             if (getCheckBoxItem(SkyLv_Taric.Misc, "Taric.AutoEInterrupt") && E.IsReady() && sender.LSIsValidTarget(E.Range))
                 E.Cast(sender, PacketCast);
