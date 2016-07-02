@@ -261,92 +261,65 @@ namespace UnderratedAIO.Champions
 
         private void Combo()
         {
+            if (activatedR)
+            {
+                return;
+            }
+            AIHeroClient target = TargetSelector.GetTarget(1500, DamageType.Physical);
+
             if (getCheckBoxItem(menuC, "user") && R.IsReady())
             {
                 var rTarget = TargetSelector.GetTarget(2500, DamageType.Physical);
-                if (rTarget == null) return;
-                if (!activatedR && !Orbwalker.IsAutoAttacking)
+                if (!activatedR)
                 {
-                    if (rTarget != null && !rTarget.IsInvulnerable && !rTarget.MagicImmune &&  rTarget.LSDistance(Game.CursorPos) < 300)
+                    if (rTarget != null && !rTarget.IsInvulnerable && !rTarget.MagicImmune &&
+                        rTarget.LSDistance(Game.CursorPos) < 300)
                     {
-                        if (player.LSDistance(rTarget) + 100 > Environment.Map.GetPath(player, rTarget.Position) && ComboDamage(rTarget) > rTarget.Health && !CombatHelper.IsCollidingWith( player, rTarget.Position.LSExtend(player.Position, player.BoundingRadius + 15), player.BoundingRadius, new[] {CollisionableObjects.Heroes, CollisionableObjects.Walls}) && (ComboDamage(rTarget) - R.GetDamage(rTarget) < rTarget.Health || rTarget.LSDistance(player) > 400 || player.HealthPercent < 25) && rTarget.CountAlliesInRange(2500) + 1 >= rTarget.CountEnemiesInRange(2500))
+                        if (player.LSDistance(rTarget) + 100 > Environment.Map.GetPath(player, rTarget.Position) &&
+                            (ComboDamage(rTarget) > rTarget.Health &&
+                             !CombatHelper.IsCollidingWith(
+                                 player, rTarget.Position.LSExtend(player.Position, player.BoundingRadius + 15),
+                                 player.BoundingRadius,
+                                 new[] { CollisionableObjects.Heroes, CollisionableObjects.Walls }) &&
+                             (ComboDamage(rTarget) - R.GetDamage(rTarget) < rTarget.Health ||
+                              rTarget.LSDistance(player) > 400 || player.HealthPercent < 25) &&
+                             rTarget.CountAlliesInRange(2500) + 1 >= rTarget.LSCountEnemiesInRange(2500)))
                         {
-                            R.Cast(rTarget.Position);
+                            R.Cast(target.Position);
                         }
                     }
                 }
             }
 
-            var target = TargetSelector.GetTarget(1500, DamageType.Physical);
             if (target == null || target.IsInvulnerable || target.MagicImmune)
             {
                 return;
             }
+
             var data = IncDamages.GetAllyData(player.NetworkId);
-            if (!activatedW && W.IsReady() && getCheckBoxItem(menuC, "usew"))
+            if (!activatedW && W.IsReady() && getCheckBoxItem(menuC, "usew") && W.IsInRange(target))
             {
-                if (data.DamageTaken > player.Health ||
-                    (data.DamageTaken > getWShield()/100*getSliderItem(menuC, "shieldDmg")) ||
-                    (target.LSDistance(player) < W.Range && getCheckBoxItem(menuC, "usewir")))
+                if (data.DamageTaken > player.Health || (data.DamageTaken > getWShield()/100*getSliderItem(menuC, "shieldDmg")) || (target.LSDistance(player) < W.Range && getCheckBoxItem(menuC, "usewir")))
                 {
                     W.Cast(getCheckBoxItem(config, "packets"));
                 }
             }
-            if (activatedW && getCheckBoxItem(menuC, "usew") && W.IsReady() &&
-                player.LSDistance(target) < W.Range &&
-                (target.Health < W.GetDamage(target) ||
-                 (W.IsInRange(target) && !W.IsInRange(Prediction.GetPrediction(target, 0.2f).UnitPosition))))
+
+            if (activatedW && getCheckBoxItem(menuC, "usew") && W.IsReady() && player.LSDistance(target) < W.Range && (target.Health < W.GetDamage(target) || (W.IsInRange(target) && !W.IsInRange(Prediction.GetPrediction(target, 0.2f).UnitPosition))))
             {
                 W.Cast(getCheckBoxItem(config, "packets"));
             }
 
-            var ignitedmg = (float) player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
-            var hasIgnite = player.Spellbook.CanUseSpell(player.GetSpellSlot("SummonerDot")) == SpellState.Ready;
-            if (getCheckBoxItem(menuC, "useIgnite") &&
-                ignitedmg > HealthPrediction.GetHealthPrediction(target, 700) && hasIgnite &&
-                !CombatHelper.CheckCriticalBuffs(target))
-            {
-                player.Spellbook.CastSpell(player.GetSpellSlot("SummonerDot"), target);
-            }
             if (activatedP)
             {
-                if (Q.IsReady() && player.LSDistance(target) > Orbwalking.GetRealAutoAttackRange(target))
+                if (Q.IsReady() && player.Distance(target) > Orbwalking.GetRealAutoAttackRange(target))
                 {
                     Q.Cast(getCheckBoxItem(config, "packets"));
                 }
                 return;
             }
-
-            var qTarget = TargetSelector.GetTarget(!Q.IsCharging ? Q.ChargedMaxRange / 2 : Q.ChargedMaxRange, DamageType.Physical);
-
-            if (qTarget == null && Q.IsCharging)
-            {
-                ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Q);
-            }
             if (Q.IsCharging)
             {
-                var start = ObjectManager.Player.ServerPosition.LSTo2D();
-                var end = start.LSExtend(QCastPos, Q.Range);
-                var direction = (end - start).LSNormalized();
-                var normal = direction.LSPerpendicular();
-
-                var points = new List<Vector2>();
-                var hitBox = qTarget.BoundingRadius;
-                points.Add(start + normal * (Q.Width + hitBox));
-                points.Add(start - normal * (Q.Width + hitBox));
-                points.Add(end + Q.ChargedMaxRange * direction - normal * (Q.Width + hitBox));
-                points.Add(end + Q.ChargedMaxRange * direction + normal * (Q.Width + hitBox));
-
-                for (var i = 0; i <= points.Count - 1; i++)
-                {
-                    var A = points[i];
-                    var B = points[i == points.Count - 1 ? 0 : i + 1];
-
-                    if (qTarget.ServerPosition.LSTo2D().LSDistance(A, B, true, true) < 50 * 50)
-                    {
-                        Q.Cast(qTarget, true);
-                    }
-                }
                 checkCastedQ(target);
                 return;
             }
@@ -368,10 +341,17 @@ namespace UnderratedAIO.Champions
                 W.Cast(getCheckBoxItem(config, "packets"));
             }
 
-            if (getCheckBoxItem(menuC, "userCC") && player.LSDistance(target) < Q.Range &&
-                HeroManager.Enemies.FirstOrDefault(e => e.LSDistance(Game.CursorPos) < 300) != null && data.AnyCC)
+            if (getCheckBoxItem(menuC, "userCC") && player.Distance(target) < Q.Range &&
+                HeroManager.Enemies.FirstOrDefault(e => e.Distance(Game.CursorPos) < 300) != null && data.AnyCC)
             {
                 R.Cast(Game.CursorPos, getCheckBoxItem(config, "packets"));
+            }
+
+            var ignitedmg = (float)player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+            var hasIgnite = player.Spellbook.CanUseSpell(player.GetSpellSlot("SummonerDot")) == SpellState.Ready;
+            if (getCheckBoxItem(menuC, "useIgnite") && ignitedmg > HealthPrediction.GetHealthPrediction(target, 700) && hasIgnite && !CombatHelper.CheckCriticalBuffs(target))
+            {
+                player.Spellbook.CastSpell(player.GetSpellSlot("SummonerDot"), target);
             }
         }
 
