@@ -28,11 +28,10 @@ namespace ExorAIO.Champions.Corki
             /// <summary>
             ///     The E Combo Logic.
             /// </summary>
-            if (Vars.E.IsReady() &&
-                Targets.Target.LSIsValidTarget(Vars.AARange) &&
-                Vars.getCheckBoxItem(Vars.EMenu, "combo"))
+            if (Vars.E.IsReady() && Targets.Target.LSIsValidTarget(GameObjects.Player.AttackRange) && Vars.getCheckBoxItem(Vars.EMenu, "combo"))
             {
-                Vars.E.Cast();
+                GameObjects.Player.Spellbook.CastSpell(EloBuddy.SpellSlot.E);
+                //Vars.E.Cast();
             }
 
             /// <summary>
