@@ -148,7 +148,7 @@ namespace Marksman.Champions
                             R.IsReady() && enemy.LSIsValidTarget() && R.GetDamage(enemy) > enemy.Health
                             && enemy.LSDistance(ObjectManager.Player) > Q.Range))
                 {
-                    Utils.MPing.Ping(enemy.Position.LSTo2D());
+                    //Utils.MPing.Ping(enemy.Position.LSTo2D());
                 }
             }
 

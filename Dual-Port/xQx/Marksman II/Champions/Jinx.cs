@@ -157,7 +157,7 @@ namespace Marksman.Champions
                         R.IsReady() && t.LSIsValidTarget() && R.GetDamage(t) > t.Health
                         && t.LSDistance(ObjectManager.Player) > Orbwalking.GetRealAutoAttackRange(null) + 65 + QAddRange))
                 {
-                    Utils.Utils.MPing.Ping(enemy.Position.LSTo2D(), 2, PingCategory.Normal);
+                    //Utils.Utils.MPing.Ping(enemy.Position.LSTo2D(), 2, PingCategory.Normal);
                 }
             }
 
