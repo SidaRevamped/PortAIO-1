@@ -67,7 +67,7 @@
         {
             this.Menu.AddGroupLabel(Name);
             this.Menu.Add("UseSeraphsCombo", new CheckBox("Activated"));
-            this.Menu.Add("ModeSERAPH", new ComboBox("Activation mode: ", 1, "Use always", "Use in combo"));
+            this.Menu.Add("Mode-seraphs", new ComboBox("Activation mode: ", 1, "Use always", "Use in combo"));
             this.Menu.Add("seraphs-min-health", new Slider("Health percentage", 20, 1));
             this.Menu.AddSeparator();
         }
