@@ -91,9 +91,9 @@
                 healMenu.Add("PauseHealHotkey", new KeyBind("Don't use heal key", false, KeyBind.BindTypes.HoldActive, 'L'));
                 healMenu.Add("min-health", new Slider("Health percentage", 20, 1));
                 healMenu.Add("min-damage", new Slider("Heal on % incoming damage", 20, 1));
-                foreach (var x in ObjectManager.Get<AIHeroClient>().Where(x => x.IsAlly))
+                foreach (var x in HeroManager.Allies)
                 {
-                    healMenu.Add("healon" + x.ChampionName, new CheckBox("Use for " + x.ChampionName));
+                    healMenu.Add($"healon{x.ChampionName}", new CheckBox("Use for " + x.ChampionName));
                 }
             }
 
@@ -150,16 +150,14 @@
                     }
 
                     var enemies = ally.LSCountEnemiesInRange(750f);
+                    var totalDamage = IncomingDamageManager.GetDamage(ally) * 1.1f;
 
                     if (ally.HealthPercent <= getSliderItem(this.Menu, "min-health") && (this.HealSpell.IsInRange(ally) || ally.IsMe) && enemies >= 1 && !ally.IsDead)
                     {
                         if (ally.HealthPercent < getSliderItem(this.Menu, "min-health"))
                         {
                             this.Player.Spellbook.CastSpell(this.HealSpell.Slot);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("[ELUTILITYSUITE - HEAL] Used for: {0} - health percentage: {1}%", ally.ChampionName, (int)ally.HealthPercent);
                         }
-                        Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
 

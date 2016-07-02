@@ -102,9 +102,9 @@
             {
                 snowballMenu.Add("Snowball.Activated", new CheckBox("Snowball activated"));
                 snowballMenu.Add("SnowballHotkey", new KeyBind("Throw snowball", false, KeyBind.BindTypes.HoldActive, 'Z'));
-                foreach (var x in ObjectManager.Get<AIHeroClient>().Where(x => x.IsEnemy))
+                foreach (var x in HeroManager.Enemies)
                 {
-                    snowballMenu.Add("snowballon" + x.ChampionName, new CheckBox("Use for " + x.ChampionName));
+                    snowballMenu.Add($"snowballon{x.ChampionName}", new CheckBox("Use for " + x.ChampionName));
                 }
             }
 

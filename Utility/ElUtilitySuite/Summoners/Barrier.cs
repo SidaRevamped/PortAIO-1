@@ -120,7 +120,7 @@
         {
             try
             {
-                if (this.Player.IsDead || !this.BarrierSpell.IsReady() || this.Player.InFountain() || this.Player.LSIsRecalling() || !getCheckBoxItem(this.Menu, "Barrier.Activated"))
+                if (this.Player.IsDead || !this.BarrierSpell.IsReady() || this.Player.HasBuff("ChronoShift") || this.Player.InFountain() || this.Player.LSIsRecalling() || !getCheckBoxItem(this.Menu, "Barrier.Activated"))
                 {
                     return;
                 }
@@ -135,10 +135,7 @@
                         || this.Player.HealthPercent < getSliderItem(this.Menu, "barrier.min-health"))
                     {
                         this.Player.Spellbook.CastSpell(this.BarrierSpell.Slot);
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("[ELUTILITYSUITE - BARRIER] Used for: {0} - health percentage: {1}%", this.Player.ChampionName, (int)this.Player.HealthPercent);
                     }
-                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
             catch (Exception e)
