@@ -23,16 +23,16 @@ namespace SephLissandra
         public static bool jumping;
         private static Vector2 MissilePosition;
         private static MissileClient LissEMissile;
-        public static Menu Config = LissMenu.Config;
-        public static Menu comboMenu = LissMenu.comboMenu;
-        public static Menu ksMenu = LissMenu.ksMenu;
-        public static Menu harassMenu = LissMenu.harassMenu;
-        public static Menu lastHitMenu = LissMenu.lastHitMenu;
-        public static Menu clearMenu = LissMenu.clearMenu;
-        public static Menu interruptMenu = LissMenu.interruptMenu;
-        public static Menu blackListMenu = LissMenu.blackListMenu;
-        public static Menu miscMenu = LissMenu.miscMenu;
-        public static Menu drawMenu = LissMenu.drawMenu;
+        public static Menu Config;
+        public static Menu comboMenu;
+        public static Menu ksMenu;
+        public static Menu harassMenu;
+        public static Menu lastHitMenu;
+        public static Menu clearMenu;
+        public static Menu interruptMenu;
+        public static Menu blackListMenu;
+        public static Menu miscMenu;
+        public static Menu drawMenu;
 
         private static Dictionary<string, Spell> Spells;
 
@@ -184,19 +184,19 @@ namespace SephLissandra
 
             if (Target != null && !Target.IsInvulnerable)
             {
-                if (getCheckBoxItem(comboMenu, "Combo.UseQ") && SpellSlot.Q.IsReady())
+                if (getCheckBoxItem(comboMenu, "Combo.UseQ") && Spells["Q"].IsReady())
                 {
                     CastQ(Target);
                 }
-                if (getCheckBoxItem(comboMenu, "Combo.UseW") && SpellSlot.W.IsReady())
+                if (getCheckBoxItem(comboMenu, "Combo.UseW") && Spells["W"].IsReady())
                 {
                     CastW(Target);
                 }
-                if (getCheckBoxItem(comboMenu, "Combo.UseE") && SpellSlot.E.IsReady())
+                if (getCheckBoxItem(comboMenu, "Combo.UseE") && Spells["E"].IsReady())
                 {
                     CastE(Target);
                 }
-                if (getCheckBoxItem(comboMenu, "Combo.UseR") && SpellSlot.R.IsReady() && !Target.IsZombie)
+                if (getCheckBoxItem(comboMenu, "Combo.UseR") && Spells["R"].IsReady() && !Target.IsZombie)
                 {
                     CastR(Target);
                 }
@@ -363,7 +363,7 @@ namespace SephLissandra
                 var Enemiesatpoint = LissEMissile.Position.GetEnemiesInRange(Spells["R"].Range);
                 var enemiesatpointR = Enemiesatpoint.Count;
 
-                if ((enemiesatpointR >= getSliderItem(comboMenu, "Combo.ecountR") && SpellSlot.R.IsReady()) ||
+                if ((enemiesatpointR >= getSliderItem(comboMenu, "Combo.ecountR") && Spells["R"].IsReady()) ||
                     Enemiesatpoint.Any(
                         e =>
                             e.IsKillableFromPoint(LissEMissile.Position) &&
@@ -379,7 +379,7 @@ namespace SephLissandra
                     return;
                 }
                 var enemiesatpointW = LissEMissile.Position.LSCountEnemiesInRange(Spells["W"].Range);
-                if (enemiesatpointW >= getSliderItem(comboMenu, "Combo.ecountW") && SpellSlot.W.IsReady())
+                if (enemiesatpointW >= getSliderItem(comboMenu, "Combo.ecountW") && Spells["W"].IsReady())
                 {
                     if (LissUtils.PointUnderEnemyTurret(MissilePosition) &&
                         getCheckBoxItem(miscMenu, "Misc.DontETurret"))
@@ -394,23 +394,23 @@ namespace SephLissandra
         public static bool IsKillableFromPoint(this AIHeroClient target, Vector3 Point, bool ExcludeE = false)
         {
             double totaldmgavailable = 0;
-            if (SpellSlot.Q.IsReady() && getCheckBoxItem(comboMenu, "Combo.UseQ") &&
+            if (Spells["Q"].IsReady() && getCheckBoxItem(comboMenu, "Combo.UseQ") &&
                 Vector3.Distance(Point, target.ServerPosition) < Spells["Q"].Range + 35)
             {
                 totaldmgavailable += Player.LSGetSpellDamage(target, SpellSlot.Q);
             }
-            if (SpellSlot.W.IsReady() && getCheckBoxItem(comboMenu, "Combo.UseW") &&
+            if (Spells["W"].IsReady() && getCheckBoxItem(comboMenu, "Combo.UseW") &&
                 Vector3.Distance(Point, target.ServerPosition) < Spells["W"].Range + 35)
             {
                 totaldmgavailable += Player.LSGetSpellDamage(target, SpellSlot.W);
             }
-            if (SpellSlot.E.IsReady() && getCheckBoxItem(comboMenu, "Combo.UseE") &&
+            if (Spells["E"].IsReady() && getCheckBoxItem(comboMenu, "Combo.UseE") &&
                 Vector3.Distance(Point, target.ServerPosition) < Spells["E"].Range + 35 && !LissUtils.CanSecondE() &&
                 LissEMissile == null && !ExcludeE)
             {
                 totaldmgavailable += Player.LSGetSpellDamage(target, SpellSlot.E);
             }
-            if (SpellSlot.R.IsReady() && getCheckBoxItem(comboMenu, "Combo.UseR") &&
+            if (Spells["R"].IsReady() && getCheckBoxItem(comboMenu, "Combo.UseR") &&
                 Vector3.Distance(Point, target.ServerPosition) < Spells["Q"].Range + 35)
             {
                 totaldmgavailable += Player.LSGetSpellDamage(target, SpellSlot.R);
@@ -526,7 +526,7 @@ namespace SephLissandra
             var targets = HeroManager.Enemies.Where(x => x.LSIsValidTarget() && !x.IsInvulnerable & !x.IsZombie);
 
             var objAiHeroes = targets as IList<AIHeroClient> ?? targets.ToList();
-            if (SpellSlot.Q.IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseQ"))
+            if (Spells["Q"].IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseQ"))
             {
                 var qtarget =
                     objAiHeroes.Where(x => x.LSDistance(Player.Position) < Spells["Q"].Range)
@@ -544,7 +544,7 @@ namespace SephLissandra
                     }
                 }
             }
-            if (SpellSlot.W.IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseW"))
+            if (Spells["W"].IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseW"))
             {
                 var wtarget =
                     objAiHeroes.Where(x => x.LSDistance(Player.Position) < Spells["W"].Range)
@@ -561,7 +561,7 @@ namespace SephLissandra
 
             var etarget =
                 objAiHeroes.Where(x => x.LSDistance(Player.Position) < Spells["E"].Range).MinOrDefault(x => x.Health);
-            if (SpellSlot.E.IsReady() && LissEMissile == null && !LissUtils.CanSecondE() &&
+            if (Spells["E"].IsReady() && LissEMissile == null && !LissUtils.CanSecondE() &&
                 getCheckBoxItem(ksMenu, "Killsteal.UseE"))
             {
                 if (etarget != null)
@@ -582,7 +582,7 @@ namespace SephLissandra
                 LissUtils.isHealthy() && getCheckBoxItem(ksMenu, "Killsteal.UseE2"))
             {
                 if (Vector3.Distance(LissEMissile.Position, etarget.Position) < Spells["Q"].Range &&
-                    SpellSlot.Q.IsReady() && etarget.Health < Player.LSGetSpellDamage(etarget, SpellSlot.Q))
+                    Spells["Q"].IsReady() && etarget.Health < Player.LSGetSpellDamage(etarget, SpellSlot.Q))
                 {
                     if (LissUtils.PointUnderEnemyTurret(MissilePosition) &&
                         getCheckBoxItem(miscMenu, "Misc.DontETurret"))
@@ -608,7 +608,7 @@ namespace SephLissandra
                 }
             }
 
-            if (SpellSlot.R.IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseR"))
+            if (Spells["R"].IsReady() && getCheckBoxItem(ksMenu, "Killsteal.UseR"))
             {
                 var Rtarget =
                     objAiHeroes.Where(
@@ -696,7 +696,7 @@ namespace SephLissandra
                              Vector3.Distance(m.ServerPosition, Player.ServerPosition) <= Spells["W"].Range ||
                              Vector3.Distance(m.ServerPosition, Player.ServerPosition) <= Spells["E"].Range));
 
-            if (SpellSlot.Q.IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseQ"))
+            if (Spells["Q"].IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseQ"))
             {
                 var KillableMinionsQ =
                     Minions.Where(
@@ -708,7 +708,7 @@ namespace SephLissandra
                     Spells["Q"].Cast(KillableMinionsQ.FirstOrDefault().ServerPosition);
                 }
             }
-            if (SpellSlot.W.IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseW"))
+            if (Spells["W"].IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseW"))
             {
                 var KillableMinionsW =
                     Minions.Where(
@@ -721,7 +721,7 @@ namespace SephLissandra
                 }
             }
 
-            if (SpellSlot.E.IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseE") && LissEMissile == null &&
+            if (Spells["E"].IsReady() && getCheckBoxItem(lastHitMenu, "Farm.UseE") && LissEMissile == null &&
                 !LissUtils.CanSecondE() && LissEMissile == null)
             {
                 var KillableMinionsE =
@@ -748,7 +748,7 @@ namespace SephLissandra
                              Vector3.Distance(m.ServerPosition, Player.ServerPosition) <= Spells["E"].Range));
 
 
-            if (SpellSlot.Q.IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseQ"))
+            if (Spells["Q"].IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseQ"))
             {
                 var qminions =
                     Minions.Where(
@@ -764,7 +764,7 @@ namespace SephLissandra
                 }
             }
 
-            if (SpellSlot.E.IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseE"))
+            if (Spells["E"].IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseE"))
             {
                 if (LissEMissile == null && !LissUtils.CanSecondE())
                 {
@@ -781,7 +781,7 @@ namespace SephLissandra
                 }
                 else if (LissEMissile != null && getCheckBoxItem(clearMenu, "Waveclear.UseE2") &&
                          Vector2.Distance(MissilePosition, LissEMissile.EndPosition.LSTo2D()) <= 15 &&
-                         SpellSlot.E.IsReady())
+                         Spells["E"].IsReady())
                 {
                     if (LissUtils.PointUnderEnemyTurret(MissilePosition) &&
                         getCheckBoxItem(miscMenu, "Misc.DontETurret"))
@@ -792,7 +792,7 @@ namespace SephLissandra
                 }
             }
 
-            if (SpellSlot.W.IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseW"))
+            if (Spells["W"].IsReady() && getCheckBoxItem(clearMenu, "Waveclear.UseW"))
             {
                 var wminions =
                     Minions.Where(
