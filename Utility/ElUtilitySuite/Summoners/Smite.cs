@@ -431,6 +431,7 @@
 
             if (this.Menu["ElSmite.KS.Activated"].Cast<CheckBox>().CurrentValue && this.SmiteSpell.IsReady())
             {
+                var kSableEnemy = HeroManager.Enemies.FirstOrDefault(hero => !hero.IsZombie && this.SmiteSpell.IsInRange(hero) && hero.LSIsValidTarget(SmiteRange) && this.SmiteDmg() >= hero.Health && hero.IsVisible && hero.IsHPBarRendered);
                 if (kSableEnemy != null)
                 {
                     this.Player.Spellbook.CastSpell(this.SmiteSpell.Slot, kSableEnemy);
@@ -438,6 +439,7 @@
             }
         }
 
+        private float SmiteDmg()
         {
             if (this.SmiteSpell.Slot == Extensions.GetSpellSlotFromName(ObjectManager.Player, "s5_summonersmiteduel"))
             {
