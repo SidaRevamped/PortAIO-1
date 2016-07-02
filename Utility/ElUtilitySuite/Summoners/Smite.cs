@@ -396,19 +396,12 @@
         /// <param name="args">The <see cref="System.EventArgs" /> instance containing the event data.</param>
         private void OnUpdate(EventArgs args)
         {
-            if (this.Player.IsDead || this.SmiteSpell == null
-                || !this.Menu["ElSmite.Activated"].Cast<KeyBind>().CurrentValue || !this.SmiteSpell.IsReady())
+            if (this.Player.IsDead || this.SmiteSpell == null || !this.Menu["ElSmite.Activated"].Cast<KeyBind>().CurrentValue || !this.SmiteSpell.IsReady())
             {
                 return;
             }
 
             var minion = EntityManager.MinionsAndMonsters.Monsters.FirstOrDefault(o => Vector3.Distance(ObjectManager.Player.Position, o.ServerPosition) <= 950f && o.Team == GameObjectTeam.Neutral && !o.CharData.BaseSkinName.ToLower().Contains("barrel") && !o.CharData.BaseSkinName.ToLower().Contains("mini") && !o.CharData.BaseSkinName.ToLower().Contains("respawn") && SmiteObjects.Contains(o.BaseSkinName) && o.LSIsValidTarget(SmiteRange) && this.Menu[o.CharData.BaseSkinName].Cast<CheckBox>().CurrentValue);
-
-            if (minion != null)
-            {
-                Console.WriteLine(minion.BaseSkinName);
-            }
-
             if (minion != null && this.Player.GetSummonerSpellDamage(minion, LeagueSharp.Common.Damage.SummonerSpell.Smite) > minion.Health)
             {
                 this.SmiteSpell.Cast(minion);
@@ -438,12 +431,26 @@
 
             if (this.Menu["ElSmite.KS.Activated"].Cast<CheckBox>().CurrentValue && this.SmiteSpell.IsReady())
             {
-                var kSableEnemy = HeroManager.Enemies.FirstOrDefault(hero => !hero.IsZombie && hero.LSIsValidTarget(SmiteRange) && this.SmiteSpell.GetDamage(hero) >= hero.Health && hero.IsVisible && hero.IsHPBarRendered);
                 if (kSableEnemy != null)
                 {
                     this.Player.Spellbook.CastSpell(this.SmiteSpell.Slot, kSableEnemy);
                 }
             }
+        }
+
+        {
+            if (this.SmiteSpell.Slot == Extensions.GetSpellSlotFromName(ObjectManager.Player, "s5_summonersmiteduel"))
+            {
+                var damage = new int[] { 54 + 6 * ObjectManager.Player.Level };
+                return EloBuddy.Player.CanUseSpell(this.SmiteSpell.Slot) == SpellState.Ready ? damage.Max() : 0;
+            }
+
+            if (this.SmiteSpell.Slot == Extensions.GetSpellSlotFromName(ObjectManager.Player, "s5_summonersmiteplayerganker"))
+            {
+                var damage = new int[] { 20 + 8 * ObjectManager.Player.Level };
+                return EloBuddy.Player.CanUseSpell(this.SmiteSpell.Slot) == SpellState.Ready ? damage.Max() : 0;
+            }
+            return 0;
         }
 
         private float SmiteDamage()
