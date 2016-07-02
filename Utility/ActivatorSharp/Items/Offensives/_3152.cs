@@ -37,7 +37,7 @@ namespace Activators.Items.Offensives
                     if (Tar.Player.LSDistance(Player.ServerPosition) > Range - 100 && !Tar.Player.LSIsFacing(Player) && !Tar.Player.IsMelee)
                     {
                         var endpos = Player.ServerPosition.LSTo2D() + Player.Direction.LSTo2D().LSPerpendicular() * Range;
-                        if (endpos.To3D().CountEnemiesInRange(Range + (1 + Player.AttackRange + Player.LSDistance(Player.BBox.Minimum))) > 0)
+                        if (endpos.To3D().LSCountEnemiesInRange(Range + (1 + Player.AttackRange + Player.LSDistance(Player.BBox.Minimum))) > 0)
                         {
                             UseItem(true);
                         }
