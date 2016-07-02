@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,15 @@ namespace GosuMechanicsYasuo
     class Program
     {
 
-        public static LeagueSharp.Common.Spell Q, Q3;
+        public static LeagueSharp.Common.Spell Q1,Q3;
+        public static readonly EloBuddy.SDK.Spell.Skillshot Q = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.Q, 475, EloBuddy.SDK.Enumerations.SkillShotType.Linear, (int)GetQ1Delay, GetNewQSpeed() , 20)
+        {
+            AllowedCollisionCount = int.MaxValue
+        };
+        public static readonly EloBuddy.SDK.Spell.Skillshot Q4 = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.Q, 900, EloBuddy.SDK.Enumerations.SkillShotType.Linear, (int)GetQ2Delay, 1200, 90)
+        {
+            AllowedCollisionCount = int.MaxValue
+        };
         public static LeagueSharp.Common.Spell W = new LeagueSharp.Common.Spell(SpellSlot.W, 400);
         public static LeagueSharp.Common.Spell E = new LeagueSharp.Common.Spell(SpellSlot.E, 475);
         public static LeagueSharp.Common.Spell R = new LeagueSharp.Common.Spell(SpellSlot.R, 1200);
@@ -85,9 +93,9 @@ namespace GosuMechanicsYasuo
             if (myHero.ChampionName != "Yasuo")
                 return;
 
-            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 505);
+            Q1 = new LeagueSharp.Common.Spell(SpellSlot.Q, 505);
             Q3 = new LeagueSharp.Common.Spell(SpellSlot.Q, 1100);
-            Q.SetSkillshot(GetQ1Delay, 20, float.MaxValue, false, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(GetQ1Delay, 20, float.MaxValue, false, SkillshotType.SkillshotLine);
             Q3.SetSkillshot(GetQ2Delay, 90, 1200, false, SkillshotType.SkillshotLine);
 
             var slot = ObjectManager.Player.GetSpellSlot("summonerdot");
@@ -117,8 +125,8 @@ namespace GosuMechanicsYasuo
             comboMenu.Add("QC", new CheckBox("Use Q"));
             comboMenu.AddGroupLabel("E Settings : ");
             comboMenu.Add("EC", new CheckBox("Use E"));
-            comboMenu.Add("E1", new Slider("when enemy range >=", 375, 1, 475));
-            comboMenu.Add("E2", new Slider("Use E-GapCloser when enemy range >=", 230, 1, 1300));
+            comboMenu.Add("E1", new Slider("when enemy range >=", 1, 1, 475));
+            comboMenu.Add("E2", new Slider("Use E-GapCloser when enemy range >=", 250, 1, 1300));
             comboMenu.Add("E3", new CheckBox("Mode: On = ToTarget / OFF = ToMouse"));
             comboMenu.AddGroupLabel("R Settings : ");
             comboMenu.Add("R", new CheckBox("Use Smart R"));
@@ -180,7 +188,7 @@ namespace GosuMechanicsYasuo
             smartWMenu = Config.AddSubMenu("WindWall Settings", "aShots");
             smartWMenu.Add("smartW", new CheckBox("Use Auto WindWall"));
             smartWMenu.Add("smartWDanger", new Slider("if Spell DangerLevel >=", 3, 1, 5));
-            smartWMenu.Add("smartWDelay", new Slider("WindWall Humanizer (500 = Lowest Reaction Time)", 3000, 500, 3000));
+            smartWMenu.Add("smartWDelay", new Slider("WindWall Humanizer (Delay)", 500, 0, 3000));
             smartWMenu.Add("smartEDogue", new CheckBox("Use E-Vade"));
             smartWMenu.Add("smartEDogueDanger", new Slider("if Spell DangerLevel >=", 1, 1, 5));
             smartWMenu.Add("wwDanger", new CheckBox("Block only dangerous", false));
@@ -207,8 +215,8 @@ namespace GosuMechanicsYasuo
             SkillshotDetector.OnDeleteMissile += OnDeleteMissile;
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
-            Obj_AI_Base.OnDelete += Obj_AI_Base_OnDelete;
+            GameObject.OnCreate += Obj_AI_Base_OnCreate;
+            GameObject.OnDelete += Obj_AI_Base_OnDelete;
             Obj_AI_Base.OnPlayAnimation += Obj_AI_Base_OnPlayAnimation;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
@@ -265,7 +273,7 @@ namespace GosuMechanicsYasuo
 
             if (Q3.IsReady() && Q3READY() && getCheckBoxItem(miscMenu, "IntAnt"))
             {
-                Q3.Cast(target);
+                Q4.Cast(target);
             }
         }
 
@@ -273,7 +281,7 @@ namespace GosuMechanicsYasuo
         {
             if (sender != null && Q3.IsReady() && Q3READY() && sender.LSIsValidTarget(Q3.Range) && getCheckBoxItem(miscMenu, "IntAnt"))
             {
-                Q3.Cast(sender);
+                Q4.Cast(sender);
             }
         }
 
@@ -296,7 +304,7 @@ namespace GosuMechanicsYasuo
             }
 
             EvadeDetectedSkillshots.RemoveAll(skillshot => !skillshot.IsActive());
-
+           // SpellDetectorWindwaller.Init(); In Dev need some fixs
             foreach (var mis in EvadeDetectedSkillshots)
             {
                 if (getCheckBoxItem(smartWMenu, "smartW"))
@@ -348,11 +356,11 @@ namespace GosuMechanicsYasuo
             {
                 var TsTarget = TargetSelector.GetTarget(1000, DamageType.Physical);
 
-                if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && getCheckBoxItem(harassMenu, "HarassTower") && Q3.IsReady() && getCheckBoxItem(harassMenu, "HarassQ3") && !IsDashing && Q3READY() && Q3.IsInRange(TsTarget))
+                if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && getCheckBoxItem(harassMenu, "HarassTower") && Q3.IsReady() && getCheckBoxItem(harassMenu, "HarassQ3") && !IsDashing && Q3READY() && Extensions.IsValidTarget(TsTarget, Q3.Range))
                 {
                     CastQ3(TsTarget);
                 }
-                else if (TsTarget != null && !getCheckBoxItem(harassMenu, "HarassTower") && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && !UnderTower(myHero.ServerPosition.LSTo2D()) && Q3.IsReady() && getCheckBoxItem(harassMenu, "HarassQ3") && !IsDashing && Q3READY() && Q3.IsInRange(TsTarget))
+                else if (TsTarget != null && !getCheckBoxItem(harassMenu, "HarassTower") && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && !UnderTower(myHero.ServerPosition.LSTo2D()) && Q3.IsReady() && getCheckBoxItem(harassMenu, "HarassQ3") && !IsDashing && Q3READY() && Extensions.IsValidTarget(TsTarget,Q3.Range))
                 {
                     CastQ3(TsTarget);
                 }
@@ -362,15 +370,34 @@ namespace GosuMechanicsYasuo
             {
                 var TsTarget = TargetSelector.GetTarget(475, DamageType.Physical);
 
-                if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && getCheckBoxItem(harassMenu, "HarassTower") && !Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && Q.IsInRange(TsTarget))
+                if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && getCheckBoxItem(harassMenu, "HarassTower") && !Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && Extensions.IsValidTarget(TsTarget, Q.Range))
                 {
                     CastQ12(TsTarget);
                 }
-                else if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && !getCheckBoxItem(harassMenu, "HarassTower") && !Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && !UnderTower(myHero.ServerPosition.LSTo2D()) && Q.IsInRange(TsTarget))
+                else if (TsTarget != null && TsTarget.CharData.BaseSkinName != "gangplankbarrel" && !getCheckBoxItem(harassMenu, "HarassTower") && !Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && !UnderTower(myHero.ServerPosition.LSTo2D()) && Extensions.IsValidTarget(TsTarget, Q.Range))
                 {
                     CastQ12(TsTarget);
                 }
             }
+            //need fix
+            /*foreach (var enemy in EntityManager.Heroes.Enemies)
+            {
+                if (enemy.HasBuff("KatarinaR") || enemy.HasBuff("KatarinaRSound") && enemy.ChampionName == "Katarina" && Player.Instance.Distance(enemy) < 550)
+                {
+                    if (Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
+                    {
+                        Player.CastSpell(SpellSlot.W, enemy.Position);
+                    }
+                }
+                if (enemy.HasBuff("SwainMetamorphism") && enemy.ChampionName == "Swain" && Player.Instance.Distance(enemy) < 700)
+                {
+                    if (Player.GetSpell(SpellSlot.W).State == SpellState.Ready)
+                    {
+                        Player.CastSpell(SpellSlot.W, enemy.Position);
+                    }
+                }
+            };
+            */
         }
         public static void HarassLastHit()
         {
@@ -381,7 +408,7 @@ namespace GosuMechanicsYasuo
                     return;
                 }
 
-                if (!minion.IsDead && minion != null && getCheckBoxItem(lastHitMenu, "LastHitQ1") && Q.IsReady() && minion.LSIsValidTarget(500) && !Q3READY() && Q.IsInRange(minion))
+                if (!minion.IsDead && minion != null && getCheckBoxItem(lastHitMenu, "LastHitQ1") && Q.IsReady() && minion.LSIsValidTarget(500) && !Q3READY() && Extensions.IsValidTarget(minion, Q.Range))
                 {
                     var predHealth = HealthPrediction.GetHealthPrediction(minion, (int)(Program.myHero.LSDistance(minion.Position) * 1000 / 2000));
                     if (predHealth <= GetQDmg(minion))
@@ -408,6 +435,7 @@ namespace GosuMechanicsYasuo
                 }
                 else if (!Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && Q.IsInRange(TsTarget))
                 {
+                    TsTarget = TargetSelector.GetTarget(470, DamageType.Physical);
                     CastQ12(TsTarget);
                 }
             }
@@ -419,6 +447,7 @@ namespace GosuMechanicsYasuo
                 }
                 if (!Q3READY() && Q.IsReady() && getCheckBoxItem(harassMenu, "HarassQ") && !IsDashing && !UnderTower(myHero.ServerPosition.LSTo2D()) && Q.IsInRange(TsTarget))
                 {
+                    TsTarget = TargetSelector.GetTarget(470, DamageType.Physical);
                     CastQ12(TsTarget);
                 }
             }
@@ -528,7 +557,7 @@ namespace GosuMechanicsYasuo
                     else if (!Q3READY() && Q.IsInRange(minion) && !IsDashing)
                     {
                         List<Vector2> minionPs = GetCastMinionsPredictedPositions(Qminion, .025f, 50f, float.MaxValue, myHero.ServerPosition, 475f, false, SkillshotType.SkillshotLine);
-                        MinionManager.FarmLocation farm = Q.GetLineFarmLocation(minionPs);
+                        MinionManager.FarmLocation farm = Q1.GetLineFarmLocation(minionPs);
                         if (farm.MinionsHit >= 1)
                         {
                             CastQ12(minion);
@@ -671,11 +700,17 @@ namespace GosuMechanicsYasuo
 
             var enemies = enemiesKnockedUp as IList<AIHeroClient> ?? enemiesKnockedUp.ToList();
 
-            if (enemies.Count() >= autoREnemies && Program.myHero.Health >= MyHP && myHero.CountEnemiesInRange(1500) <= enemyInRange)
+            if (enemies.Count() >= autoREnemies && Program.myHero.Health >= MyHP && myHero.LSCountEnemiesInRange(1500) <= enemyInRange)
             {
                 Program.R.Cast();
             }
         }
+        private static List<AIHeroClient> GetRTarget => EntityManager.Heroes.Enemies.Where(i => i.LSIsValidTarget(R.Range) && HaveR(i)).ToList();
+                private static bool HaveR(AIHeroClient target)
+        {
+            return target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Knockup);
+        }
+
         public static void Combo()
         {
             var TsTarget = TargetSelector.GetTarget(1300, DamageType.Physical);
@@ -687,7 +722,7 @@ namespace GosuMechanicsYasuo
 
             if (TsTarget != null && getCheckBoxItem(comboMenu, "QC"))
             {
-                if (Q3READY() && Q3.IsReady() && Q3.IsInRange(TsTarget) && !IsDashing)
+                if (Q3READY() && Q3.IsReady() && Extensions.IsValidTarget(TsTarget,Q3.Range) && !IsDashing)
                 {
                     PredictionOutput Q3Pred = Q3.GetPrediction(TsTarget);
                     if (Q3.IsInRange(TsTarget) && Q3Pred.Hitchance >= HitChance.VeryHigh) 
@@ -695,12 +730,13 @@ namespace GosuMechanicsYasuo
                         Q3.Cast(TsTarget);
                     }
                 }
-                if (!Q3READY() && Q.IsReady() && Q.IsInRange(TsTarget))
+                if (!Q3READY() && Q.IsReady() && Extensions.IsValidTarget(TsTarget, Q.Range))
                 {
-                    PredictionOutput QPred = Q.GetPrediction(TsTarget);
-                    if (Q.IsInRange(TsTarget) && QPred.Hitchance >= HitChance.High)
+                    PredictionOutput QPred = Q1.GetPrediction(TsTarget);
+                    if (Q.IsInRange(TsTarget) && QPred.Hitchance >= LeagueSharp.Common.HitChance.High)
                     {
-                        Q.Cast(TsTarget);
+                        TsTarget = TargetSelector.GetTarget(470, DamageType.Physical);
+                        Q1.Cast(TsTarget);
                     }
                 } 
             }
@@ -723,7 +759,7 @@ namespace GosuMechanicsYasuo
                 {
                     useENormal(TsTarget);
                 }
-                else if (Q.IsReady() && IsDashing && myHero.LSDistance(TsTarget) <= 275 * 275)
+                else if (Q.IsReady() && IsDashing && myHero.LSDistance(TsTarget) <= 300)
                 {
                     LeagueSharp.Common.Utility.DelayAction.Add(200, () => { CastQ12(TsTarget); } );
                 }
@@ -731,7 +767,7 @@ namespace GosuMechanicsYasuo
                 {
                     E.CastOnUnit(TsTarget, true);
                 }
-                else if (Q3.IsReady() && IsDashing && myHero.LSDistance(TsTarget) <= 275 * 275 && Q3READY())
+                else if (Q3.IsReady() && IsDashing && myHero.LSDistance(TsTarget) <= 300 && Q3READY())
                 {
                     LeagueSharp.Common.Utility.DelayAction.Add(200, () => { CastQ3(TsTarget); });
                 }           
@@ -749,7 +785,7 @@ namespace GosuMechanicsYasuo
                     {
                         E.CastOnUnit(bestMinion, true);
                     }
-                    else if (bestMinion != null && TsTarget != null && dmg2 <= TsTarget.Health && myHero.LSIsFacing(bestMinion) && TsTarget.LSDistance(myHero) >= (getSliderItem(comboMenu, "E2")) && CanCastE(bestMinion) && myHero.IsFacing(bestMinion))
+                    else if (bestMinion != null && TsTarget != null && dmg2 <= TsTarget.Health && myHero.LSIsFacing(bestMinion) && TsTarget.LSDistance(myHero) >= (getSliderItem(comboMenu, "E2")) && CanCastE(bestMinion) && myHero.LSIsFacing(bestMinion))
                     {
                         useENormal(bestMinion);
                     }
@@ -768,7 +804,7 @@ namespace GosuMechanicsYasuo
                     {
                         E.CastOnUnit(bestMinion, true);
                     }
-                    else if (bestMinion != null && TsTarget != null && dmg3 <= TsTarget.Health && myHero.IsFacing(bestMinion) && TsTarget.LSDistance(myHero) >= (getSliderItem(comboMenu, "E2")) && CanCastE(bestMinion) && myHero.LSIsFacing(bestMinion))
+                    else if (bestMinion != null && TsTarget != null && dmg3 <= TsTarget.Health && myHero.LSIsFacing(bestMinion) && TsTarget.LSDistance(myHero) >= (getSliderItem(comboMenu, "E2")) && CanCastE(bestMinion) && myHero.LSIsFacing(bestMinion))
                     {
                         useENormal(bestMinion);
                     }
@@ -792,34 +828,35 @@ namespace GosuMechanicsYasuo
 
             if (Program.R.IsReady() && getCheckBoxItem(comboMenu, "R"))
             {
-                List<AIHeroClient> enemies = HeroManager.Enemies;
+                List<AIHeroClient> enemies = EntityManager.Heroes.Enemies;
                 foreach (AIHeroClient enemy in enemies)
                 {
                     if (ObjectManager.Player.LSDistance(enemy) <= 1200)
                     {
                         var enemiesKnockedUp =
                             ObjectManager.Get<AIHeroClient>()
-                            .Where(x => x.LSIsValidTarget(Program.R.Range))
-                            .Where(x => x.HasBuffOfType(BuffType.Knockup));
+                            .Where(x => x.LSIsValidTarget(R.Range))
+                            .Where(x => x.HasBuffOfType(BuffType.Knockback) || x.HasBuffOfType(BuffType.Knockup)).MaxOrDefault(i => new LeagueSharp.SDK.Modes.Priority().GetDefaultPriority(enemy));
 
-                        var enemiesKnocked = enemiesKnockedUp as IList<AIHeroClient> ?? enemiesKnockedUp.ToList();
-                        if (enemy.LSIsValidTarget(Program.R.Range) && Program.CanCastDelayR(enemy) && enemiesKnocked.Count() >= (getSliderItem(comboMenu, "R2")))
+                        var targets = GetRTarget;
+
+                        if (enemy.LSIsValidTarget(R.Range) && CanCastDelayR(enemy) && targets.Count() >= (getSliderItem(comboMenu, "R2")) && enemiesKnockedUp != null)
                         {
-                            Program.R.Cast();
+                            R.Cast();
                         }
                     }
-                    if (enemy.LSIsValidTarget(Program.R.Range))
+                    if (enemy.LSIsValidTarget(1200))
                     {
                         
-                        if (Program.IsKnockedUp(enemy) && Program.CanCastDelayR(enemy) && enemy.Health <= ((getSliderItem(comboMenu, "R1") / 100 * enemy.MaxHealth) * 1.5f) && getCheckBoxItem(ultMenu, enemy.NetworkId + ""))
+                        if (IsKnockedUp(enemy) && CanCastDelayR(enemy) && enemy.Health <= ((getSliderItem(comboMenu, "R1") / 100 * enemy.MaxHealth) * 1.5f) && getCheckBoxItem(ultMenu, enemy.NetworkId + "") && R.IsReady())
                         {
-                            Program.R.Cast();
+                            R.Cast();
                         }
-                        else if (Program.IsKnockedUp(enemy) && Program.CanCastDelayR(enemy) && enemy.Health >= ((getSliderItem(comboMenu, "R1") / 100 * enemy.MaxHealth) * 1.5f) && (getCheckBoxItem(comboMenu, "R3")))
+                        else if (IsKnockedUp(enemy) && CanCastDelayR(enemy) && enemy.Health >= ((getSliderItem(comboMenu, "R1") / 100 * enemy.MaxHealth) * 1.5f) && (getCheckBoxItem(comboMenu, "R3")) && R.IsReady())
                         {
-                            if (Program.AlliesNearTarget(enemy, 600))
+                            if (AlliesNearTarget(enemy, 600))
                             {
-                                Program.R.Cast();
+                                R.Cast();
                             }
                         }
                     }
@@ -882,10 +919,10 @@ namespace GosuMechanicsYasuo
             {
                 return;
             }
-            PredictionOutput QPred = Q.GetPrediction(target, true);
-            if (QPred.Hitchance >= HitChance.Medium && Q.IsInRange(target))
+            PredictionOutput QPred = Q1.GetPrediction(target);
+            if (QPred.Hitchance >= LeagueSharp.Common.HitChance.High && Extensions.IsValidTarget(target, Q.Range))
             {
-                Q.Cast(QPred.CastPosition, true);
+                Q1.Cast(target);
             }
         }
         public static void CastQ3(Obj_AI_Base target)
@@ -895,9 +932,9 @@ namespace GosuMechanicsYasuo
                 return;
             }
             PredictionOutput Q3Pred = Q3.GetPrediction(target, true);
-            if (Q3Pred.Hitchance >= HitChance.Medium && Q3.IsInRange(target))
+            if (Q3Pred.Hitchance >= HitChance.High && Extensions.IsValidTarget(target, Q3.Range))
             {
-                Q.Cast(Q3Pred.CastPosition, true);
+                Q4.Cast(target);
             }
         }
         public static void CastQ3AoE()
@@ -905,9 +942,9 @@ namespace GosuMechanicsYasuo
             foreach (AIHeroClient target in HeroManager.Enemies.Where(x => x.LSIsValidTarget(1100)))
             {
                 PredictionOutput Q3Pred = Q3.GetPrediction(target, true);
-                if (Q3Pred.Hitchance >= HitChance.Medium && Q3.IsInRange(target) && Q3Pred.AoeTargetsHitCount >= 2)
+                if (Q3Pred.Hitchance >= HitChance.High && Extensions.IsValidTarget(target ,Q3.Range) && Q3Pred.AoeTargetsHitCount >= 2)
                 {
-                    Q3.Cast(Q3Pred.CastPosition, true);
+                    Q4.Cast(target);
                 }
             }          
         }
@@ -985,7 +1022,7 @@ namespace GosuMechanicsYasuo
             if (!target.IsMoving || myHero.LSDistance(dashPos) <= dist + 40)
                 if (dist < 330 && dist > 100 && W.IsReady() && getCheckBoxItem(wwMenu, target.NetworkId + ""))
                 {
-                    W.Cast(po.UnitPosition, true);
+                    W.Cast(po.UnitPosition - 50, true);
                 }
         }
 
@@ -1282,7 +1319,7 @@ namespace GosuMechanicsYasuo
                 Vector2 posAfterE = pPos + (Vector2.Normalize(target.Position.LSTo2D() - pPos) * E.Range);
                 if (!(posAfterE.To3D().UnderTurret(true)))
                 {
-                    Console.WriteLine("use gap?");
+                    //Console.WriteLine("use gap?");
                     if (isSafePoint(posAfter, true).IsSafe)
                     {
                         E.Cast(target, true, false);
@@ -1698,7 +1735,10 @@ namespace GosuMechanicsYasuo
         {
             return m[item].Cast<ComboBox>().CurrentValue;
         }
-
+        public static int GetNewQSpeed()
+        {
+            return (int)(1 / (1 / 0.5 * Player.Instance.AttackSpeedMod));
+        }
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (getCheckBoxItem(drawMenu, "Disable"))

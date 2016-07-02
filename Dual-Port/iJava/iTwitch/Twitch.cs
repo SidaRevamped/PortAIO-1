@@ -67,9 +67,6 @@
             miscOptions.Add("com.itwitch.misc.noWAA", new Slider("No W if x aa can kill", 2, 0, 10));
             miscOptions.Add("com.itwitch.misc.saveManaE", new CheckBox("Save Mana for E", true));
             miscOptions.Add("com.itwitch.misc.recall", new KeyBind("Stealth Recall", false, KeyBind.BindTypes.HoldActive, 'T'));
-            miscOptions.AddLabel("Will Instant Q After Kill");
-            miscOptions.Add("com.itwitch.misc.EAAQ", new CheckBox("E AA Q", false));
-            miscOptions.AddLabel("Will cast E if killable by E + AA then Q");
 
 
             drawOptions = Menu.AddSubMenu("iTwitch 2.0 - Drawing", "com.itwitch.drawing");
@@ -288,25 +285,27 @@
 
             if (getCheckBoxItem(comboOptions, "com.itwitch.combo.useEKillable") && Spells[SpellSlot.E].IsReady())
             {
-                if (getCheckBoxItem(miscOptions, "com.itwitch.misc.EAAQ") && Spells[SpellSlot.Q].IsReady()) return;
-
-                if (HeroManager.Enemies.Any(x => x.IsPoisonKillable() && x.LSIsValidTarget(Spells[SpellSlot.E].Range)))
+                foreach (var enemy in
+                HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(Spells[SpellSlot.E].Range) && enemy.HasBuff("TwitchDeadlyVenom")))
                 {
-                    Spells[SpellSlot.E].Cast();
+                    if (enemy.IsPoisonKillable() && (Spells[SpellSlot.E].GetDamage(enemy) + Spells[SpellSlot.E].GetDamage(enemy, 1)) > enemy.Health)
+                    {
+                        Spells[SpellSlot.E].Cast();
+                    }
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    OnCombo();
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    OnHarass();
                 }
             }
 
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-            {
-                OnCombo();
-            }
-
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-            {
-                OnHarass();
-            }
         }
-
         #endregion
     }
 }

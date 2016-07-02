@@ -11,12 +11,14 @@ using HitChance = SebbyLib.Prediction.HitChance;
 using Prediction = SebbyLib.Prediction.Prediction;
 using PredictionInput = SebbyLib.Prediction.PredictionInput;
 using Spell = LeagueSharp.Common.Spell;
+using System.Collections.Generic;
 
 namespace PortAIO.Champion.Ashe
 {
     internal class Program
     {
         private static readonly Menu Config = SebbyLib.Program.Config;
+        private static bool CastR = false;
         public static Spell Q, W, E, R;
         public static float QMANA, WMANA, EMANA, RMANA;
         private static Menu drawMenu, QMenu, EMenu, RMenu, FarmMenu, harassMenu;
@@ -41,6 +43,11 @@ namespace PortAIO.Champion.Ashe
             return m[item].Cast<KeyBind>().CurrentValue;
         }
 
+        public static int getBoxItem(Menu m, string item)
+        {
+            return m[item].Cast<ComboBox>().CurrentValue;
+        }
+
         public static bool getAutoE()
         {
             return EMenu["autoE"].Cast<CheckBox>().CurrentValue;
@@ -63,7 +70,29 @@ namespace PortAIO.Champion.Ashe
             RMenu.Add("Rkscombo", new CheckBox("R KS combo R + W + AA"));
             RMenu.Add("autoRaoe", new CheckBox("Auto R aoe"));
             RMenu.Add("autoRinter", new CheckBox("Auto R OnPossibleToInterrupt"));
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var spell = enemy.Spellbook.Spells[i];
+                    if (spell.SData.TargettingType != SpellDataTargetType.Self && spell.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
+                    {
+                        RMenu.Add("spell" + spell.SData.Name, new CheckBox(spell.Name, false));
+                    }
+                }
+            }
+
             RMenu.Add("useR", new KeyBind("Semi-manual cast R key", false, KeyBind.BindTypes.HoldActive, 'T'));
+
+            List<string> modes = new List<string>();
+            modes.Add("LOW HP");
+            modes.Add("CLOSEST");
+            foreach (var enemy in HeroManager.Enemies)
+            {
+                modes.Add(enemy.ChampionName);
+            }
+
+            RMenu.Add("Semi-manual", new ComboBox("Semi-manual MODE", 0, modes.ToArray()));
 
             foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.Team != Player.Team))
             {
@@ -90,7 +119,7 @@ namespace PortAIO.Champion.Ashe
             Q = new Spell(SpellSlot.Q);
             W = new Spell(SpellSlot.W, 1260);
             E = new Spell(SpellSlot.E, 2500);
-            R = new Spell(SpellSlot.R, 3000f);
+            R = new Spell(SpellSlot.R, float.MaxValue);
 
             W.SetSkillshot(0.25f, 20f, 1500f, true, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.25f, 299f, 1400f, false, SkillshotType.SkillshotLine);
@@ -102,6 +131,19 @@ namespace PortAIO.Champion.Ashe
             Orbwalker.OnPreAttack += BeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+        }
+
+        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack()
+                || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
+                return;
+
+            if (!getCheckBoxItem(RMenu, "spell" + args.SData.Name))
+                return;
+
+            R.Cast(sender);
         }
 
         private static void Interrupter2_OnInterruptableTarget(AIHeroClient sender,
@@ -135,10 +177,34 @@ namespace PortAIO.Champion.Ashe
             {
                 if (getKeyBindItem(RMenu, "useR"))
                 {
-                    var t = TargetSelector.GetTarget(1500, DamageType.Physical);
-                    if (t.LSIsValidTarget())
-                        R.Cast(t, true, true);
+                    CastR = true;
                 }
+
+                if (CastR)
+                {
+                    if (getBoxItem(RMenu, "Semi-manual") == 0)
+                    {
+                        var t = TargetSelector.GetTarget(1800, DamageType.Physical);
+                        if (t.LSIsValidTarget())
+                            SebbyLib.Program.CastSpell(R, t);
+                    }
+                    else if (getBoxItem(RMenu, "Semi-manual") == 1)
+                    {
+                        var t = HeroManager.Enemies.OrderBy(x => x.Distance(Player)).FirstOrDefault();
+                        if (t.LSIsValidTarget())
+                            SebbyLib.Program.CastSpell(R, t);
+                    }
+                    else
+                    {
+                        var t = HeroManager.Enemies[getBoxItem(RMenu, "Semi-manual") - 2];
+                        if (t.LSIsValidTarget())
+                            SebbyLib.Program.CastSpell(R, t);
+                    }
+                }
+            }
+            else
+            {
+                CastR = false;
             }
 
             if (SebbyLib.Program.LagFree(1))
@@ -190,7 +256,7 @@ namespace PortAIO.Champion.Ashe
                         getCheckBoxItem(RMenu, "autoRaoe"))
                         SebbyLib.Program.CastSpell(R, target);
                     if (SebbyLib.Program.Combo && target.LSIsValidTarget(W.Range) && getCheckBoxItem(RMenu, "Rkscombo") &&
-                        Player.LSGetAutoAttackDamage(target)*5 + rDmg + W.GetDamage(target) > target.Health &&
+                        Player.LSGetAutoAttackDamage(target) * 5 + rDmg + W.GetDamage(target) > target.Health &&
                         target.HasBuffOfType(BuffType.Slow) && !OktwCommon.IsSpellHeroCollision(target, R))
                         SebbyLib.Program.CastSpell(R, target);
                     if (rDmg > target.Health && target.CountAlliesInRange(600) == 0 &&
@@ -224,7 +290,7 @@ namespace PortAIO.Champion.Ashe
             if (t != null && t.LSIsValidTarget())
             {
                 if (SebbyLib.Program.Combo &&
-                    (Player.Mana > RMANA + QMANA || t.Health < 5*Player.LSGetAutoAttackDamage(Player)))
+                    (Player.Mana > RMANA + QMANA || t.Health < 5 * Player.LSGetAutoAttackDamage(Player)))
                     Q.Cast();
                 else if (SebbyLib.Program.Farm && Player.Mana > RMANA + QMANA + WMANA && getCheckBoxItem(QMenu, "harasQ") &&
                          getCheckBoxItem(harassMenu, "haras" + t.NetworkId))
@@ -326,7 +392,7 @@ namespace PortAIO.Champion.Ashe
             EMANA = E.Instance.SData.Mana;
 
             if (!R.IsReady())
-                RMANA = WMANA - Player.PARRegenRate*W.Instance.Cooldown;
+                RMANA = WMANA - Player.PARRegenRate * W.Instance.Cooldown;
             else
                 RMANA = R.Instance.SData.Mana;
         }

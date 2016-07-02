@@ -57,7 +57,7 @@
                 igniteMenu.Add("Ignite.Activated", new CheckBox("Ignite"));
                 foreach (var x in HeroManager.Enemies)
                 {
-                    igniteMenu.Add("igniteon" + x.ChampionName, new CheckBox("Use on " + x.ChampionName));
+                    igniteMenu.Add($"igniteon{x.ChampionName}", new CheckBox("Use on " + x.ChampionName));
                 }
             }
 
