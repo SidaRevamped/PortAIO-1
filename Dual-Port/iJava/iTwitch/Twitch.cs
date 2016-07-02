@@ -288,25 +288,27 @@
 
             if (getCheckBoxItem(comboOptions, "com.itwitch.combo.useEKillable") && Spells[SpellSlot.E].IsReady())
             {
-                if (getCheckBoxItem(miscOptions, "com.itwitch.misc.EAAQ") && Spells[SpellSlot.Q].IsReady()) return;
-
-                if (HeroManager.Enemies.Any(x => x.IsPoisonKillable() && x.LSIsValidTarget(Spells[SpellSlot.E].Range)))
+                foreach (var enemy in
+                HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(Spells[SpellSlot.E].Range) && enemy.HasBuff("TwitchDeadlyVenom")))
                 {
-                    Spells[SpellSlot.E].Cast();
+                    if (enemy.IsPoisonKillable() && (Spells[SpellSlot.E].GetDamage(enemy) + Spells[SpellSlot.E].GetDamage(enemy, 1)) > enemy.Health)
+                    {
+                        Spells[SpellSlot.E].Cast();
+                    }
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    OnCombo();
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    OnHarass();
                 }
             }
 
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-            {
-                OnCombo();
-            }
-
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-            {
-                OnHarass();
-            }
         }
-
         #endregion
     }
 }
