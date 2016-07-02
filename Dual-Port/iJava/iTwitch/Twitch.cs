@@ -67,9 +67,6 @@
             miscOptions.Add("com.itwitch.misc.noWAA", new Slider("No W if x aa can kill", 2, 0, 10));
             miscOptions.Add("com.itwitch.misc.saveManaE", new CheckBox("Save Mana for E", true));
             miscOptions.Add("com.itwitch.misc.recall", new KeyBind("Stealth Recall", false, KeyBind.BindTypes.HoldActive, 'T'));
-            miscOptions.AddLabel("Will Instant Q After Kill");
-            miscOptions.Add("com.itwitch.misc.EAAQ", new CheckBox("E AA Q", false));
-            miscOptions.AddLabel("Will cast E if killable by E + AA then Q");
 
 
             drawOptions = Menu.AddSubMenu("iTwitch 2.0 - Drawing", "com.itwitch.drawing");
