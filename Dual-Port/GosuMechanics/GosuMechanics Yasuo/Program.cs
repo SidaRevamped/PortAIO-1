@@ -189,9 +189,10 @@ namespace GosuMechanicsYasuo
             smartWMenu.Add("smartW", new CheckBox("Use Auto WindWall"));
             smartWMenu.Add("smartWDanger", new Slider("if Spell DangerLevel >=", 3, 1, 5));
             smartWMenu.Add("smartWDelay", new Slider("WindWall Humanizer (Delay)", 500, 0, 3000));
+            smartWMenu.Add("wwDanger", new CheckBox("Block only dangerous", false));
+            smartWMenu.AddGroupLabel("E Dodge Settings : ");
             smartWMenu.Add("smartEDogue", new CheckBox("Use E-Vade"));
             smartWMenu.Add("smartEDogueDanger", new Slider("if Spell DangerLevel >=", 1, 1, 5));
-            smartWMenu.Add("wwDanger", new CheckBox("Block only dangerous", false));
 
             skillShotMenu = getSkilshotMenu();
 
