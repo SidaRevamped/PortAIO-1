@@ -18,7 +18,7 @@ namespace NabbActivator
         /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
         public static void Cleansers(EventArgs args)
         {
-            if (!Vars.TypesMenu["cleansers"].Cast<CheckBox>().CurrentValue)
+            if (!Vars.TypesMenu["cleansersC"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }

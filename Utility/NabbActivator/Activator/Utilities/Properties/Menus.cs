@@ -66,7 +66,8 @@ namespace NabbActivator
                 Vars.TypesMenu.Add("potions", new CheckBox("Potions"));
                 Vars.TypesMenu.Add("resetters", new CheckBox("Tiamat/Hydra/Titanic"));
                 Vars.TypesMenu.Add("heal1", new CheckBox("Heal Ally?", false));
-                Vars.TypesMenu.Add("cleansers", new Slider("Cleansers / Delay", 0, 0, 300));
+                Vars.TypesMenu.Add("cleansersC", new CheckBox("Cleanse"));
+                Vars.TypesMenu.Add("cleansers", new Slider("Cleanse Delay", 0, 0, 300));
 
             }
         }
