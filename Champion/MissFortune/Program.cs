@@ -55,7 +55,7 @@ namespace OneKeyToWin_AIO_Sebby
             qMenu.Add("harasQ", new CheckBox("Use Q on minion"));
             qMenu.Add("killQ", new CheckBox("Use Q only if can kill minion", false));
             qMenu.Add("qMinionMove", new CheckBox("Don't use if minions moving"));
-            qMenu.Add("qMinionWidth", new Slider("secound Q angle", 40, 0, 90));
+            qMenu.Add("qMinionWidth", new Slider("secound Q angle", 80, 0, 100));
 
             wMenu = Config.AddSubMenu("W Config");
             wMenu.Add("autoW", new CheckBox("Auto W"));
