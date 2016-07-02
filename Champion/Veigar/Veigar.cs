@@ -20,6 +20,7 @@ using System.Security.AccessControl;
 using System;
 using System.Speech.Synthesis;
 using static FreshBooster.FreshCommon;
+using UnderratedAIO.Helpers;
 
 namespace FreshBooster.Champion
 {
@@ -89,6 +90,7 @@ namespace FreshBooster.Champion
                 Combo.Add("Veigar_CUseQ", new CheckBox("Use Q"));
                 Combo.Add("Veigar_CUseW", new CheckBox("Use W"));
                 Combo.Add("Veigar_CUseE", new CheckBox("Use E"));
+                Combo.Add("Veigar_CEMode", new ComboBox("E Mode", 0, "Cast at targ pos", "Edge Stun"));
                 Combo.Add("Veigar_CUseR", new CheckBox("Use R"));
                 Combo.Add("Veigar_CUseR_Select", new CheckBox("When can be Kill, Only use R"));
                 //Combo.Add("buffer", new Slider("Buffer", 5, 0, 25));
@@ -222,7 +224,18 @@ namespace FreshBooster.Champion
                 {
                     if (getCheckBoxItem(Combo, "Veigar_CUseE") && ETarget != null && _E.IsReady())
                     {
-                        SpellUseE(ETarget);
+                        switch (getBoxItem(Combo, "Veigar_CEMode"))
+                        {
+                            case 0:
+                                SpellUseE(ETarget);
+                                break;
+                            case 1:
+                                CastE(ETarget);
+                                break;
+                            default:
+                                SpellUseE(ETarget);
+                                break;
+                        }
                     }
                     if (getCheckBoxItem(Combo, "Veigar_CUseW") && WTarget != null && _W.IsReady())
                     {
@@ -332,7 +345,83 @@ namespace FreshBooster.Champion
                 }
             }
         }
-        
+
+        public static readonly AIHeroClient player = ObjectManager.Player;
+
+        private static void CastE(AIHeroClient target, bool edge = true, int minHits = 1)
+        {
+            if (player.CountEnemiesInRange(_E.Range + 175) <= 1)
+            {
+                var targE = _E.GetPrediction(target);
+                var pos = targE.CastPosition;
+                if (pos.IsValid() && pos.LSDistance(player.Position) < _E.Range &&
+                    targE.Hitchance >= LeagueSharp.Common.HitChance.VeryHigh)
+                {
+                    _E.Cast(edge ? pos.LSExtend(player.Position, 375) : pos);
+                }
+            }
+            else
+            {
+                var targE = getBestEVector3(target, minHits);
+                if (targE != Vector3.Zero)
+                {
+                    _E.Cast(targE);
+                }
+            }
+        }
+
+        private static Vector3 getBestEVector3(AIHeroClient target, int minHits = 1)
+        {
+            var points = GetEpoints(target);
+            var otherHeroes =
+                HeroManager.Enemies.Where(
+                    e => e.IsValidTarget() && e.NetworkId != target.NetworkId && player.Distance(e) < 1000)
+                    .Select(e => _E.GetPrediction(e));
+
+            var targetList = new List<EData>();
+
+            if (otherHeroes.Any())
+            {
+                foreach (var point in points)
+                {
+                    targetList.Add(
+                        new EData(
+                            point,
+                            otherHeroes.Count(
+                                otherHero =>
+                                    otherHero.CastPosition.LSDistance(point) > 345 &&
+                                    otherHero.CastPosition.LSDistance(point) < 375), point.CountEnemiesInRange(345)));
+                }
+            }
+
+            var result = targetList.Where(t => t.hits >= minHits).OrderByDescending(t => t.hits).FirstOrDefault();
+            if (result != null)
+            {
+                return result.point;
+            }
+            if (minHits > 1)
+            {
+                var result2 =
+                    targetList.Where(t => t.hits >= 1 && t.enemiesAround >= minHits)
+                        .OrderByDescending(t => t.hits)
+                        .ThenByDescending(t => t.enemiesAround)
+                        .FirstOrDefault();
+                if (result2 != null)
+                {
+                    return result2.point;
+                }
+            }
+            return Vector3.Zero;
+        }
+
+        private static IEnumerable<Vector3> GetEpoints(AIHeroClient target)
+        {
+            var targetPos = _E.GetPrediction(target);
+            return
+                CombatHelper.PointsAroundTheTargetOuterRing(targetPos.CastPosition, 345, 16)
+                    .Where(p => player.LSDistance(p) < 700);
+        }
+
         private static void LastHitQ()
         {
             if (!_Q.IsReady())
@@ -450,4 +539,19 @@ namespace FreshBooster.Champion
 
         }
     }
+
+    internal class EData
+    {
+        public Vector3 point;
+        public int hits;
+        public int enemiesAround;
+
+        public EData(Vector3 _point, int _hits, int _enemiesAround)
+        {
+            hits = _hits;
+            point = _point;
+            enemiesAround = _enemiesAround;
+        }
+    }
+
 }
