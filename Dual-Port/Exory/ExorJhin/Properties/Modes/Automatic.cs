@@ -50,42 +50,25 @@ namespace ExorAIO.Champions.Jhin
             /// </summary>
             if (Vars.W.IsReady() &&
                 !GameObjects.Player.IsUnderEnemyTurret() &&
-                Vars.getCheckBoxItem(Vars.WMenu, "logical") && !Vars.R.Instance.Name.Equals("JhinRShot"))
+                Vars.getCheckBoxItem(Vars.WMenu, "logical"))
             {
                 foreach (var target in GameObjects.EnemyHeroes.Where(
                     t =>
                         !Invulnerable.Check(t) &&
                         t.HasBuff("jhinespotteddebuff") &&
-                        t.LSIsValidTarget(Vars.W.Range-150f) &&
-                        !t.LSIsValidTarget(Vars.AARange+50f) &&
-                        !Vars.W.GetPrediction(t).CollisionObjects.Any(
-                            c =>
-                                !c.HasBuff("jhinespotteddebuff") &&
-                                GameObjects.EnemyHeroes.Contains(c)) &&
+                        t.IsValidTarget(Vars.W.Range - 150f) &&
+                        !t.IsValidTarget(Vars.AARange + 50f) &&
                         Vars.getCheckBoxItem(Vars.WhiteListMenu, t.ChampionName.ToLower())))
                 {
-                    if (Bools.IsImmobile(target))
+                    if (!Vars.W.GetPrediction(target).CollisionObjects.Any(c => !c.HasBuff("jhinespotteddebuff")))
                     {
-                        Vars.W.Cast(target.ServerPosition);
-                        return;
-                    }
-                    else
-                    {
-                        if (!target.LSIsFacing(GameObjects.Player) &&
-                            GameObjects.Player.LSIsFacing(target))
+                        if (Bools.IsImmobile(target))
                         {
-                            Vars.W.Cast(Vars.W.GetPrediction(target).UnitPosition);
+                            Vars.W.Cast(target.ServerPosition);
                             return;
                         }
 
-                        if (target.LSIsFacing(GameObjects.Player) &&
-                            !GameObjects.Player.LSIsFacing(target) &&
-                            !GameObjects.EnemyHeroes.Any(
-                                t =>
-                                    t.LSIsValidTarget(Vars.Q.Range+50f)))
-                        {
-                            Vars.W.Cast(Vars.W.GetPrediction(target).UnitPosition);
-                        }
+                        Vars.W.Cast(Vars.W.GetPrediction(target).UnitPosition);
                     }
                 }
             }

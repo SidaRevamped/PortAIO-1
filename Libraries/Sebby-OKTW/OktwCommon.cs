@@ -392,7 +392,7 @@ namespace SebbyLib
                     var champion in
                         ChampionList.Where(
                             champion =>
-                                !champion.IsDead && champion.IsVisible && champion.Team != sender.Team &&
+                                !champion.IsDead && champion.IsVisible && champion.IsHPBarRendered && champion.Team != sender.Team &&
                                 champion.LSDistance(sender) < 2000))
                 {
                     if (CanHitSkillShot(champion, args))

@@ -32,19 +32,29 @@ namespace ExorAIO.Champions.Lucian
             {
                 if (!Game.CursorPos.IsUnderEnemyTurret() ||
                     (args.Target as AIHeroClient).Health <
-                        GameObjects.Player.GetAutoAttackDamage(args.Target as AIHeroClient)*2)
+                        GameObjects.Player.GetAutoAttackDamage(args.Target as AIHeroClient) * 2)
                 {
-                    if ((GameObjects.Player.Distance(Game.CursorPos) < Vars.AARange ||
-                        (args.Target as AIHeroClient).CountEnemyHeroesInRange(700f) >= 2) &&
-                        Vars.getBoxItem(Vars.EMenu, "mode") == 0)
+                    switch (Vars.getBoxItem(Vars.EMenu, "mode"))
                     {
-                        Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 50f));
-                        return;
+                        case 0:
+                            if (GameObjects.Player.Distance(Game.CursorPos) < Vars.AARange ||
+                                (args.Target as AIHeroClient).CountEnemyHeroesInRange(700f) >= 2)
+                            {
+                                Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, GameObjects.Player.BoundingRadius));
+                                return;
+                            }
+
+                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange));
+                            break;
+
+                        case 1:
+                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange));
+                            break;
+
+                        default:
+                            break;
                     }
-                    else
-                    {
-                        Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange));
-                    }
+                    return;
                 }
             }
 
@@ -53,8 +63,6 @@ namespace ExorAIO.Champions.Lucian
             /// </summary>
             if (Vars.Q.IsReady() &&
                 (args.Target as AIHeroClient).LSIsValidTarget(Vars.Q.Range) &&
-                (args.Target as AIHeroClient).Health >
-                    GameObjects.Player.GetAutoAttackDamage(args.Target as AIHeroClient) &&
                 Vars.getCheckBoxItem(Vars.QMenu, "combo"))
             {
                 Vars.Q.CastOnUnit(args.Target as AIHeroClient);
@@ -65,6 +73,7 @@ namespace ExorAIO.Champions.Lucian
             ///     The W Combo Logic.
             /// </summary>
             if (Vars.W.IsReady() &&
+                (args.Target as AIHeroClient).LSIsValidTarget(Vars.W.Range) &&
                 Vars.getCheckBoxItem(Vars.WMenu, "combo"))
             {
                 Vars.W.Cast(Vars.W.GetPrediction(args.Target as AIHeroClient).UnitPosition);
