@@ -285,26 +285,48 @@
 
             if (getCheckBoxItem(comboOptions, "com.itwitch.combo.useEKillable") && Spells[SpellSlot.E].IsReady())
             {
-                foreach (var enemy in
-                HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(Spells[SpellSlot.E].Range) && enemy.HasBuff("TwitchDeadlyVenom")))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(Spells[SpellSlot.E].Range) && (enemy.HasBuff("TwitchDeadlyVenom") || enemy.HasBuff("twitchdeadlyvenom"))))
                 {
-                    if (enemy.IsPoisonKillable() && (Spells[SpellSlot.E].GetDamage(enemy) + Spells[SpellSlot.E].GetDamage(enemy, 1)) > enemy.Health)
+                    if (enemy.Health + enemy.AttackShield < EDamage(enemy))
                     {
                         Spells[SpellSlot.E].Cast();
                     }
                 }
-
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                {
-                    OnCombo();
-                }
-
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-                {
-                    OnHarass();
-                }
             }
 
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            {
+                OnCombo();
+            }
+
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                OnHarass();
+            }
+        }
+
+        /* Doc7 - Twitch for calculations */
+
+        public static int[] stack = { 0, 15, 20, 25, 30, 35 };
+        public static int[] _base = { 0, 20, 35, 50, 65, 80 };
+
+        private static float EDamage(Obj_AI_Base target)
+        {
+            var stacks = Stack(target);
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, _base[Spells[SpellSlot.E].Level] + stacks * (0.25f * ObjectManager.Player.FlatPhysicalDamageMod + 0.2f * ObjectManager.Player.FlatMagicDamageMod + stack[Spells[SpellSlot.E].Level]));
+        }
+
+        private static int Stack(Obj_AI_Base obj)
+        {
+            var Ec = 0;
+            for (var t = 1; t < 7; t++)
+            {
+                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(s => s.Position.Distance(obj.ServerPosition) <= 175 && s.Name == "twitch_poison_counter_0" + t + ".troy"))
+                {
+                    Ec = t;
+                }
+            }
+            return Ec;
         }
         #endregion
     }
