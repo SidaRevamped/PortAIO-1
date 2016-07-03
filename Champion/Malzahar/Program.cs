@@ -93,27 +93,30 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (args.Slot == SpellSlot.R && sender.Owner.IsMe && !getCheckBoxItem(rMenu, "preventRCast"))
             {
-                var t = TargetSelector.GetTarget(R.Range - 20, DamageType.Magical);
-
-                if (E.IsReady() && Player.Mana > RMANA + EMANA)
+                var t = args.Target as AIHeroClient;
+                if (t != null && t.Health > R.GetDamage(t))
                 {
-                    E.CastOnUnit(t);
-                    args.Process = false;
-                    return;
-                }
+                    if (E.IsReady() && Player.Mana > RMANA + EMANA)
+                    {
+                        E.CastOnUnit(t);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (W.IsReady() && Player.Mana > RMANA + WMANA)
-                {
-                    W.Cast(t.Position);
-                    args.Process = false;
-                    return;
-                }
+                    if (W.IsReady() && Player.Mana > RMANA + WMANA)
+                    {
+                        W.Cast(t.Position);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (Q.IsReady() && t.LSIsValidTarget(Q.Range) && Player.Mana > RMANA + QMANA)
-                {
-                    Qr.Cast(t);
-                    args.Process = false;
-                    return;
+                    if (Q.IsReady() && t.LSIsValidTarget(Q.Range) && Player.Mana > RMANA + QMANA)
+                    {
+                        Qr.Cast(t);
+                        args.Process = false;
+                        return;
+                    }
+
                 }
 
                 if (R.IsReady() && t.LSIsValidTarget())
