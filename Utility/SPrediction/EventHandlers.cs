@@ -92,56 +92,14 @@ namespace SPredictioner
 
                         if (enemy != null)
                         {
-                            SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
-                            bool aoe2 = false;
-
-                            if (SPredictioner.Spells[(int)args.Slot].Type == SkillshotType.SkillshotCircle)
-                            {
-                                //CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotCircle;
-                                //aoe2 = true;
-                            }
-
-                            if (SPredictioner.Spells[(int)args.Slot].Width > 80 && !SPredictioner.Spells[(int)args.Slot].Collision)
-                                aoe2 = true;
-
-                            var predInput2 = new SebbyLib.Movement.PredictionInput
-                            {
-                                Aoe = aoe2,
-                                Collision = SPredictioner.Spells[(int)args.Slot].Collision,
-                                Speed = SPredictioner.Spells[(int)args.Slot].Speed,
-                                Delay = SPredictioner.Spells[(int)args.Slot].Delay,
-                                Range = SPredictioner.Spells[(int)args.Slot].Range,
-                                From = Player.ServerPosition,
-                                Radius = SPredictioner.Spells[(int)args.Slot].Width,
-                                Unit = enemy,
-                                Type = CoreType2
-                            };
-                            var poutput2 = SebbyLib.Movement.Prediction.GetPrediction(predInput2);
-
-                            if (SPredictioner.Spells[(int)args.Slot].Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
-                                return;
-
-                            if (getBoxItem(menu, "SPREDHITC") == 0) // Very High
-                            {
-                                if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.VeryHigh)
-                                    SPredictioner.Spells[(int)args.Slot].Cast(poutput2.CastPosition);
-                                else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
-                                {
-                                    SPredictioner.Spells[(int)args.Slot].Cast(poutput2.CastPosition);
-                                }
-
-                            }
-                            else if (getBoxItem(menu, "SPREDHITC") == 1)
-                            {
-                                if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
-                                    SPredictioner.Spells[(int)args.Slot].Cast(poutput2.CastPosition);
-
-                            }
-                            else if (getBoxItem(menu, "SPREDHITC") == 2)
-                            {
-                                if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.Medium)
-                                    SPredictioner.Spells[(int)args.Slot].Cast(poutput2.CastPosition);
-                            }
+                            if (ObjectManager.Player.ChampionName == "Viktor" && args.Slot == SpellSlot.E)
+                                SPredictioner.Spells[(int)args.Slot].SPredictionCastVector(enemy, 500, ShineCommon.Utility.HitchanceArray[getBoxItem(menu, "SPREDHITC")]);
+                            else if (ObjectManager.Player.ChampionName == "Diana" && args.Slot == SpellSlot.Q)
+                                SPredictioner.Spells[(int)args.Slot].SPredictionCastArc(enemy, ShineCommon.Utility.HitchanceArray[getBoxItem(menu, "SPREDHITC")]);
+                            else if (ObjectManager.Player.ChampionName == "Veigar" && args.Slot == SpellSlot.E)
+                                SPredictioner.Spells[(int)args.Slot].SPredictionCastRing(enemy, 80, ShineCommon.Utility.HitchanceArray[getBoxItem(menu, "SPREDHITC")]);
+                            else
+                                SPredictioner.Spells[(int)args.Slot].SPredictionCast(enemy, ShineCommon.Utility.HitchanceArray[getBoxItem(menu, "SPREDHITC")]);
                         }
                     }
                 }

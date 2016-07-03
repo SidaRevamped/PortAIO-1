@@ -156,6 +156,28 @@ namespace PortAIO
                     }
                 }
 
+                if (Loader.predictioner)
+                {
+                    switch (Loader.predictionerCB)
+                    {
+                        case 0:
+                            EBPredictioner.Program.Init();
+                            break;
+                        case 1:
+                            SDKPredictioner.Program.Init();
+                            break;
+                        case 2:
+                            OKTWPredictioner.Program.Init();
+                            break;
+                        case 3:
+                            SPredictioner.Program.Init();
+                            break;
+                        default:
+                            EBPredictioner.Program.Init();
+                            break;
+                    }
+                }
+
                 if (Loader.cheat)
                 {
                     new TheCheater.TheCheater().Load();
@@ -174,11 +196,6 @@ namespace PortAIO
                 if (Loader.traptrack)
                 {
                     AntiTrap.Program.Game_OnGameLoad();
-                }
-
-                if (Loader.sdkPredictioner)
-                {
-                    SPredictioner.Program.Init();
                 }
 
                 if (Loader.limitedShat)
@@ -219,11 +236,6 @@ namespace PortAIO
                 if (Loader.antiStealth)
                 {
                     new AntiStealth.AntiStealth();
-                }
-
-                if (Loader.EBPrediction)
-                {
-                    EBPredictioner.Program.Init();
                 }
 
                 if (Loader.reform)
@@ -956,7 +968,7 @@ namespace PortAIO
                                 LCS_Janna.Program.OnGameLoad();
                                 break;
                             case 1:
-                               new FreshBooster.Champion.Janna();
+                                new FreshBooster.Champion.Janna();
                                 break;
                             default:
                                 LCS_Janna.Program.OnGameLoad();
@@ -1229,7 +1241,7 @@ namespace PortAIO
                                 break;
                             case 4:
                                 SebbyLib.Program.GameOnOnGameLoad();
-                                break;;
+                                break; ;
                             case 5:
                                 HoolaLucian.Program.OnGameLoad();
                                 break;

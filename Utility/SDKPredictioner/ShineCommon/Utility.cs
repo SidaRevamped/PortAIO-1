@@ -85,7 +85,7 @@ namespace ShineCommon
 
         public static bool IsValidSlot(SpellSlot slot)
         {
-            return slot == SpellSlot.Q || slot == SpellSlot.W || slot == SpellSlot.E || slot == SpellSlot.W;
+            return slot == SpellSlot.Q || slot == SpellSlot.W || slot == SpellSlot.E || slot == SpellSlot.R;
         }
     }
 }

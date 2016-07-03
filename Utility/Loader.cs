@@ -25,7 +25,6 @@ namespace PortAIO.Utility
         public static bool emoteSpammer { get { return Miscc["emoteSpammer"].Cast<CheckBox>().CurrentValue; } }
         public static bool pastingSharp { get { return Miscc["pastingSharp"].Cast<CheckBox>().CurrentValue; } }
         public static bool useActivator { get { return Miscc["activator"].Cast<CheckBox>().CurrentValue; } }
-        public static bool sdkPredictioner { get { return Miscc["sdkPredictioner"].Cast<CheckBox>().CurrentValue; } }
         public static bool cheat { get { return Miscc["cheat"].Cast<CheckBox>().CurrentValue; } }
         public static bool useTracker { get { return Miscc["tracker"].Cast<CheckBox>().CurrentValue; } }
         public static bool useRecall { get { return Miscc["recall"].Cast<CheckBox>().CurrentValue; } }
@@ -111,7 +110,6 @@ namespace PortAIO.Utility
         public static int syndra { get { return Miscc["syndra"].Cast<ComboBox>().CurrentValue; } }
         public static int aatrox { get { return Miscc["aatrox"].Cast<ComboBox>().CurrentValue; } }
         public static int missfortune { get { return Miscc["missfortune"].Cast<ComboBox>().CurrentValue; } }
-        public static bool EBPrediction { get { return Miscc["EBPrediction"].Cast<CheckBox>().CurrentValue; } }
         public static bool reform { get { return Miscc["reform"].Cast<CheckBox>().CurrentValue; } }
         public static bool dzaware { get { return Miscc["dzaware"].Cast<CheckBox>().CurrentValue; } }
         public static int trackerCB { get { return Miscc["trackerCB"].Cast<ComboBox>().CurrentValue; } }
@@ -134,6 +132,8 @@ namespace PortAIO.Utility
         public static int udyr { get { return Miscc["udyr"].Cast<ComboBox>().CurrentValue; } }
         public static int veigar { get { return Miscc["veigar"].Cast<ComboBox>().CurrentValue; } }
         public static int warwick { get { return Miscc["warwick"].Cast<ComboBox>().CurrentValue; } }
+        public static bool predictioner { get { return Miscc["predictioner"].Cast<CheckBox>().CurrentValue; } }
+        public static int predictionerCB { get { return Miscc["predictionerCB"].Cast<ComboBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -567,6 +567,7 @@ namespace PortAIO.Utility
             Miscc.Add("evadeCB", new ComboBox("Which Evade?", 0, "ezEvade", "Evade#"));
             Miscc.Add("activatorCB", new ComboBox("Which Activator?", 0, "ElUtilitySuite", "NabbActivator", "Activator#"));
             Miscc.Add("trackerCB", new ComboBox("Which Tracker?", 0, "NabbTracker"));
+            Miscc.Add("predictionerCB", new ComboBox("Which Predictioner?", 0, "EB", "SDK", "OKTW", "SPred"));
             Miscc.AddSeparator();
             Miscc.AddGroupLabel("Util Changes");
             Miscc.AddLabel("Please F5 after making any changes below >>");
@@ -579,17 +580,17 @@ namespace PortAIO.Utility
             Miscc.Add("skin", new CheckBox("Enable Skin Hack?", false));
             Miscc.AddSeparator();
             Miscc.Add("evade", new CheckBox("Enable Evade?", false));
+            Miscc.Add("predictioner", new CheckBox("Enable Predictioner?", true));
             Miscc.Add("dzaware", new CheckBox("Enable DZAwareness?", false));
             Miscc.Add("godTracker", new CheckBox("Enable God Jungle Tracker?", false));
-            Miscc.Add("human", new CheckBox("Enable Humanizer?", false));
             Miscc.AddSeparator();
+            Miscc.Add("human", new CheckBox("Enable Humanizer?", false));
             Miscc.Add("gank", new CheckBox("Enable GankAlerter?", false));
             Miscc.Add("cheat", new CheckBox("Enable TheCheater?", false));
+            Miscc.Add("randomult", new CheckBox("Enable Random Ult?", false));
+            Miscc.AddSeparator();
             Miscc.Add("banwards", new CheckBox("Enable Sebby BanWars?", false));
             Miscc.Add("antialistar", new CheckBox("Enable AntiAlistar?", false));
-            Miscc.AddSeparator();
-            Miscc.Add("sdkPredictioner", new CheckBox("Enable SDKPredictioner?", false));
-            Miscc.Add("EBPrediction", new CheckBox("Enable EBPredictioner?", true));
             Miscc.Add("traptrack", new CheckBox("Enable TrapTracker?", false));
             Miscc.Add("limitedShat", new CheckBox("Enable LimitedShat?", false));
             Miscc.AddSeparator();
@@ -610,7 +611,6 @@ namespace PortAIO.Utility
             Miscc.AddSeparator();
             Miscc.Add("cursor", new CheckBox("Enable VCursor?", false));
             Miscc.Add("condemn", new CheckBox("Enable Asuna Condemn (Vayne Only)?", false));
-            Miscc.Add("randomult", new CheckBox("Enable Random Ult?", false));
 
             var credits = Miscc.AddSubMenu("Credits");
             credits.AddLabel("Nathan or jQuery");

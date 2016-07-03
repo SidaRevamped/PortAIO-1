@@ -14,7 +14,7 @@ namespace SPredictioner
         public static void Initialize()
         {
             #region Initialize Menu
-            Config = MainMenu.AddMenu("SDKPredictioner", "sdkpaksldjaskdjlkasjdk");
+            Config = MainMenu.AddMenu("SPredictioner", "spreds");
             Config.Add("ENABLED", new CheckBox("Enabled"));
             Config.Add("SPREDHITC", new ComboBox("HitChance", 1, "Very High", "High", "Medium"));
             Config.AddSeparator();
@@ -31,6 +31,8 @@ namespace SPredictioner
             }
             #endregion
             #endregion
+
+            SPrediction.Prediction.Initialize(Config, "SPREDFORSPREDICTONER");
 
             #region Initialize Events
             Spellbook.OnCastSpell += EventHandlers.Spellbook_OnCastSpell;
