@@ -31,7 +31,7 @@ namespace PortAIO
         {
             if (Orbwalker.ForcedTarget != null)
             {
-                if (!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.LSDistance(Orbwalker.ForcedTarget) > ObjectManager.Player.GetAutoAttackRange() || ObjectManager.Player.IsDead || ObjectManager.Player.LSIsRecalling())
+                if (!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.IsDead || ObjectManager.Player.LSIsRecalling())
                 {
                     Orbwalker.ForcedTarget = null;
                 }

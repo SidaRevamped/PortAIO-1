@@ -169,6 +169,10 @@ namespace ElTristana
                     {
                         Orbwalker.ForcedTarget = targeta;
                     }
+                    else
+                    {
+                        Orbwalker.ForcedTarget = null;
+                    }
                 }
 
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
@@ -179,6 +183,10 @@ namespace ElTristana
                         if (minion.HasBuff("TristanaECharge"))
                         {
                             Orbwalker.ForcedTarget = minion;
+                        }
+                        else
+                        {
+                            Orbwalker.ForcedTarget = null;
                         }
                     }
                     else
