@@ -91,10 +91,7 @@ namespace EBPredictioner
                     {
                         args.Process = false;
                         handleEvent[(int)args.Slot] = false;
-                        var enemy = args.EndPosition.GetEnemiesInRange(200f).OrderByDescending(p => ShineCommon.Utility.GetPriority(p.ChampionName)).FirstOrDefault();
-
-                        if (enemy == null)
-                            enemy = TargetSelector.GetTarget(SPredictioner._spells[(int)args.Slot].Range, DamageType.Physical);
+                        var enemy = TargetSelector.GetTarget(SPredictioner._spells[(int)args.Slot].Range, DamageType.Physical);
 
                         if (enemy != null)
                         {
