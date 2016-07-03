@@ -1256,6 +1256,9 @@ namespace PortAIO
                             case 2:
                                 ElLux.Program.Init();
                                 break;
+                            case 3:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 MoonLux.Program.GameOnOnGameLoad();
                                 break;

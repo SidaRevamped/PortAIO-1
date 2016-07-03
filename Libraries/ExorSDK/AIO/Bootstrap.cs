@@ -32,6 +32,7 @@ using ExorAIO.Champions.Lucian;
 using ExorAIO.Champions.Tristana;
 using ExorAIO.Champions.Vayne;
 using ExorAIO.Champions.Twitch;
+using ExorAIO.Champions.Lux;
 
 namespace ExorAIO.Core
 {
@@ -145,6 +146,9 @@ namespace ExorAIO.Core
                     break;
                 case "Evelynn":
                     new Champions.Evelynn.Evelynn().OnLoad();
+                    break;
+                case "Lux":
+                    new Lux().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
