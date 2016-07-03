@@ -859,6 +859,9 @@ namespace PortAIO
                             case 1:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;
+                            case 2:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 Evelynn.Program.Game_OnGameLoad();
                                 break;

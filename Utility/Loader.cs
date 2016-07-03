@@ -319,7 +319,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[22]))
                 {
-                    Miscc.Add("evelynn", new ComboBox("Use addon for Evelynn : ", 0, "Evelynn#", "OKTW"));
+                    Miscc.Add("evelynn", new ComboBox("Use addon for Evelynn : ", 0, "Evelynn#", "OKTW", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[23]))
                 {

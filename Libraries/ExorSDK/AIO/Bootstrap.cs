@@ -90,7 +90,7 @@ namespace ExorAIO.Core
                     new Graves().OnLoad();
                     break;
                 case "Karma":
-                    new ExorAIO.Champions.Karma.Karma().OnLoad();
+                    new Champions.Karma.Karma().OnLoad();
                     break;
                 case "Jax":
                     new Jax().OnLoad();
@@ -129,7 +129,7 @@ namespace ExorAIO.Core
                     new Kalista().OnLoad();
                     break;
                 case "KogMaw":
-                    new ExorAIO.Champions.KogMaw.KogMaw().OnLoad();
+                    new Champions.KogMaw.KogMaw().OnLoad();
                     break;
                 case "Lucian":
                     new Lucian().OnLoad();
@@ -142,6 +142,9 @@ namespace ExorAIO.Core
                     break;
                 case "Twitch":
                     new Twitch().OnLoad();
+                    break;
+                case "Evelynn":
+                    new Champions.Evelynn.Evelynn().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
