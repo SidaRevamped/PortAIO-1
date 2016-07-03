@@ -255,7 +255,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[6]))
                 {
-                    Miscc.Add("twitch", new ComboBox("Use addon for Twitch : ", 0, "OKTW", "Infected Twitch", "iTwitch"));
+                    Miscc.Add("twitch", new ComboBox("Use addon for Twitch : ", 0, "OKTW", "Infected Twitch", "iTwitch", "ExorAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[7]))
                 {

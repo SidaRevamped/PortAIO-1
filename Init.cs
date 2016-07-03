@@ -385,6 +385,9 @@ namespace PortAIO
                             case 2:
                                 iTwitch.Twitch.OnGameLoad();
                                 break;
+                            case 3:
+                                ExorAIO.AIO.OnLoad();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;

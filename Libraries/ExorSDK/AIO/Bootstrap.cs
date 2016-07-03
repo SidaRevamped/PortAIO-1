@@ -31,6 +31,7 @@ using ExorAIO.Champions.KogMaw;
 using ExorAIO.Champions.Lucian;
 using ExorAIO.Champions.Tristana;
 using ExorAIO.Champions.Vayne;
+using ExorAIO.Champions.Twitch;
 
 namespace ExorAIO.Core
 {
@@ -138,6 +139,9 @@ namespace ExorAIO.Core
                     break;
                 case "Vayne":
                     new Vayne().OnLoad();
+                    break;
+                case "Twitch":
+                    new Twitch().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
