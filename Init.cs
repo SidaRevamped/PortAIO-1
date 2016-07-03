@@ -1655,7 +1655,18 @@ namespace PortAIO
                         ElVladimirReborn.Vladimir.OnLoad();
                         break;
                     case "warwick": // Warwick - Mirin
-                        Warwick.Program.Game_OnGameLoad();
+                        switch (Loader.warwick)
+                        {
+                            case 0:
+                                Warwick.Program.Game_OnGameLoad();
+                                break;
+                            case 1:
+                                ExorAIO.AIO.OnLoad();
+                                break;
+                            default:
+                                Warwick.Program.Game_OnGameLoad();
+                                break;
+                        }
                         break;
                     case "monkeyking": // Wukong - xQx
                         Wukong.Program.Game_OnGameLoad();

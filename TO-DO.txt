@@ -4,8 +4,6 @@ Check Nechrito Rengar Combo
 
 -Port [Will Port One at a time when I'm bored or there's nothing on the to-do]
 
-Warwick = Port these for ExorAIO SDK
-
 Champion Ports [Starting 5/19, I'm going to start checking these in game via L# to see which actually work before porting]:
 - Nocturne is Back https://github.com/xQxCPMxQx/LeagueSharp2/tree/master/Nocturne
 - Karma - the Englightned One [https://github.com/SwipeDan/LeagueSharp/tree/master/Karma%20%20%20%E2%80%93%20%20the%20Enlightened%20One]
@@ -37,7 +35,6 @@ Utility Ports [Only doing after Champions are completed] :
 - Sebby Predictioner
 
 AIOS in an AIO : 
-- Finish Up ExorAIO
 - Finish Up Marksman
 - Challenger Series
 - OKTW

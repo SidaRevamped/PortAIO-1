@@ -133,6 +133,7 @@ namespace PortAIO.Utility
         public static bool randomult { get { return Miscc["randomult"].Cast<CheckBox>().CurrentValue; } }
         public static int udyr { get { return Miscc["udyr"].Cast<ComboBox>().CurrentValue; } }
         public static int veigar { get { return Miscc["veigar"].Cast<ComboBox>().CurrentValue; } }
+        public static int warwick { get { return Miscc["warwick"].Cast<ComboBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -223,6 +224,7 @@ namespace PortAIO.Utility
             "Karthus", //76
             "Udyr", //77
             "Veigar", // 78
+            "Warwick", //79
         });
 
         public static void Menu()
@@ -550,6 +552,10 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[78]))
                 {
                     Miscc.Add("veigar", new ComboBox("Use addon for Veigar : ", 0, "FreshBooster", "ExorAIO"));
+                }
+                if (Player.ChampionName.Equals(Champion[79]))
+                {
+                    Miscc.Add("warwick", new ComboBox("Use addon for Warwick : ", 0, "Warwick | The Blood Hunter", "ExorAIO"));
                 }
             }
             else
