@@ -191,6 +191,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.LSIsRecalling())
+                return;
+
             if (getKeyBindItem(rMenu, "useR") && R.IsReady())
             {
                 var t = TargetSelector.GetTarget(R.Range, DamageType.Physical);
