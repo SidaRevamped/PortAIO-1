@@ -306,7 +306,7 @@
         }
 
         private static bool IsCastingW
-            => !wShadow.LSIsValid() && wMissile != null && wMissile.Distance(wMissile.EndPosition) < 40;
+            => !wShadow.LSIsValid() && wMissile != null && wMissile.Distance(wMissile.EndPosition) < 80;
 
         private static bool IsROne => R.Instance.SData.Name == "ZedR";
 
@@ -319,7 +319,7 @@
                 var validW = wShadow.LSIsValid();
                 var validR = rShadow.LSIsValid();
                 var posW = validW ? wShadow.ServerPosition : new Vector3();
-                if (!posW.IsValid() && IsCastingW)
+                if (!posW.IsValid() && wMissile != null)
                 {
                     validW = true;
                     posW = wMissile.EndPosition;
@@ -433,33 +433,37 @@
 
         private static bool CastQKill(LeagueSharp.SDK.Spell spell, Obj_AI_Base target)
         {
-            var pred = spell.GetPrediction(target, false, -1, CollisionableObjects.YasuoWall);
-            if (pred.Hitchance < Q.MinHitChance)
+            var pred1 = spell.GetPrediction(target, false, -1, CollisionableObjects.YasuoWall);
+            if (pred1.Hitchance < Q.MinHitChance)
             {
                 return false;
             }
-            var col = spell.GetCollision(
+            var pred2 = spell.GetPrediction(
                 target,
-                new List<Vector3> { pred.UnitPosition, target.Position },
+                false,
+                -1,
                 CollisionableObjects.Heroes | CollisionableObjects.Minions);
-            if (col.Count == 0)
+            if (pred2.Hitchance == HitChance.Collision)
             {
-                return Q.Cast(pred.CastPosition);
+                var subDmg = Q.GetDamage(target, DamageStage.SecondForm);
+                switch (target.Type)
+                {
+                    case GameObjectType.AIHeroClient:
+                        return target.Health + target.AttackShield <= subDmg && Q.Cast(pred1.CastPosition);
+                    case GameObjectType.obj_AI_Minion:
+                        return spell.CanLastHit(target, subDmg) && Q.Cast(pred1.CastPosition);
+                }
             }
-            var subDmg = Q.GetDamage(target, DamageStage.SecondForm);
-            switch (target.Type)
+            else if (pred2.Hitchance >= Q.MinHitChance)
             {
-                case GameObjectType.AIHeroClient:
-                    return target.Health + target.AttackShield <= subDmg && Q.Cast(pred.CastPosition);
-                case GameObjectType.obj_AI_Minion:
-                    return spell.CanLastHit(target, subDmg) && Q.Cast(pred.CastPosition);
+                return Q.Cast(pred2.CastPosition);
             }
             return false;
         }
 
         private static void CastW(AIHeroClient target, SpellSlot slot, bool isRCombo = false)
         {
-            if (slot == SpellSlot.Unknown || Variables.TickCount - lastW <= 100 || IsCastingW)
+            if (slot == SpellSlot.Unknown || Variables.TickCount - lastW <= 300 || wMissile != null)
             {
                 return;
             }
@@ -485,11 +489,11 @@
                 switch (getBoxItem(comboMenu, "WAdv"))
                 {
                     case 1:
-                        posCast = Player.ServerPosition + (posCast - posEnd).LSNormalized() * 500;
+                        posCast = Player.ServerPosition + (posCast - posEnd).LSNormalized() * 550;
                         break;
                     case 2:
-                        var subPos1 = Player.ServerPosition + (posCast - posEnd).LSNormalized().Perpendicular() * 500;
-                        var subPos2 = Player.ServerPosition + (posEnd - posCast).LSNormalized().Perpendicular() * 500;
+                        var subPos1 = Player.ServerPosition + (posCast - posEnd).LSNormalized().Perpendicular() * 550;
+                        var subPos2 = Player.ServerPosition + (posEnd - posCast).LSNormalized().Perpendicular() * 550;
                         if (!subPos1.LSIsWall() && subPos2.LSIsWall())
                         {
                             posCast = subPos1;
@@ -514,7 +518,7 @@
             {
                 posCast = Player.ServerPosition.LSExtend(posCast, 500);
             }
-            else if (posCast.DistanceToPlayer() > 550 && posCast.DistanceToPlayer() < 750)
+            else if (posCast.DistanceToPlayer() > 550 && posCast.DistanceToPlayer() < 650)
             {
                 posCast = Player.ServerPosition.LSExtend(posCast, 600);
             }
@@ -530,51 +534,49 @@
             if (target != null)
             {
                 Swap(target);
-                var useR = getKeyBindItem(comboMenu, "R");
-                var targetR = getCheckBoxItem(comboMenu, "RCast" + target.NetworkId);
-                var stateR = RState;
-                var canCast = !useR || !targetR || (stateR == 0 && target.DistanceToPlayer() > getSliderItem(comboMenu, "RStopRange")) || stateR == -1;
-                if (stateR == 0 && useR && targetR && R.IsInRange(target) && CanR)
+                var useR = getKeyBindItem(comboMenu, "R")
+                           && getCheckBoxItem(comboMenu, "RCast" + target.NetworkId);
+                if (RState == 0 && useR && R.IsInRange(target) && CanR && R.CastOnUnit(target))
                 {
-                    R.CastOnUnit(target);
                     return;
                 }
-                if (getCheckBoxItem(comboMenu, "Ignite") && Ignite.IsReady() && (HaveR(target) || target.HealthPercent < 25) && target.DistanceToPlayer() < IgniteRange)
+                if (getCheckBoxItem(comboMenu, "Ignite") && Common.CanIgnite && (HaveR(target) || target.HealthPercent < 25)
+                    && target.DistanceToPlayer() < IgniteRange)
                 {
                     Player.Spellbook.CastSpell(Ignite, target);
                 }
-                var norW = getCheckBoxItem(comboMenu, "WNormal");
-                var advW = getBoxItem(comboMenu, "WAdv");
-                if ((norW || advW > 0) && WState == 0)
+                var canCast = !useR || (RState == 0 && target.DistanceToPlayer() > getSliderItem(comboMenu, "RStopRange"))
+                              || RState == -1;
+                if (WState == 0)
                 {
                     var slot = CanW(target);
                     if (slot != SpellSlot.Unknown)
                     {
-                        if (advW > 0 && rShadow.LSIsValid() && useR && targetR && HaveR(target) && !IsKillByMark(target))
+                        if (getBoxItem(comboMenu, "WAdv") > 0 && rShadow.IsValid() && useR
+                            && HaveR(target) && !IsKillByMark(target))
                         {
                             CastW(target, slot, true);
                             return;
                         }
-                        if (norW)
+                        if (getCheckBoxItem(comboMenu, "WNormal")
+                            && ((RState < 1 && canCast) || (rShadow.IsValid() && useR && !HaveR(target))))
                         {
-                            if (stateR < 1 && canCast)
-                            {
-                                CastW(target, slot);
-                            }
-                            if (rShadow.LSIsValid() && useR && targetR && !HaveR(target))
-                            {
-                                CastW(target, slot);
-                            }
+                            CastW(target, slot);
+                            return;
                         }
                     }
-                    else if (Variables.TickCount - lastW > 500 && target.Health + target.AttackShield <= Player.GetAutoAttackDamage(target) && !E.IsInRange(target) && !IsKillByMark(target) && target.DistanceToPlayer() < W.Range + target.GetRealAutoAttackRange() - 100)
+                    else if (getCheckBoxItem(comboMenu, "WNormal") && Variables.TickCount - lastW > 500
+                             && target.Health + target.AttackShield <= Player.GetAutoAttackDamage(target)
+                             && !E.IsInRange(target) && !IsKillByMark(target)
+                             && target.DistanceToPlayer() < W.Range + target.GetRealAutoAttackRange() - 100
+                             && W.Cast(
+                                 target.ServerPosition.Extend(Player.ServerPosition, -target.GetRealAutoAttackRange())))
                     {
-                        W.Cast(target.ServerPosition.LSExtend(Player.ServerPosition, -target.GetRealAutoAttackRange()));
                         lastW = Variables.TickCount;
                         return;
                     }
                 }
-                if (canCast || rShadow.LSIsValid())
+                if (canCast || rShadow.IsValid())
                 {
                     CastE();
                     CastQ(target);
@@ -685,6 +687,7 @@
             if (mode == 0 && WState == 0)
             {
                 CastW(target, CanW(target));
+                return;
             }
             if (mode < 2)
             {
@@ -830,13 +833,11 @@
             }
             if (getCheckBoxItem(drawMenu, "WPos") && wShadow.LSIsValid())
             {
-                Render.Circle.DrawCircle(wShadow.Position, wShadow.BoundingRadius, Color.MediumSlateBlue);
                 var pos = Drawing.WorldToScreen(wShadow.Position);
                 Drawing.DrawText(pos.X - (float)30 / 2, pos.Y, Color.BlueViolet, "W");
             }
             if (getCheckBoxItem(drawMenu, "RPos") && rShadow.LSIsValid())
             {
-                Render.Circle.DrawCircle(rShadow.Position, rShadow.BoundingRadius, Color.MediumSlateBlue);
                 var pos = Drawing.WorldToScreen(rShadow.Position);
                 Drawing.DrawText(pos.X - (float)30 / 2, pos.Y, Color.BlueViolet, "R");
             }

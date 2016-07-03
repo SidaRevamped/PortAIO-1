@@ -1167,7 +1167,7 @@ namespace Valvrave_Sharp.Evade
                     SpellName = "GnarQReturn",
                     Slot = SpellSlot.Q,
                     Type = SkillShotType.SkillshotMissileLine,
-                    Range = 2500,
+                    Range = 3000,
                     Radius = 75,
                     MissileSpeed = 60,
                     MissileAccel = 800,

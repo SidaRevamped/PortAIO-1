@@ -22,6 +22,7 @@
     using Skillshot = Valvrave_Sharp.Evade.Skillshot;
     using LeagueSharp.Data.Enumerations;
     using LeagueSharp.SDK.Enumerations;
+    using LeagueSharp.SDK.Polygons;
     #endregion
 
     internal class Yasuo : Program
@@ -48,6 +49,10 @@
 
         private static Vector2 posDash;
 
+        private static MissileClient wallLeft, wallRight;
+
+        private static RectanglePoly wallPoly;
+
         public static Menu comboMenu, hybridMenu, lcMenu, lhMenu, ksMenu, fleeMenu, drawMenu, miscMenu;
 
         #endregion
@@ -59,8 +64,8 @@
 
             Q = new LeagueSharp.SDK.Spell(SpellSlot.Q, 505).SetSkillshot(QDelay, 20, float.MaxValue, false, SkillshotType.SkillshotLine);
             Q2 = new LeagueSharp.SDK.Spell(Q.Slot, 1100).SetSkillshot(Q2Delay, 90, 1200, true, Q.Type);
-            Q3 = new LeagueSharp.SDK.Spell(Q.Slot, 250).SetTargetted(0.005f, float.MaxValue);
-            W = new LeagueSharp.SDK.Spell(SpellSlot.W, 400);
+            Q3 = new LeagueSharp.SDK.Spell(Q.Slot, 250).SetTargetted(0.025f, float.MaxValue);
+            W = new LeagueSharp.SDK.Spell(SpellSlot.W, 400).SetTargetted(0.25f, float.MaxValue);
             E = new LeagueSharp.SDK.Spell(SpellSlot.E, 475).SetTargetted(0, 1040);
             E2 = new LeagueSharp.SDK.Spell(E.Slot, E.Range).SetTargetted(Q3.Delay, E.Speed);
             R = new LeagueSharp.SDK.Spell(SpellSlot.R, 1200);
@@ -82,6 +87,9 @@
 
             comboMenu = config.AddSubMenu("Combo", "Combo");
             comboMenu.AddGroupLabel("Q: Always On");
+            comboMenu.AddGroupLabel("Smart Settings");
+            comboMenu.Add("W", new CheckBox("Use W", false));
+            comboMenu.Add("E", new CheckBox("Use E", false));
             comboMenu.AddGroupLabel("E Gap Settings");
             comboMenu.Add("EGap", new CheckBox("Use E"));
             comboMenu.Add("EMode", new ComboBox("Follow Mode", 0, "Enemy", "Mouse"));
@@ -170,11 +178,13 @@
                 };
             Orbwalker.OnPostAttack += (sender, args) =>
                 {
-                    if (!Q.IsReady() || haveQ3 || (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) || Orbwalker.LastTarget is AIHeroClient || Orbwalker.LastTarget is Obj_AI_Minion)
+                    if (!Q.IsReady() || haveQ3 || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                     {
                         return;
                     }
-                    if (Q.GetTarget(50) != null || Common.ListMinions().Count(i => i.LSIsValidTarget(Q.Range + 50)) > 0)
+                    var tur = Orbwalker.LastTarget as Obj_AI_Turret;
+                    if (tur == null || Q.GetTarget(50) != null
+                        || Common.ListMinions().Count(i => i.LSIsValidTarget(Q.Range + 50)) > 0)
                     {
                         return;
                     }
@@ -209,13 +219,10 @@
                         case "yasuoeqcombosoundmiss":
                         case "YasuoEQComboSoundHit":
                             DelayAction.Add(
-                                100,
+                                70,
                                 () =>
                                 {
-                                    Orbwalker.ResetAutoAttack();
-                                    EloBuddy.Player.IssueOrder(
-                                        GameObjectOrder.AttackTo,
-                                        Player.ServerPosition.LSExtend(Game.CursorPos, Player.BoundingRadius));
+                                    EloBuddy.Player.IssueOrder(GameObjectOrder.AttackTo, Player.ServerPosition.LSExtend(Game.CursorPos, Player.BoundingRadius));
                                 });
                             break;
                     }
@@ -244,6 +251,35 @@
                             break;
                     }
                 };
+
+            GameObjectNotifier<MissileClient>.OnCreate += (sender, args) =>
+            {
+                var spellCaster = args.SpellCaster as AIHeroClient;
+                if (spellCaster == null || !spellCaster.IsMe)
+                {
+                    return;
+                }
+                switch (args.SData.Name)
+                {
+                    case "YasuoWMovingWallMisL":
+                        wallLeft = args;
+                        break;
+                    case "YasuoWMovingWallMisR":
+                        wallRight = args;
+                        break;
+                }
+            };
+            GameObjectNotifier<MissileClient>.OnDelete += (sender, args) =>
+            {
+                if (args.Compare(wallLeft))
+                {
+                    wallLeft = null;
+                }
+                else if (args.Compare(wallRight))
+                {
+                    wallRight = null;
+                }
+            };
         }
 
         public static bool getCheckBoxItem(Menu m, string item)
@@ -327,7 +363,7 @@
             }
             if (!pos.IsValid())
             {
-                pos = target.ServerPosition;
+                pos = E.GetPredPosition(target, true);
             }
             var posAfterE = GetPosAfterDash(target);
             return (underTower || !posAfterE.IsUnderEnemyTurret())
@@ -380,11 +416,49 @@
                     }
                     if (targets.Count > 0)
                     {
-                        var target = targets.MaxOrDefault(i => new Priority().GetPriority(i));
+                        var target = targets.MaxOrDefault(i => new Priority().GetDefaultPriority(i));
                         if (target != null && R.CastOnUnit(target))
                         {
                             return;
                         }
+                    }
+                }
+            }
+
+            if (getCheckBoxItem(comboMenu, "W") && W.IsReady())
+            {
+                var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+                if (target != null && Math.Abs(target.GetProjectileSpeed() - float.MaxValue) > float.Epsilon
+                    && (target.HealthPercent > Player.HealthPercent
+                            ? Player.CountAllyHeroesInRange(Q.Range) < target.CountEnemyHeroesInRange(Q.Range)
+                            : Player.HealthPercent < 30))
+                {
+                    var posPred = W.GetPredPosition(target, true);
+                    if (posPred.DistanceToPlayer() > 100 && posPred.DistanceToPlayer() < 375 && W.Cast(posPred))
+                    {
+                        return;
+                    }
+                }
+            }
+            if (getCheckBoxItem(comboMenu, "E") && E.IsReady() && wallLeft != null && wallRight != null)
+            {
+                var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+                if (target != null && Math.Abs(target.GetProjectileSpeed() - float.MaxValue) > float.Epsilon
+                    && !HaveE(target) && Evade.IsSafePoint(GetPosAfterDash(target).ToVector2()).IsSafe)
+                {
+                    var listPos =
+                        Common.ListEnemies()
+                            .Where(i => i.LSIsValidTarget(E.Range * 2) && !HaveE(i))
+                            .Select(GetPosAfterDash)
+                            .Where(
+                                i =>
+                                target.Distance(i) < target.DistanceToPlayer()
+                                || target.Distance(i) < target.GetRealAutoAttackRange() + 100)
+                            .ToList();
+                    if (listPos.Any(i => IsThroughWall(target.ServerPosition, i)) && E.CastOnUnit(target))
+                    {
+                        lastE = Variables.TickCount;
+                        return;
                     }
                 }
             }
@@ -451,7 +525,8 @@
                 else
                 {
                     var target = Orbwalker.LastTarget;
-                    if (target == null || Player.Distance(target) > target.GetRealAutoAttackRange() * 0.4)
+                    if (target == null || Player.Distance(target) > target.GetRealAutoAttackRange() * 0.7
+                        || Player.Distance(Game.CursorPos) > E.Range * 1.5)
                     {
                         var obj = GetBestObjToMouse(underTower);
                         if (obj != null && E.CastOnUnit(obj))
@@ -639,7 +714,28 @@
 
         private static bool IsInRangeQ(Obj_AI_Minion minion)
         {
-            return minion.LSIsValidTarget(Math.Max(475 + minion.BoundingRadius / 3 - 7, 475));
+            return minion.LSIsValidTarget(Math.Max(465 + minion.BoundingRadius / 3, 475));
+        }
+
+        private static bool IsThroughWall(Vector3 from, Vector3 to)
+        {
+            if (wallLeft == null || wallRight == null)
+            {
+                return false;
+            }
+            wallPoly = new RectanglePoly(wallLeft.Position, wallRight.Position, 75);
+            for (var i = 0; i < wallPoly.Points.Count; i++)
+            {
+                var inter = wallPoly.Points[i].LSIntersection(
+                    wallPoly.Points[i != wallPoly.Points.Count - 1 ? i + 1 : 0],
+                    from.ToVector2(),
+                    to.ToVector2());
+                if (inter.Intersects)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void KillSteal()
@@ -744,9 +840,7 @@
 
         private static void LaneClear()
         {
-            var useQ = getCheckBoxItem(lcMenu, "Q");
-            var useQ3 = getCheckBoxItem(lcMenu, "Q3");
-            if (haveQ3 && useQ3)
+            if (haveQ3 && getCheckBoxItem(lcMenu, "Q3"))
             {
                 var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters().Where(i => Q2.IsInRange(i)).Cast<Obj_AI_Base>().ToList();
                 if (minions != null)
@@ -773,7 +867,7 @@
                 }
             }
 
-            if (useQ && Q.IsReady() && (!haveQ3 || useQ3))
+            if (getCheckBoxItem(lcMenu, "Q") && Q.IsReady() && (!haveQ3 || getCheckBoxItem(lcMenu, "Q3")))
             {
                 if (IsDashing)
                 {
@@ -948,7 +1042,7 @@
             {
                 AutoQ();
             }
-            if (!getKeyBindItem(fleeMenu, "E"))
+            if (getKeyBindItem(miscMenu, "StackQ") && !getKeyBindItem(fleeMenu, "E"))
             {
                 StackQ();
             }
@@ -956,7 +1050,7 @@
 
         private static void StackQ()
         {
-            if (!getKeyBindItem(miscMenu, "StackQ") || !Q.IsReady() || haveQ3 || IsDashing)
+            if (!Q.IsReady() || haveQ3 || IsDashing)
             {
                 return;
             }

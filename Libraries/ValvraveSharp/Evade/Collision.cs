@@ -154,7 +154,7 @@
                     for (var i = 0; i < wallPolygon.Points.Count; i++)
                     {
                         var inter =
-                            wallPolygon.Points[i].Intersection(
+                            wallPolygon.Points[i].LSIntersection(
                                 wallPolygon.Points[i != wallPolygon.Points.Count - 1 ? i + 1 : 0],
                                 @from,
                                 skillshot.End);

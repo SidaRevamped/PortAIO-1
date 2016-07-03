@@ -407,7 +407,7 @@
                 {
                     var sideStart = this.Polygon.Points[j];
                     var sideEnd = this.Polygon.Points[j == this.Polygon.Points.Count - 1 ? 0 : j + 1];
-                    var intersection = from.Intersection(to, sideStart, sideEnd);
+                    var intersection = from.LSIntersection(to, sideStart, sideEnd);
                     if (intersection.Intersects)
                     {
                         segmentIntersections.Add(

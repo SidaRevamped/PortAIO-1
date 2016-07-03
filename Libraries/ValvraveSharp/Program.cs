@@ -29,7 +29,7 @@
 
         internal static EloBuddy.SDK.Item Bilgewater, BotRuinedKing, Youmuu, Tiamat, Hydra, Titanic;
 
-        internal static SpellSlot Flash, Ignite, Smite;
+        internal static SpellSlot Flash = SpellSlot.Unknown, Ignite = SpellSlot.Unknown, Smite = SpellSlot.Unknown;
 
         internal static Menu _MainMenu;
 
@@ -79,10 +79,14 @@
 
         private static void InitSummonerSpell()
         {
-            var smiteName = Player.Spellbook.Spells.Where(i => (i.Slot == SpellSlot.Summoner1 || i.Slot == SpellSlot.Summoner2) && i.Name.ToLower().Contains("smite")).Select(i => i.Name).FirstOrDefault();
-            if (!string.IsNullOrEmpty(smiteName))
+            foreach (var smite in
+                Player.Spellbook.Spells.Where(
+                    i =>
+                    (i.Slot == SpellSlot.Summoner1 || i.Slot == SpellSlot.Summoner2)
+                    && i.Name.ToLower().Contains("smite")))
             {
-                Smite = Player.GetSpellSlot(smiteName);
+                Smite = smite.Slot;
+                break;
             }
             Ignite = Player.GetSpellSlot("SummonerDot");
             Flash = Player.GetSpellSlot("SummonerFlash");
