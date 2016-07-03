@@ -1410,7 +1410,18 @@ namespace PortAIO
                         }
                         break;
                     case "udyr": // D_Udyr
-                        D_Udyr.Program.Game_OnGameLoad();
+                        switch (Loader.udyr)
+                        {
+                            case 0:
+                                D_Udyr.Program.Game_OnGameLoad();
+                                break;
+                            case 1:
+                                ExorAIO.AIO.OnLoad();
+                                break;
+                            default:
+                                D_Udyr.Program.Game_OnGameLoad();
+                                break;
+                        }
                         break;
                     case "maokai": // Underrated AIO
                         new UnderratedAIO.Champions.Maokai();

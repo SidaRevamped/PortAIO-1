@@ -33,6 +33,7 @@ using ExorAIO.Champions.Tristana;
 using ExorAIO.Champions.Vayne;
 using ExorAIO.Champions.Twitch;
 using ExorAIO.Champions.Lux;
+using ExorAIO.Champions.Udyr;
 
 namespace ExorAIO.Core
 {
@@ -149,6 +150,9 @@ namespace ExorAIO.Core
                     break;
                 case "Lux":
                     new Lux().OnLoad();
+                    break;
+                case "Udyr":
+                    new Udyr().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
