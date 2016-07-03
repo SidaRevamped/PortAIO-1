@@ -29,10 +29,7 @@ namespace ElVladimirReborn
     {
         #region Properties
 
-        private static AIHeroClient Player
-        {
-            get { return ObjectManager.Player; }
-        }
+        private static AIHeroClient Player => ObjectManager.Player;
 
         #endregion
 
@@ -132,7 +129,7 @@ namespace ElVladimirReborn
 
         private static void OnCombo()
         {
-            var target = TargetSelector.GetTarget(1500, DamageType.Magical);
+            var target = TargetSelector.GetTarget(spells[Spells.Q].Range, DamageType.Magical);
             if (target == null)
             {
                 return;
@@ -148,17 +145,9 @@ namespace ElVladimirReborn
 
             if (getCheckBoxItem(ElVladimirMenu.comboMenu, "ElVladimir.Combo.E") && spells[Spells.E].IsReady() && target.LSIsValidTarget(800))
             {
-                Orbwalker.OrbwalkTo(Game.CursorPos);
-                if (Player.LSDistance(target) < 800)
+                if (Player.Distance(target) > 300 && Player.Distance(target) < spells[Spells.E].Range)
                 {
-                    spells[Spells.E].StartCharging();
-                    if (spells[Spells.E].IsCharging)
-                    {
-                        if (Player.LSDistance(target) >= 550)
-                        {
-                            spells[Spells.E].Cast();
-                        }
-                    }
+                    spells[Spells.E].StartCharging(Game.CursorPos);
                 }
             }
 
@@ -213,7 +202,7 @@ namespace ElVladimirReborn
             {
                 if (Player.LSDistance(target) < 800)
                 {
-                    spells[Spells.E].StartCharging();
+                    spells[Spells.E].StartCharging(Game.CursorPos);
                 }
             }
         }

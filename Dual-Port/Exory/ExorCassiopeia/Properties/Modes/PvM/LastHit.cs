@@ -32,9 +32,9 @@ namespace ExorAIO.Champions.Cassiopeia
                         m =>
                             Vars.GetRealHealth(m) <
                                 (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) + 
-                                    (m.HasBuffOfType(BuffType.Poison)
-                                        ? (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Empowered)
-                                        : 0)))
+                                (m.HasBuffOfType(BuffType.Poison)
+                                    ? (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Empowered)
+                                    : 0)))
                     {
                         Vars.E.CastOnUnit(minion);
                     }

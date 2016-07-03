@@ -3,8 +3,8 @@ using System.Linq;
 using ExorAIO.Utilities;
 using LeagueSharp;
 using LeagueSharp.SDK;
-using LeagueSharp.Data.Enumerations;
 using LeagueSharp.SDK.Core.Utils;
+using LeagueSharp.Data.Enumerations;
 using EloBuddy;
 
 namespace ExorAIO.Champions.Cassiopeia
@@ -26,27 +26,36 @@ namespace ExorAIO.Champions.Cassiopeia
             }
 
             /// <summary>
-            ///     The E Clear Logic.
+            ///     The E Clear Logics.
             /// </summary>
             if (Vars.E.IsReady())
             {
-                if (Targets.JungleMinions.Any() &&
-                    GameObjects.Player.ManaPercent >
-                        ManaManager.GetNeededMana(Vars.E.Slot, Vars.getSliderItem(Vars.EMenu, "clear")) &&
-                    Vars.getSliderItem(Vars.EMenu, "clear") != 101)
+                /// <summary>
+                ///     The E JungleClear Logic.
+                /// </summary>
+                if (Targets.JungleMinions.Any())
                 {
-                    DelayAction.Add(Vars.getSliderItem(Vars.EMenu, "delay"), () =>
+                    if (GameObjects.Player.ManaPercent >
+                            ManaManager.GetNeededMana(Vars.E.Slot, Vars.getSliderItem(Vars.EMenu, "clear")) &&
+                        Vars.getSliderItem(Vars.EMenu, "clear") != 101)
                     {
-                        foreach (var minion in Targets.JungleMinions.Where(m => m.HasBuffOfType(BuffType.Poison)))
+                        DelayAction.Add(Vars.getSliderItem(Vars.EMenu, "delay"), () =>
                         {
-                            Vars.E.CastOnUnit(minion);
-                        }
-                    });
+                            foreach (var minion in Targets.Minions.Where(m => m.HasBuffOfType(BuffType.Poison)))
+                            {
+                                Vars.E.CastOnUnit(minion);
+                            }
+                        });
+                    }
                 }
+
+                /// <summary>
+                ///     The E LaneClear Logics.
+                /// </summary>
                 else if (Targets.Minions.Any())
                 {
                     if (GameObjects.Player.ManaPercent <
-                            Vars.getSliderItem(Vars.EMenu, "lasthit") &&
+                            ManaManager.GetNeededMana(Vars.E.Slot, Vars.getSliderItem(Vars.EMenu, "lasthit")) &&
                         Vars.getSliderItem(Vars.EMenu, "lasthit") != 101)
                     {
                         DelayAction.Add(Vars.getSliderItem(Vars.EMenu, "delay"), () =>
@@ -54,17 +63,17 @@ namespace ExorAIO.Champions.Cassiopeia
                             foreach (var minion in Targets.Minions.Where(
                                 m =>
                                     Vars.GetRealHealth(m) <
-                                        (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) + 
-                                            (m.HasBuffOfType(BuffType.Poison)
-                                                ? (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Empowered)
-                                                : 0)))
+                                        (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E) +
+                                        (m.HasBuffOfType(BuffType.Poison)
+                                            ? (float)GameObjects.Player.LSGetSpellDamage(m, SpellSlot.E, DamageStage.Empowered)
+                                            : 0)))
                             {
                                 Vars.E.CastOnUnit(minion);
                             }
                         });
                     }
                     else if (GameObjects.Player.ManaPercent >=
-                            Vars.getSliderItem(Vars.EMenu, "clear") &&
+                            ManaManager.GetNeededMana(Vars.E.Slot, Vars.getSliderItem(Vars.EMenu, "clear")) &&
                         Vars.getSliderItem(Vars.EMenu, "clear") != 101)
                     {
                         DelayAction.Add(Vars.getSliderItem(Vars.EMenu, "delay"), () =>
@@ -87,20 +96,21 @@ namespace ExorAIO.Champions.Cassiopeia
                 Vars.getSliderItem(Vars.QMenu, "clear") != 101)
             {
                 /// <summary>
+                ///     The Q JungleClear Logic.
+                /// </summary>
+                if (Targets.JungleMinions.Any())
+                {
+                    Vars.Q.Cast(Targets.JungleMinions[0].ServerPosition);
+                }
+
+                /// <summary>
                 ///     The Q LaneClear Logic.
                 /// </summary>
-                if (Vars.Q.GetCircularFarmLocation(Targets.Minions, Vars.Q.Width).MinionsHit >= 3)
+                else if (Vars.Q.GetCircularFarmLocation(Targets.Minions, Vars.Q.Width).MinionsHit >= 3)
                 {
                     Vars.Q.Cast(Vars.Q.GetCircularFarmLocation(Targets.Minions, Vars.Q.Width).Position);
                 }
 
-                /// <summary>
-                ///     The Q JungleClear Logic.
-                /// </summary>
-                else if (Targets.JungleMinions.Any())
-                {
-                    Vars.Q.Cast(Targets.JungleMinions[0].ServerPosition);
-                }
             }
 
             /// <summary>
@@ -112,19 +122,19 @@ namespace ExorAIO.Champions.Cassiopeia
                 Vars.getSliderItem(Vars.WMenu, "clear") != 101)
             {
                 /// <summary>
-                ///     The W LaneClear Logic.
+                ///     The W JungleClear Logic.
                 /// </summary>
-                if (Vars.W.GetCircularFarmLocation(Targets.Minions, Vars.W.Width).MinionsHit >= 3)
+                if (Targets.JungleMinions.Any(m => !m.HasBuffOfType(BuffType.Poison)))
                 {
-                    Vars.W.Cast(Vars.W.GetCircularFarmLocation(Targets.Minions.Where(m => !m.HasBuffOfType(BuffType.Poison)).ToList(), Vars.W.Width).Position);
+                    Vars.W.Cast(Targets.JungleMinions.Where(m => !m.HasBuffOfType(BuffType.Poison)).FirstOrDefault().ServerPosition);
                 }
 
                 /// <summary>
-                ///     The W JungleClear Logic.
+                ///     The W LaneClear Logic.
                 /// </summary>
-                else if (Targets.JungleMinions.Any(m => !m.HasBuffOfType(BuffType.Poison)))
+                else if (Vars.W.GetCircularFarmLocation(Targets.Minions, Vars.W.Width).MinionsHit >= 3)
                 {
-                    Vars.W.Cast(Targets.JungleMinions.Where(m => !m.HasBuffOfType(BuffType.Poison)).FirstOrDefault().ServerPosition);
+                    Vars.W.Cast(Vars.W.GetCircularFarmLocation(Targets.Minions.Where(m => !m.HasBuffOfType(BuffType.Poison)).ToList(), Vars.W.Width).Position);
                 }
             }
         }
