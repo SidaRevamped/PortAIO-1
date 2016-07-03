@@ -85,8 +85,10 @@ namespace PortAIO.Champion.Ashe
             RMenu.Add("useR", new KeyBind("Semi-manual cast R key", false, KeyBind.BindTypes.HoldActive, 'T'));
 
             List<string> modes = new List<string>();
+
             modes.Add("LOW HP");
             modes.Add("CLOSEST");
+
             foreach (var enemy in HeroManager.Enemies)
             {
                 modes.Add(enemy.ChampionName);
@@ -140,10 +142,8 @@ namespace PortAIO.Champion.Ashe
                 || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
-            if (!getCheckBoxItem(RMenu, "spell" + args.SData.Name))
-                return;
-
-            R.Cast(sender);
+            if (RMenu["spell" + args.SData.Name] != null && !getCheckBoxItem(RMenu, "spell" + args.SData.Name))
+                R.Cast(sender);
         }
 
         private static void Interrupter2_OnInterruptableTarget(AIHeroClient sender,
