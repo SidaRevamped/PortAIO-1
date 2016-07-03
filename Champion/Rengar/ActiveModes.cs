@@ -25,7 +25,7 @@ namespace ElRengarRevamped
             try
             {
                 var target = TargetSelector.SelectedTarget ?? TargetSelector.GetTarget(spells[Spells.E].Range, DamageType.Physical);
-                if (target.LSIsValidTarget() == false)
+                if (target == null)
                 {
                     return;
                 }
@@ -437,15 +437,15 @@ namespace ElRengarRevamped
         /// <value>
         ///     Youmuus Ghostblade
         /// </value>
-        private static new Items.Item Youmuu => ItemData.Youmuus_Ghostblade.GetItem();
-
+        private static new Item Youmuu => new Item(ItemId.Youmuus_Ghostblade);
+    
         /// <summary>
         ///     Gets Ravenous Hydra
         /// </summary>
         /// <value>
         ///     Ravenous Hydra
         /// </value>
-        private static Items.Item Hydra => ItemData.Ravenous_Hydra_Melee_Only.GetItem();
+        private static Item Hydra => new Item(ItemId.Ravenous_Hydra_Melee_Only);
 
         /// <summary>
         ///     Gets Tiamat Item
@@ -453,15 +453,15 @@ namespace ElRengarRevamped
         /// <value>
         ///     Tiamat Item
         /// </value>
-        private static Items.Item Tiamat => ItemData.Tiamat_Melee_Only.GetItem();
-
+        private static Item Tiamat => new Item(ItemId.Tiamat_Melee_Only);
+    
         /// <summary>
         ///     Gets Titanic Hydra
         /// </summary>
         /// <value>
         ///     Titanic Hydra
         /// </value>
-        private static Items.Item Titanic => ItemData.Titanic_Hydra_Melee_Only.GetItem();
+        private static Item Titanic => new Item(ItemId.Titanic_Hydra);
 
 
         /// <summary>
@@ -474,13 +474,13 @@ namespace ElRengarRevamped
             var units = MinionManager.GetMinions(385, MinionTypes.All, MinionTeam.NotAlly).Count(o => !(o is Obj_AI_Turret));
             var count = units;
             var tiamat = Tiamat;
-            if (tiamat.IsReady() && count > 0 && tiamat.Cast())
+            if (tiamat.IsOwned() && tiamat.IsReady() && count > 0 && tiamat.Cast())
             {
                 return true;
             }
 
             var hydra = Hydra;
-            if (Hydra.IsReady() && count > 0 && hydra.Cast())
+            if (Hydra.IsOwned() && Hydra.IsReady() && count > 0 && hydra.Cast())
             {
                 return true;
             }
@@ -504,25 +504,25 @@ namespace ElRengarRevamped
             var count = heroes;
 
             var tiamat = Tiamat;
-            if (tiamat.IsReady() && count > 0 && tiamat.Cast())
+            if (tiamat.IsOwned() && tiamat.IsReady() && count > 0 && tiamat.Cast())
             {
                 return true;
             }
 
             var hydra = Hydra;
-            if (Hydra.IsReady() && count > 0 && hydra.Cast())
+            if (Hydra.IsOwned() && Hydra.IsReady() && count > 0 && hydra.Cast())
             {
                 return true;
             }
 
             var youmuus = Youmuu;
-            if (Youmuu.IsReady() && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && youmuus.Cast())
+            if (Youmuu.IsOwned() && Youmuu.IsReady() && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && youmuus.Cast())
             {
                 return true;
             }
 
             var titanic = Titanic;
-            return titanic.IsReady() && count > 0 && titanic.Cast();
+            return Titanic.IsOwned() && titanic.IsReady() && count > 0 && titanic.Cast();
         }
 
         #endregion
