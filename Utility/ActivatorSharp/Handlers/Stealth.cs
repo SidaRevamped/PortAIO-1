@@ -62,7 +62,7 @@ namespace Activators.Handlers
             {
                 foreach (var x in Data.Somedata.Spells)
                 {
-                    if (args.SData.Name.ToLower() == x.SDataName && x.HitType.Contains(HitType.Stealth))
+                    if (args.SData.Name.Equals(x.SDataName, StringComparison.InvariantCultureIgnoreCase) && x.HitType.Contains(HitType.Stealth))
                     {
                         hero.HitTypes.Add(HitType.Stealth);
                         LeagueSharp.Common.Utility.DelayAction.Add(100 + _random.Next(200, 450), () => hero.HitTypes.Remove(HitType.Stealth));
