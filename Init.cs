@@ -1379,6 +1379,9 @@ namespace PortAIO
                             case 3:
                                 Slutty_Thresh.SluttyThresh.OnLoad();
                                 break;
+                            case 4:
+                                yol0Thresh.Program.OnLoad();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;

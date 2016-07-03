@@ -515,7 +515,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[69]))
                 {
-                    Miscc.Add("thresh", new ComboBox("Use addon for Thresh : ", 0, "OKTW", "Thesh the Ruler", "Thresh the Chain Warden", "Slutty Thresh"));
+                    Miscc.Add("thresh", new ComboBox("Use addon for Thresh : ", 0, "OKTW", "Thesh the Ruler", "Thresh the Chain Warden", "Slutty Thresh", "yol0 Thresh"));
                 }
                 if (Player.ChampionName.Equals(Champion[70]))
                 {
