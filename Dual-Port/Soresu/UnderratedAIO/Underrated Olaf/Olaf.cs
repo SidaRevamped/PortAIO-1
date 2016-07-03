@@ -344,7 +344,7 @@ namespace UnderratedAIO.Champions
         private static void InitOlaf()
         {
             Q = new Spell(SpellSlot.Q, 1000);
-            Q.SetSkillshot(250, 105, 1600, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.25f, 105, 1600, false, SkillshotType.SkillshotLine);
             W = new Spell(SpellSlot.W);
             E = new Spell(SpellSlot.E, 325);
             R = new Spell(SpellSlot.R);
