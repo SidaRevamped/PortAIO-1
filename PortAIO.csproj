@@ -802,6 +802,9 @@
     <Compile Include="Dual-Port\iJava\iTwitch\Extensions.cs" />
     <Compile Include="Dual-Port\iJava\iTwitch\Twitch.cs" />
     <Compile Include="Dual-Port\TheKushStyle\KappaSeries\Aatrox.cs" />
+    <Compile Include="Dual-Port\`LSStaff\KarthusSharp\Helper.cs" />
+    <Compile Include="Dual-Port\`LSStaff\KarthusSharp\Karthus.cs" />
+    <Compile Include="Dual-Port\`LSStaff\KarthusSharp\Program.cs" />
     <Compile Include="Dual-Port\`LSStaff\KoratuSyndra\ManaBarIndicator.cs" />
     <Compile Include="Dual-Port\`LSStaff\KoratuSyndra\OrbManager.cs" />
     <Compile Include="Dual-Port\`LSStaff\KoratuSyndra\Program.cs" />

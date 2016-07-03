@@ -128,6 +128,7 @@ namespace PortAIO.Utility
         public static int tristana { get { return Miscc["tristana"].Cast<ComboBox>().CurrentValue; } }
         public static int zac { get { return Miscc["zac"].Cast<ComboBox>().CurrentValue; } }
         public static int annie { get { return Miscc["annie"].Cast<ComboBox>().CurrentValue; } }
+        public static int karthus { get { return Miscc["karthus"].Cast<ComboBox>().CurrentValue; } }
         public static bool condemn { get { return Miscc["condemn"].Cast<CheckBox>().CurrentValue; } }
         public static bool randomult { get { return Miscc["randomult"].Cast<CheckBox>().CurrentValue; } }
 
@@ -217,6 +218,7 @@ namespace PortAIO.Utility
             "Tristana", //73
             "Zac", //74
             "Annie", //75
+            "Karthus", //76
         });
 
         public static void Menu()
@@ -532,6 +534,10 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[75]))
                 {
                     Miscc.Add("annie", new ComboBox("Use addon for Annie : ", 0, "OKTW Annie", "OAnnie"));
+                }
+                if (Player.ChampionName.Equals(Champion[76]))
+                {
+                    Miscc.Add("karthus", new ComboBox("Use addon for Karthus : ", 0, "OKTW Karthus", "KarthusSharp"));
                 }
             }
             else
