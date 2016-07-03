@@ -1555,7 +1555,18 @@ namespace PortAIO
                         Elvarus.Varus.Game_OnGameLoad();
                         break;
                     case "veigar": // FreshBooster
-                        new FreshBooster.Champion.Veigar();
+                        switch (Loader.veigar)
+                        {
+                            case 0:
+                                new FreshBooster.Champion.Veigar();
+                                break;
+                            case 1:
+                                ExorAIO.AIO.OnLoad();
+                                break;
+                            default:
+                                new FreshBooster.Champion.Veigar();
+                                break;
+                        }
                         break;
                     case "reksai": // D-Reksai && HeavenStrikeReksaj
                         switch (Loader.reksai)

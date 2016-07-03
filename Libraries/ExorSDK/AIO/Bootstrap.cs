@@ -34,6 +34,7 @@ using ExorAIO.Champions.Vayne;
 using ExorAIO.Champions.Twitch;
 using ExorAIO.Champions.Lux;
 using ExorAIO.Champions.Udyr;
+using ExorAIO.Champions.Veigar;
 
 namespace ExorAIO.Core
 {
@@ -153,6 +154,9 @@ namespace ExorAIO.Core
                     break;
                 case "Udyr":
                     new Udyr().OnLoad();
+                    break;
+                case "Veigar":
+                    new Veigar().OnLoad();
                     break;
                 default:
                     Vars.IsLoaded = false;
