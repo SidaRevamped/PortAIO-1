@@ -1927,6 +1927,7 @@
     <Compile Include="Utility\VCursor\Utility.cs" />
     <Compile Include="Utility\VCursor\VirtualCursor.cs" />
     <Compile Include="Utility\`Champion Utility\JaxWardJumper\Jumper.cs" />
+    <Compile Include="Utility\`Champion Utility\MorganaE\Shield.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

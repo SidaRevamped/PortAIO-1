@@ -18,7 +18,7 @@ namespace KurisuMorgana
         private static Spell _q, _w, _e, _r;
         private static readonly AIHeroClient Me = ObjectManager.Player;
 
-        public static Menu menuQ, menuW, menuE, shieldMenu, menuR, wwmenu, miscMenu;
+        public static Menu menuQ, menuW, menuR, wwmenu, miscMenu;
 
         private static float _mq, _mw, _mr;
         private static float _ma, _mi, _guise;
@@ -40,6 +40,8 @@ namespace KurisuMorgana
 
             _menu = MainMenu.AddMenu("Kurisu's Morgana", "morgana");
 
+            MorganaE.Shield.Initialize(_menu);
+
             menuQ = _menu.AddSubMenu("Dark Binding [Q]", "asdfasdf");
             menuQ.Add("hitchanceq", new Slider("Binding Hitchance", 3, 1, 4));
             menuQ.Add("useqcombo", new CheckBox("Use in Combo"));
@@ -56,37 +58,6 @@ namespace KurisuMorgana
             menuW.Add("useharassw", new CheckBox("Use in Harass", false));
             menuW.Add("usewauto", new CheckBox("Use on Immobile"));
             menuW.Add("waitfor", new CheckBox("Cast only on if Immobile"));
-
-            menuE = _menu.AddSubMenu("BlackShield [E]", "emasdfasdfasdfenu");
-            menuE.Add("shieldtg", new CheckBox("Shield Only Target Spells", false));
-            menuE.Add("usemorge", new CheckBox("Enabled"));
-
-            shieldMenu = _menu.AddSubMenu("Use Shield [Who?]", "usefor");
-            foreach (var frn in ObjectManager.Get<AIHeroClient>().Where(x => x.Team == Me.Team))
-            {
-                if (shieldMenu["useon" + frn.NetworkId] == null)
-                {
-                    shieldMenu.Add("useon" + frn.NetworkId, new CheckBox("Shield " + frn.ChampionName, !frn.IsMe));
-                }
-            }
-            shieldMenu.AddSeparator();
-            shieldMenu.AddGroupLabel("Enemy Shield :");
-            shieldMenu.AddLabel("Shield these skills.");
-            shieldMenu.AddSeparator();
-            foreach (var ene in ObjectManager.Get<AIHeroClient>().Where(x => x.Team != Me.Team))
-            {
-                shieldMenu.AddGroupLabel(ene.ChampionName);
-
-                foreach (var lib in KurisuLib.CCList.Where(x => x.HeroName == ene.ChampionName))
-                {
-                    if (shieldMenu[lib.SDataName + "on"] == null)
-                    {
-                        shieldMenu.AddLabel(lib.Slot + " - " + lib.SpellMenuName);
-                        shieldMenu.Add(lib.SDataName + "on", new CheckBox("Enabled"));
-                        shieldMenu.AddSeparator();
-                    }
-                }
-            }
 
             menuR = _menu.AddSubMenu("Soul Shackles [R]", "rasdfasdfmenu");
             menuR.Add("rkill", new CheckBox("Use in combo if killable"));
@@ -386,37 +357,6 @@ namespace KurisuMorgana
                     if (getCheckBoxItem(menuQ, "autoqaa"))
                     {
                         _q.CastIfHitchanceEquals(hero, HitChance.VeryHigh);
-                    }
-                }
-            }
-
-            if (sender.Type != Me.Type || !_e.IsReady() || !sender.IsEnemy || !getCheckBoxItem(menuE, "usemorge"))
-                return;
-
-            var attacker = ObjectManager.Get<AIHeroClient>().First(x => x.NetworkId == sender.NetworkId);
-            foreach (var ally in HeroManager.Allies.Where(x => x.LSIsValidTarget(_e.Range)))
-            {
-                var detectRange = ally.ServerPosition +
-                                  (args.End - ally.ServerPosition).Normalized()*ally.LSDistance(args.End);
-                if (detectRange.LSDistance(ally.ServerPosition) > ally.AttackRange - ally.BoundingRadius)
-                    continue;
-
-                foreach (
-                    var lib in
-                        KurisuLib.CCList.Where(
-                            x => x.HeroName == attacker.ChampionName && x.Slot == attacker.GetSpellSlot(args.SData.Name))
-                    )
-                {
-                    if (lib.Type == Skilltype.Unit && args.Target.NetworkId != ally.NetworkId)
-                        return;
-
-                    if (getCheckBoxItem(menuE, "shieldtg") && lib.Type != Skilltype.Unit)
-                        return;
-
-                    if (getCheckBoxItem(shieldMenu, lib.SDataName + "on") &&
-                        getCheckBoxItem(shieldMenu, "useon" + ally.NetworkId))
-                    {
-                        Utility.DelayAction.Add(lib.Slot != SpellSlot.R ? 100 : 0, () => _e.CastOnUnit(ally));
                     }
                 }
             }
