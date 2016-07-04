@@ -935,7 +935,7 @@ namespace GosuMechanicsYasuo
             PredictionOutput Q3Pred = Q3.GetPrediction(target, true);
             if (Q3Pred.Hitchance >= HitChance.High && Extensions.IsValidTarget(target, Q3.Range))
             {
-                Q4.Cast(target);
+                Q3.Cast(target);
             }
         }
         public static void CastQ3AoE()
@@ -945,7 +945,7 @@ namespace GosuMechanicsYasuo
                 PredictionOutput Q3Pred = Q3.GetPrediction(target, true);
                 if (Q3Pred.Hitchance >= HitChance.High && Extensions.IsValidTarget(target ,Q3.Range) && Q3Pred.AoeTargetsHitCount >= 2)
                 {
-                    Q4.Cast(target);
+                    Q3.Cast(target);
                 }
             }          
         }
