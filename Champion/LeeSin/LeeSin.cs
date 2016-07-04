@@ -909,7 +909,7 @@
                         }
                     }
                 }
-                else if (getKeyBindItem(miscMenu, "RAdv"))
+                else if (getKeyBindItem(bkMenu, "R"))
                 {
                     Orbwalker.MoveTo(Game.CursorPos);
                     BubbaKush();
