@@ -33,6 +33,10 @@ namespace Challenger_Series
         public bool IsPerformanceChallengerEnabled;
         public int TriggerOnUpdate;
         private int _lastOnUpdateTriggerT = 0;
+        internal LeagueSharp.SDK.Spell Q;
+        internal LeagueSharp.SDK.Spell W;
+        internal LeagueSharp.SDK.Spell E;
+        internal LeagueSharp.SDK.Spell R;
 
         public static bool getCheckBoxItem(Menu m, string item)
         {
