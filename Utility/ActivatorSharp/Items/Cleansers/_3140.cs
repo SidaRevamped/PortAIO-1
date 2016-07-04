@@ -40,9 +40,8 @@ namespace Activators.Items.Cleansers
 
                     Buffs.CheckQSS(hero.Player);
 
-                    var d = Convert.ToDouble(array[Menu["use" + Name + "time"].Cast<ComboBox>().CurrentValue]);
                     if (hero.QSSBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue &&
-                        hero.QSSHighestBuffTime >= d * 1000)
+                        hero.QSSHighestBuffTime >= Menu["use" + Name + "time"].Cast<Slider>().CurrentValue)
                     {
                         LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + Menu["use" + Name + "delay"].Cast<Slider>().CurrentValue, delegate
                         {

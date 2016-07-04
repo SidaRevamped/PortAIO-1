@@ -47,9 +47,8 @@ namespace Activators.Items.Cleansers
 
                 Buffs.CheckMikaels(hero.Player);
 
-                var d = Convert.ToDouble(array[Menu["use" + Name + "time"].Cast<ComboBox>().CurrentValue]);
                 if (hero.MikaelsBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue &&
-                    hero.MikaelsHighestBuffTime >= d * 1000)
+                    hero.MikaelsHighestBuffTime >= Menu["use" + Name + "time"].Cast<Slider>().CurrentValue)
                 {
                     if (!Menu["use" + Name + "od"].Cast<CheckBox>().CurrentValue)
                     {

@@ -42,8 +42,7 @@ namespace Activators.Items.Cleansers
 
                     Buffs.CheckDervish(hero.Player);
 
-                    var d = Convert.ToDouble(array[Menu["use" + Name + "time"].Cast<ComboBox>().CurrentValue]);
-                    if (hero.DervishBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue && hero.DervishHighestBuffTime >= d * 1000)
+                    if (hero.DervishBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue && hero.DervishHighestBuffTime >= Menu["use" + Name + "time"].Cast<Slider>().CurrentValue)
                     {
                         LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + Menu["use" + Name + "delay"].Cast<Slider>().CurrentValue, delegate
                         {

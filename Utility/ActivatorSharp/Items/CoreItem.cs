@@ -226,8 +226,10 @@ namespace Activators.Items
                         Menu.Add(Name + "cpoison", new CheckBox("Poisons", false));
 
                     Menu.Add("use" + Name + "number", new Slider("Min Buffs to Use", DefaultHP / 5, 1, 5));
-                    Menu.Add("use" + Name + "time", new ComboBox("Min Durration to Use", 0, ".50", ".75", "1.0", "1.25", "1.5", "1.75", "2.0"));
-
+                    Menu.AddSeparator();
+                    Menu.Add("use" + Name + "time", new Slider("Min Durration to Use", 500, 250, 2000));
+                    Menu.AddLabel("^ Will not use unless the buff durration (stun, snare, etc) last at least this long (ms, 500 = 0.5 seconds)");
+                    Menu.AddSeparator();
                     if (Id == 3222)
                     {
                         Menu.Add("use" + Name + "od", new CheckBox("Use for Unique Only", false));

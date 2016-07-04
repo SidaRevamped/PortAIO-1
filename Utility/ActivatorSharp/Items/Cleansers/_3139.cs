@@ -42,9 +42,8 @@ namespace Activators.Items.Cleansers
 
                     Buffs.CheckMercurial(hero.Player);
 
-                    var d = Convert.ToDouble(array[Menu["use" + Name + "time"].Cast<ComboBox>().CurrentValue]);
                     if (hero.MercurialBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue &&
-                        hero.MercurialHighestBuffTime >= d * 1000)
+                        hero.MercurialHighestBuffTime >= Menu["use" + Name + "time"].Cast<Slider>().CurrentValue)
                     {
                         LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + Menu["use" + Name + "delay"].Cast<Slider>().CurrentValue, delegate
                         {

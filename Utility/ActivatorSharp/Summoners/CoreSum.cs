@@ -76,7 +76,10 @@ namespace Activators.Summoners
                     Menu.AddSeparator();
 
                     Menu.Add("use" + Name + "number", new Slider("Min Buffs to Use", 1, 1, 5));
-                    Menu.Add("use" + Name + "time", new ComboBox("Min Durration to Use", 0, ".50", ".75", "1.0", "1.25", "1.5", "1.75", "2.0"));
+                    Menu.AddSeparator();
+                    Menu.Add("use" + Name + "time", new Slider("Min Durration to Use", 500, 250, 2000));
+                    Menu.AddLabel("^ Will not use unless the buff durration (stun, snare, etc) last at least this long (ms, 500 = 0.5 seconds)");
+                    Menu.AddSeparator();
                     Menu.Add("use" + Name + "od", new CheckBox("Use for Dangerous Only", false));
                     Menu.Add("use" + Name + "delay", new Slider("Activation Delay (in ms)", 150, 0, 500));
                     Menu.Add("mode" + Name, new ComboBox("Mode: ", 0, "Always", "Combo"));

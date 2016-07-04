@@ -37,9 +37,8 @@ namespace Activators.Summoners
 
                     Buffs.CheckCleanse(hero.Player);
 
-                    var d = Convert.ToDouble(array[Menu["use" + Name + "time"].Cast<ComboBox>().CurrentValue]);
                     if (hero.CleanseBuffCount >= Menu["use" + Name + "number"].Cast<Slider>().CurrentValue &&
-                        hero.CleanseHighestBuffTime >= d * 1000)
+                        hero.CleanseHighestBuffTime >= Menu["use" + Name + "time"].Cast<Slider>().CurrentValue)
                     {
                         //if (!Menu["use" + Name + "od"].Cast<CheckBox>().CurrentValue)
                         //{
