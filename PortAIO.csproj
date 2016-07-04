@@ -499,6 +499,7 @@
     <Compile Include="Dual-Port\Hoes\SluttyThresh\Program.cs" />
     <Compile Include="Dual-Port\Hoola\HpBarIndicator.cs" />
     <Compile Include="Dual-Port\Hoola\Program.cs" />
+    <Compile Include="Dual-Port\imsosharp\ChallengerSeries\Plugins\Vayne.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Core.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Dmg.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Killsteal.cs" />
