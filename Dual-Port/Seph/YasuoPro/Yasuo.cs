@@ -374,23 +374,25 @@ namespace YasuoPro
 
             if (target != null && TowerCheck(target, true))
             {
-                if (target.LSDistance(Yasuo) <= 0.70 * Yasuo.AttackRange)
-                {
-                    return;
-                }
-
                 var dist = Yasuo.LSDistance(target);
-                var pctOutOfRange = dist / Spells[E].Range * 100;
-                if (target.IsDashable())
+                var pctOutOfRange = dist / Yasuo.AttackRange * 100;
+
+                if (pctOutOfRange > 0.8f)
                 {
-                    //Stay in range
-                    if (pctOutOfRange > 0.8f)
+                    if (target.IsDashable())
                     {
-                        if (TornadoReady && target.IsDashable() && targInKnockupRadius(target))
+                        if (target.ECanKill())
+                        {
+                            return;
+                        }
+
+                        if (TornadoReady && target.IsInRange(Spells[E].Range) && targInKnockupRadius(target))
                         {
                             Spells[E].CastOnUnit(target);
                         }
-                        else
+
+                        //Stay in range
+                        else if (pctOutOfRange > 0.8f)
                         {
                             var bestminion = ObjectManager.Get<Obj_AI_Base>()
                                 .Where(x =>
@@ -398,47 +400,33 @@ namespace YasuoPro
                                     && GetDashPos(x).IsCloser(target) && TowerCheck(x, true))
                                 .MinOrDefault(x => GetDashPos(x).LSDistance(target));
 
-                            if (bestminion != null)
-                            {
-                                Spells[E].CastOnUnit(bestminion);
-                            }
-
-                            else if (target.IsDashable() && GetDashPos(target).IsCloser(target))
+                            var shouldETarget = bestminion == null || GetDashPos(target).Distance(target) <
+                                                GetDashPos(bestminion).LSDistance(target);
+                            if (shouldETarget && GetDashPos(target).IsCloser(target))
                             {
                                 Spells[E].CastOnUnit(target);
                             }
+
+                            else if (bestminion != null)
+                            {
+                                Spells[E].CastOnUnit(bestminion);
+                            }
                         }
                     }
 
-                    //Go for a EQ if target is well within range
-                    else if (Spells[Q].IsReady() && TornadoReady)
+                    else
                     {
-                        if (targInKnockupRadius(target))
-                        {
-                            Spells[E].CastOnUnit(target);
-                            return;
-                        }
-                    }
-                }
-
-                //Catch up using a minion
-                else
-                {
-                    if (pctOutOfRange > 0.8f)
-                    {
-                        var minion =
-                            ObjectManager.Get<Obj_AI_Minion>()
-                                .Where(x => x.IsDashable() && x.IsCloser(target) && TowerCheck(x, true))
-                                .MinOrDefault(x => GetDashPos(x).LSDistance(target));
+                        var minion = ObjectManager.Get<Obj_AI_Minion>()
+                            .Where(x => x.IsDashable() && x.IsCloser(target) && TowerCheck(x, true))
+                            .MinOrDefault(x => GetDashPos(x).LSDistance(target));
                         if (minion != null)
                         {
-                            Spells[E].CastOnUnit(target);
+                            Spells[E].CastOnUnit(minion);
                         }
                     }
                 }
             }
         }
-
 
         private void UnitOnOnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
