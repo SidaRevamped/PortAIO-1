@@ -182,12 +182,14 @@ namespace ThreshTherulerofthesoul
             if (getKeyBindItem(comboMenu, "FlayPush") && Etarget != null && 
                 E.IsReady())
             {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
                 Push(Etarget);
             }
 
             if (getKeyBindItem(comboMenu, "FlayPull") && Etarget != null &&
                 E.IsReady())
             {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
                 Pull(Etarget);
             }
 
