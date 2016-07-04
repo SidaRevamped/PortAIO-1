@@ -65,7 +65,7 @@ namespace YasuoPro
             }
 
             var name = minion.CharData.BaseSkinName.ToLower();
-            return (Player.LSDistance(minion) <= range && minion.IsValid && minion.IsVisible && minion.Team != Player.Team && minion.IsHPBarRendered && !MinionManager.IsWard(minion) && !name.Contains("gangplankbarrel"));
+            return (Player.LSDistance(minion) <= range && minion.IsValid && minion.IsTargetable && !minion.IsInvulnerable && minion.IsVisible && minion.Team != Player.Team && minion.IsHPBarRendered && !MinionManager.IsWard(minion) && !name.Contains("gangplankbarrel"));
         }
 
         internal static bool IsValidAlly(this Obj_AI_Base unit, float range = 50000)
@@ -259,7 +259,7 @@ namespace YasuoPro
 
         internal static IEnumerable<Obj_AI_Minion> GetMinionsInRange(this Vector2 pos, float range)
         {
-            var minions = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.LSDistance(pos) <= range && (x.IsEnemy || x.Team == GameObjectTeam.Neutral));
+            var minions = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.LSIsValidTarget() && x.LSDistance(pos) <= range && (x.IsEnemy || x.Team == GameObjectTeam.Neutral));
             return minions;
         }
     }

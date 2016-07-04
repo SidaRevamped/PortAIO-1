@@ -55,24 +55,26 @@ namespace YasuoPro
 
         void OnUpdate(EventArgs args)
         {
-            if (Yasuo.IsDead || Yasuo.IsRecalling())
+            if (Yasuo.IsDead || Yasuo.LSIsRecalling())
             {
                 return;
             }
 
             CastUlt();
 
-            if (GetBool("Misc.AutoStackQ", YasuoMenu.MiscM) && !TornadoReady && !CurrentTarget.IsValidEnemy(Spells[Q].Range))
+            if (GetBool("Misc.AutoStackQ", YasuoMenu.MiscM) && !TornadoReady && !CurrentTarget.IsValidEnemy(Spells[Q].Range) && !Yasuo.LSIsDashing() && !InDash)
             {
                 var closest =
                     ObjectManager.Get<Obj_AI_Minion>()
-                        .Where(x => x.IsValidMinion(Spells[Q].Range) && !Yasuo.LSIsDashing() && !InDash && (MinionManager.IsMinion(x) || x.BaseSkinName.Equals("Sru_Crab")))
+                        .Where(x => x.IsValidMinion(Spells[Q].Range) && (MinionManager.IsMinion(x) || x.BaseSkinName.Equals("Sru_Crab")))
                         .MinOrDefault(x => x.LSDistance(Yasuo));
-
-                var pred = Spells[Q].GetPrediction(closest);
-                if (pred.Hitchance >= HitChance.Low)
+                if (closest != null)
                 {
-                    Spells[Q].Cast(closest);
+                    var pred = Spells[Q].GetPrediction(closest);
+                    if (pred.Hitchance >= HitChance.Low)
+                    {
+                        Spells[Q].Cast(closest.ServerPosition);
+                    }
                 }
             }
 
@@ -218,7 +220,15 @@ namespace YasuoPro
 
             if (GetBool("Combo.UseE", YasuoMenu.ComboM) && !Helper.DontDash)
             {
-                CastEOld(CurrentTarget);
+                var mode = GetMode();
+                if (mode == Modes.Old)
+                {
+                    CastEOld(CurrentTarget);
+                }
+                else
+                {
+                    CastENew(CurrentTarget);
+                }
             }
 
             if (GetBool("Items.Enabled", YasuoMenu.ComboM))
@@ -265,7 +275,7 @@ namespace YasuoPro
                     return;
                 }
 
-                if (GetBool("Combo.StackQ", YasuoMenu.ComboM) && !target.IsValidEnemy(Qrange) && !TornadoReady)
+                if (GetBool("Combo.StackQ", YasuoMenu.ComboM) && !target.IsValidEnemy(Qrange) && !TornadoReady && !Yasuo.LSIsDashing() && !InDash)
                 {
                     var bestmin =
                         ObjectManager.Get<Obj_AI_Minion>()
@@ -294,7 +304,7 @@ namespace YasuoPro
 
             if (target != null)
             {
-                if (SpellSlot.E.IsReady() && isHealthy && target.Distance(Yasuo) >= 0.30 * Yasuo.AttackRange)
+                if (SpellSlot.E.IsReady() && isHealthy && target.LSDistance(Yasuo) >= 0.30 * Yasuo.AttackRange)
                 {
                     if (TornadoReady && ((GetBool("Combo.ETower", YasuoMenu.ComboM) && GetKeyBind("Misc.TowerDive", YasuoMenu.MiscM)) || !GetDashPos(target).PointUnderEnemyTurret()))
                     {
@@ -318,7 +328,7 @@ namespace YasuoPro
                                          x.IsDashable()
                                          && GetDashPos(x).IsCloser(target) &&
                                         (GetBool("Combo.ETower", YasuoMenu.ComboM) || GetKeyBind("Misc.TowerDive", YasuoMenu.MiscM) || !GetDashPos(x).PointUnderEnemyTurret()))
-                                .OrderBy(x => Vector2.Distance(GetDashPos(x), target.ServerPosition.To2D()))
+                                .OrderBy(x => Vector2.Distance(GetDashPos(x), target.ServerPosition.LSTo2D()))
                                 .FirstOrDefault();
                         if (bestminion != null)
                         {
@@ -337,7 +347,7 @@ namespace YasuoPro
                         var minion =
                             ObjectManager.Get<Obj_AI_Base>()
                                 .Where(x => x.IsDashable() && GetDashPos(x).IsCloser(target) && (GetBool("Combo.ETower", YasuoMenu.ComboM) || GetKeyBind("Misc.TowerDive", YasuoMenu.MiscM) || !GetDashPos(x).PointUnderEnemyTurret()))
-                                .OrderBy(x => GetDashPos(x).Distance(target.ServerPosition)).FirstOrDefault();
+                                .OrderBy(x => GetDashPos(x).LSDistance(target.ServerPosition)).FirstOrDefault();
 
                         if (minion != null && GetDashPos(minion).IsCloser(target))
                         {
@@ -348,7 +358,6 @@ namespace YasuoPro
             }
         }
 
-        //minimum amount of minions
         internal void CastENew(AIHeroClient target)
         {
             if (!SpellSlot.E.IsReady() || Yasuo.LSIsDashing() || InDash)
@@ -365,26 +374,15 @@ namespace YasuoPro
 
             if (target != null && TowerCheck(target, true))
             {
-                if (!target.IsDashable())
+                if (target.LSDistance(Yasuo) <= 0.70 * Yasuo.AttackRange)
                 {
-                    var bestminion = ObjectManager.Get<Obj_AI_Base>()
-                        .Where(x =>
-                            x.IsDashable()
-                            && GetDashPos(x).IsCloser(target) && TowerCheck(x, true))
-                        .MinOrDefault(x => GetDashPos(x).LSDistance(target));
-
-                    if (bestminion != null)
-                    {
-                        Spells[E].CastOnUnit(bestminion);
-                        return;
-                    }
+                    return;
                 }
 
-                else
+                var dist = Yasuo.LSDistance(target);
+                var pctOutOfRange = dist / Spells[E].Range * 100;
+                if (target.IsDashable())
                 {
-                    var dist = Yasuo.LSDistance(target);
-                    var pctOutOfRange = dist / Spells[E].Range * 100;
-
                     //Stay in range
                     if (pctOutOfRange > 0.8f)
                     {
@@ -412,8 +410,21 @@ namespace YasuoPro
                         }
                     }
 
-                    //Catch up using a minion
-                    else if (pctOutOfRange > 1)
+                    //Go for a EQ if target is well within range
+                    else if (Spells[Q].IsReady() && TornadoReady)
+                    {
+                        if (targInKnockupRadius(target))
+                        {
+                            Spells[E].CastOnUnit(target);
+                            return;
+                        }
+                    }
+                }
+
+                //Catch up using a minion
+                else
+                {
+                    if (pctOutOfRange > 0.8f)
                     {
                         var minion =
                             ObjectManager.Get<Obj_AI_Minion>()
@@ -424,42 +435,6 @@ namespace YasuoPro
                             Spells[E].CastOnUnit(target);
                         }
                     }
-
-                    //Go for a EQ if target is well within range
-                    else
-                    {
-                        if (Spells[Q].IsReady() && TornadoReady)
-                        {
-                            if(targInKnockupRadius(target))
-                            {
-                                Spells[E].CastOnUnit(target);
-                                return;
-                            }
-                        }
-
-
-                        if (DashCount == 0)
-                        {
-                            var bestminion =
-                                ObjectManager.Get<Obj_AI_Base>()
-                                    .Where(
-                                        x =>
-                                            x.IsDashable()
-                                            && GetDashPos(x).IsCloser(target) && TowerCheck(x, true))
-                                    .MinOrDefault(x => GetDashPos(x).LSDistance(target));
-
-                            if (bestminion != null)
-                            {
-                                Spells[E].CastOnUnit(bestminion);
-                            }
-
-                            else if (target.IsDashable() && GetDashPos(target).IsCloser(target) &&
-                                     TowerCheck(target, true))
-                            {
-                                Spells[E].CastOnUnit(target);
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -467,49 +442,53 @@ namespace YasuoPro
 
         private void UnitOnOnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
-            if (sender.IsMe && !args.IsBlink)
+            if (GetMode() == Modes.Beta && GetBool("Combo.UseEQ", YasuoMenu.ComboM))
             {
-                LastDashTick = Helper.TickCount;
-                var endpos = args.EndPos;
-                if (SpellSlot.Q.IsReady())
+                if (sender.IsMe && !args.IsBlink)
                 {
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                    DashPosition = args.EndPos;
+                    LastDashTick = Helper.TickCount;
+                    var endpos = args.EndPos;
+                    if (SpellSlot.Q.IsReady())
                     {
-                        if (TornadoReady)
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
                         {
-                            var goodTarget = endpos.To3D().GetEnemiesInRange(QRadius).Any(x => !x.ECanKill());
-                            if (goodTarget)
+                            if (TornadoReady)
                             {
-                               Spells[Q].Cast(endpos);
-                            }
-                        }
-
-                        else if (!TornadoReady)
-                        {
-                            var targ = endpos.To3D().GetEnemiesInRange(QRadius).Any(x => !x.ECanKill());
-                            if (targ)
-                            {
-                                Spells[Q].Cast(endpos);
-                            }
-
-                            if (GetBool("Combo.StackQ", YasuoMenu.ComboM))
-                            {
-                                var nonkillableMin = endpos.GetMinionsInRange(QRadius).Any(x => !x.ECanKill());
-                                if (nonkillableMin)
+                                var goodTarget = endpos.To3D().GetEnemiesInRange(QRadius).Any(x => !x.ECanKill());
+                                if (goodTarget)
                                 {
                                     Spells[Q].Cast(endpos);
-                                    return;
+                                }
+                            }
+
+                            else if (!TornadoReady)
+                            {
+                                var targ = endpos.To3D().GetEnemiesInRange(QRadius).Any(x => !x.ECanKill());
+                                if (targ)
+                                {
+                                    Spells[Q].Cast(endpos);
+                                }
+
+                                if (GetBool("Combo.StackQ", YasuoMenu.ComboM))
+                                {
+                                    var nonkillableMin = endpos.GetMinionsInRange(QRadius).Any(x => !x.ECanKill());
+                                    if (nonkillableMin)
+                                    {
+                                        Spells[Q].Cast(endpos);
+                                        return;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
-                    {
-                        if (endpos.To3D().MinionsInRange(QRadius) >= 1 ||
-                            endpos.To3D().CountEnemiesInRange(QRadius) >= 1)
+                        else if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
                         {
-                            Spells[Q].Cast(endpos);
+                            if (endpos.To3D().MinionsInRange(QRadius) >= 1 ||
+                                endpos.To3D().LSCountEnemiesInRange(QRadius) >= 1)
+                            {
+                                Spells[Q].Cast(endpos);
+                            }
                         }
                     }
                 }
@@ -520,31 +499,30 @@ namespace YasuoPro
         {
             UltMode ultmode = GetUltMode();
 
-            IOrderedEnumerable<AIHeroClient> ordered = null;
+            List<AIHeroClient> ordered = new List<AIHeroClient>();
 
 
             if (ultmode == UltMode.Health)
             {
-                ordered = KnockedUp.OrderBy(x => x.Health).ThenByDescending(x => TargetSelector.GetPriority(x)).ThenByDescending(x => x.CountEnemiesInRange(350));
+                ordered = KnockedUp.OrderBy(x => x.Health).ThenByDescending(x => TargetSelector.GetPriority(x)).ThenByDescending(x => x.CountEnemiesInRange(350)).ToList();
             }
 
             if (ultmode == UltMode.Priority)
             {
-                ordered = KnockedUp.OrderByDescending(x => TargetSelector.GetPriority(x)).ThenBy(x => x.Health).ThenByDescending(x => x.CountEnemiesInRange(350));
+                ordered = KnockedUp.OrderByDescending(x => TargetSelector.GetPriority(x)).ThenBy(x => x.Health).ThenByDescending(x => x.CountEnemiesInRange(350)).ToList();
             }
 
             if (ultmode == UltMode.EnemiesHit)
             {
-                ordered = KnockedUp.OrderByDescending(x => x.CountEnemiesInRange(350)).ThenByDescending(x => TargetSelector.GetPriority(x)).ThenBy(x => x.Health);
+                ordered = KnockedUp.OrderByDescending(x => x.LSCountEnemiesInRange(350)).ThenByDescending(x => TargetSelector.GetPriority(x)).ThenBy(x => x.Health).ToList();
             }
 
             if (GetBool("Combo.UltOnlyKillable", YasuoMenu.ComboM))
             {
-                var killable = ordered.FirstOrDefault(x => !x.isBlackListed() && x.Health <= Yasuo.GetSpellDamage(x, SpellSlot.R) && x.HealthPercent >= GetSliderInt("Combo.MinHealthUlt", YasuoMenu.ComboM) && (GetBool("Combo.UltTower", YasuoMenu.ComboM) || GetKeyBind("Misc.TowerDive", YasuoMenu.MiscM) || ShouldDive(x)));
+                var killable = ordered.FirstOrDefault(x => !x.isBlackListed() && x.Health <= Yasuo.LSGetSpellDamage(x, SpellSlot.R) && x.HealthPercent >= GetSliderInt("Combo.MinHealthUlt", YasuoMenu.ComboM) && (GetBool("Combo.UltTower", YasuoMenu.ComboM) || GetKeyBind("Misc.TowerDive", YasuoMenu.MiscM) || ShouldDive(x)));
                 if (killable != null && (!killable.IsInRange(Spells[Q].Range) || !isHealthy))
                 {
                     Spells[R].CastOnUnit(killable);
-                    return;
                 }
                 return;
             }
@@ -611,10 +589,15 @@ namespace YasuoPro
                                     .Where(x => x.IsDashable())
                                     .MaxOrDefault(x => GetDashPos(x).LSDistance(closestturret));
 
-                            var gdpos = GetDashPos(potential);
-                            if (potential != null && gdpos.LSDistance(Game.CursorPos) < Yasuo.LSDistance(Game.CursorPos) && gdpos.LSDistance(closestturret.Position) - closestturret.BoundingRadius > Yasuo.LSDistance(closestturret.Position) - Yasuo.BoundingRadius)
+                            if (potential != null)
                             {
-                                Spells[E].Cast(potential);
+                                var gdpos = GetDashPos(potential);
+                                if (gdpos.LSDistance(Game.CursorPos) < Yasuo.LSDistance(Game.CursorPos) &&
+                                    gdpos.LSDistance(closestturret.Position) - closestturret.BoundingRadius >
+                                    Yasuo.LSDistance(closestturret.Position) - Yasuo.BoundingRadius)
+                                {
+                                    Spells[E].Cast(potential);
+                                }
                             }
                         }
 
@@ -686,7 +669,7 @@ namespace YasuoPro
                 {
                     Orbwalker.OrbwalkTo(nexus.Position);
                     var bestminion = ObjectManager.Get<Obj_AI_Base>().Where(x => x.IsDashable()).MinOrDefault(x => GetDashPos(x).LSDistance(nexus.Position));
-                    if (bestminion != null && (!GetBool("Flee.Smart", YasuoMenu.MiscM) || GetDashPos(bestminion).Distance(nexus.Position) < Yasuo.Distance(nexus.Position)))
+                    if (bestminion != null && (!GetBool("Flee.Smart", YasuoMenu.MiscM) || GetDashPos(bestminion).LSDistance(nexus.Position) < Yasuo.LSDistance(nexus.Position)))
                     {
                         Spells[E].CastOnUnit(bestminion);
                         if (GetBool("Flee.StackQ", YasuoMenu.MiscM) && SpellSlot.Q.IsReady() && !TornadoReady)
@@ -699,7 +682,7 @@ namespace YasuoPro
 
             if (FleeMode == FleeType.ToAllies)
             {
-                Obj_AI_Base bestally = HeroManager.Allies.Where(x => !x.IsMe && x.CountEnemiesInRange(300) == 0).MinOrDefault(x => x.LSDistance(Yasuo));
+                Obj_AI_Base bestally = HeroManager.Allies.Where(x => !x.IsMe && x.LSCountEnemiesInRange(300) == 0).MinOrDefault(x => x.LSDistance(Yasuo));
                 if (bestally == null)
                 {
                     bestally =
@@ -752,7 +735,7 @@ namespace YasuoPro
                 var bestminion =
                     ObjectManager.Get<Obj_AI_Base>()
                         .Where(x => x.IsDashable())
-                        .MinOrDefault(x => GetDashPos(x).Distance(Game.CursorPos));
+                        .MinOrDefault(x => GetDashPos(x).LSDistance(Game.CursorPos));
                 if (bestminion != null)
                 {
                     Spells[E].CastOnUnit(bestminion);
@@ -769,7 +752,7 @@ namespace YasuoPro
                 {
                     var minion =
                         ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(x => x.IsValidMinion(Spells[Q].Range) && ((x.IsDashable() && (x.Health - Yasuo.GetSpellDamage(x, SpellSlot.Q) >= GetProperEDamage(x))) || (x.Health - Yasuo.GetSpellDamage(x, SpellSlot.Q) >= 0.15 * x.MaxHealth || x.QCanKill()))).MaxOrDefault(x => x.MaxHealth);
+                            .Where(x => x.IsValidMinion(Spells[Q].Range) && ((x.IsDashable() && (x.Health - Yasuo.LSGetSpellDamage(x, SpellSlot.Q) >= GetProperEDamage(x))) || (x.Health - Yasuo.LSGetSpellDamage(x, SpellSlot.Q) >= 0.15 * x.MaxHealth || x.QCanKill()))).MaxOrDefault(x => x.MaxHealth);
                     if (minion != null)
                     {
                         Spells[Q].Cast(minion);
@@ -779,7 +762,7 @@ namespace YasuoPro
 
                 else if (TornadoReady && GetBool("Waveclear.UseQ2", YasuoMenu.WaveclearM))
                 {
-                    var minions = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.Distance(Yasuo) > Yasuo.AttackRange && x.IsValidMinion(Spells[Q2].Range) && ((x.IsDashable() && x.Health - Yasuo.GetSpellDamage(x, SpellSlot.Q) >= 0.85 * GetProperEDamage(x)) || (x.Health - Yasuo.GetSpellDamage(x, SpellSlot.Q) >= 0.10 * x.MaxHealth) || x.CanKill(SpellSlot.Q)));
+                    var minions = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.LSDistance(Yasuo) > Yasuo.AttackRange && x.IsValidMinion(Spells[Q2].Range) && ((x.IsDashable() && x.Health - Yasuo.LSGetSpellDamage(x, SpellSlot.Q) >= 0.85 * GetProperEDamage(x)) || (x.Health - Yasuo.LSGetSpellDamage(x, SpellSlot.Q) >= 0.10 * x.MaxHealth) || x.CanKill(SpellSlot.Q)));
                     var pred =
                         MinionManager.GetBestLineFarmLocation(minions.Select(m => m.ServerPosition.LSTo2D()).ToList(),
                             Spells[Q2].Width, Spells[Q2].Range);
@@ -957,8 +940,8 @@ namespace YasuoPro
 
                     var minion =
                         ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(x => x.IsDashable() && !x.ServerPosition.To2D().PointUnderEnemyTurret())
-                            .OrderBy(x => GetDashPos(x).Distance(target.ServerPosition))
+                            .Where(x => x.IsDashable() && !x.ServerPosition.LSTo2D().PointUnderEnemyTurret())
+                            .OrderBy(x => GetDashPos(x).LSDistance(target.ServerPosition))
                             .FirstOrDefault();
 
                     if (minion != null && GetBool("Harass.UseEMinion", YasuoMenu.HarassM) && GetDashPos(minion).IsCloser(target))
