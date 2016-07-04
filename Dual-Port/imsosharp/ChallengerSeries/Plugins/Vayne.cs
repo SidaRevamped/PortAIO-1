@@ -483,7 +483,6 @@ namespace Challenger_Series.Plugins
         #endregion
 
         #region Menu
-        private Menu Menu;
         private Menu ComboMenu, HarassMenu, FarmMenu, DrawMenu, CondemnMenu;
         bool UseQBool { get { return getCheckBoxItem(ComboMenu, "useq"); } }
         bool TryToFocus2WBool { get { return getCheckBoxItem(ComboMenu, "focus2w"); } }
@@ -528,36 +527,45 @@ namespace Challenger_Series.Plugins
 
         private void InitMenu()
         {
-            ComboMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("Combo Settings:", "Combo Settings: ");
-            CondemnMenu = ComboMenu.AddSubMenu("Condemn Settings:", "Condemn Settings:");
-            HarassMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("Harass Settings:", "Harass Settings: ");
-            FarmMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("Farm Settings:", "Farm Settings: ");
-            DrawMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("Drawing Settings:", "Drawing Settings: ");
+            ComboMenu = MainMenu.AddSubMenu("Combo Settings:", "Combo Settings: ");
             ComboMenu.Add("useq", new CheckBox("Auto Q", true));
+            ComboMenu.AddSeparator();
             ComboMenu.AddLabel("1 : PRADA | 2 : MARKSMAN | 3 : VHR | 4: SharpShooter");
             ComboMenu.Add("qmode", new Slider("Q Mode: ", 1, 1, 4));
+            ComboMenu.AddSeparator();
             ComboMenu.AddLabel("1 : NEVER | 2 : E-NOT-READY | 3 : ALWAYS ");
             ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser ", 1, 1, 3));
+            ComboMenu.AddSeparator();
             ComboMenu.Add("focus2w", new CheckBox("Try To Focus 2W", false));
+            ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking", true));
+            ComboMenu.Add("user", new CheckBox("Use R In Combo", false));
+
+            CondemnMenu = MainMenu.AddSubMenu("Condemn Settings:", "Condemn Settings:");
             CondemnMenu.Add("usee", new CheckBox("Auto E", true));
             CondemnMenu.Add("edelay", new Slider("E Delay (in ms) ", 0, 0, 100));
+            CondemnMenu.AddSeparator();
             CondemnMenu.AddLabel("1 : PRADASMART | 2 : PRADAPERFECT | 3 : MARKSMAN");
             CondemnMenu.AddLabel("4 : SHARPSHOOTER | 5 : GOSU | 6 : VHR");
             CondemnMenu.AddLabel("7 : PRADALEGACY | 8 : FASTEST | 9 : OLDPRADA");
             CondemnMenu.Add("emode", new Slider("E Mode : ", 8, 1, 9));
+            CondemnMenu.AddSeparator();
             CondemnMenu.Add("useeinterrupt", new CheckBox("Use E To Interrupt", true));
             CondemnMenu.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser", true));
             CondemnMenu.Add("ewhenmeleesnear", new CheckBox("Use E when Melee near", false));
             CondemnMenu.Add("epushdist", new Slider("E Push Distance : ", 425, 300, 470));
             CondemnMenu.Add("ehitchance", new Slider("Condemn Hitchance : ", 50, 0, 100));
             CondemnMenu.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.HoldActive, "E".ToCharArray()[0]));
-            ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking", true));
-            ComboMenu.Add("user", new CheckBox("Use R In Combo", false));
+
+            HarassMenu = MainMenu.AddSubMenu("Harass Settings:", "Harass Settings: ");
             HarassMenu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc", false));
             HarassMenu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false));
             HarassMenu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false));
+
+            FarmMenu = MainMenu.AddSubMenu("Farm Settings:", "Farm Settings: ");
             FarmMenu.Add("useqfarm", new CheckBox("Use Q",true));
             FarmMenu.Add("useejgfarm", new CheckBox("Use E Jungle",true));
+
+            DrawMenu = MainMenu.AddSubMenu("Drawing Settings:", "Drawing Settings: ");
             DrawMenu.Add("drawwstacks", new CheckBox("Draw W Stacks", true));
         }
 

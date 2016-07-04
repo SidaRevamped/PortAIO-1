@@ -47,13 +47,9 @@ namespace Challenger_Series.Plugins
     public class KogMaw : CSPlugin
     {
         #region Spells
-        public LeagueSharp.SDK.Spell Q { get; set; }
         public LeagueSharp.SDK.Spell Q2 { get; set; }
-        public LeagueSharp.SDK.Spell W { get; set; }
         public LeagueSharp.SDK.Spell W2 { get; set; }
-        public LeagueSharp.SDK.Spell E { get; set; }
         public LeagueSharp.SDK.Spell E2 { get; set; }
-        public LeagueSharp.SDK.Spell R { get; set; }
         public LeagueSharp.SDK.Spell R2 { get; set; }
         #endregion Spells
 

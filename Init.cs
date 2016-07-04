@@ -1314,6 +1314,9 @@ namespace PortAIO
                             case 4:
                                 ExorAIO.AIO.OnLoad();
                                 break;
+                            case 5:
+                                Challenger_Series.Program.Main();
+                                break;
                             default:
                                 Vayne1.Program.OnLoad();
                                 break;

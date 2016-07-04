@@ -31,7 +31,7 @@ namespace Challenger_Series
     public class Soraka : CSPlugin
     {
 
-        public static LeagueSharp.SDK.Spell Q, W, E, R;
+        public static new LeagueSharp.SDK.Spell Q, W, E, R;
 
         public Soraka()
         {

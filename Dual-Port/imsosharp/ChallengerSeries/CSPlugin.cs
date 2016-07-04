@@ -61,7 +61,7 @@ namespace Challenger_Series
 
         public CSPlugin()
         {
-            MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu("challengerseries", ObjectManager.Player.ChampionName + " To The Challenger");
+            MainMenu = EloBuddy.SDK.Menu.MainMenu.AddMenu(ObjectManager.Player.ChampionName + " To The Challenger", "challengerseries");
             CrossAssemblySettings = MainMenu.AddSubMenu("Challenger Utils: ");
             CrossAssemblySettings.Add("performancechallengerx", new CheckBox("Use Performance Challenger", false));
             CrossAssemblySettings.Add("triggeronupdate", new Slider("Trigger OnUpdate X times a second", 26, 20, 33));
