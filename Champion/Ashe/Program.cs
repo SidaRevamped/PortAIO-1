@@ -142,8 +142,10 @@ namespace PortAIO.Champion.Ashe
                 || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
-            if (RMenu["spell" + args.SData.Name] != null && !getCheckBoxItem(RMenu, "spell" + args.SData.Name))
+            if (RMenu["spell" + args.SData.Name] != null && getCheckBoxItem(RMenu, "spell" + args.SData.Name))
+            {
                 R.Cast(sender);
+            }
         }
 
         private static void Interrupter2_OnInterruptableTarget(AIHeroClient sender,
@@ -249,7 +251,7 @@ namespace PortAIO.Champion.Ashe
                 foreach (
                     var target in
                         SebbyLib.Program.Enemies.Where(
-                            target => target.LSIsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
+                            target => target.LSIsValidTarget(2000) && OktwCommon.ValidUlt(target)))
                 {
                     var rDmg = OktwCommon.GetKsDamage(target, R);
                     if (SebbyLib.Program.Combo && target.LSCountEnemiesInRange(250) > 2 &&
