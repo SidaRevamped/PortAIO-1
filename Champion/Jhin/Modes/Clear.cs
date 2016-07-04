@@ -11,10 +11,11 @@ namespace Jhin___The_Virtuoso.Modes
         /// </summary>
         private static void ExecuteQ()
         {
-            var min =
-                MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Spells.Q.Range)
-                    .MinOrDefault(x => x.Health);
-            Spells.Q.CastOnUnit(min);
+            var min = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Spells.Q.Range).MinOrDefault(x => x.Health);
+            if (min != null)
+            {
+                Spells.Q.CastOnUnit(min);
+            }
         }
 
         /// <summary>
@@ -23,6 +24,8 @@ namespace Jhin___The_Virtuoso.Modes
         private static void ExecuteW()
         {
             var min = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Spells.W.Range);
+            if (min == null)
+                return;
             if (Spells.W.GetLineFarmLocation(min).MinionsHit >= Menus.getSliderItem(Menus.clearMenu, "w.hit.x.minion"))
             {
                 Spells.W.Cast(Spells.W.GetLineFarmLocation(min).Position);
