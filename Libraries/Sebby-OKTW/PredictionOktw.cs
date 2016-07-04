@@ -397,7 +397,7 @@ namespace SebbyLib.Prediction
         {
             PredictionOutput result = null;
 
-            if (!input.Unit.LSIsValidTarget(float.MaxValue, false))
+            if (!input.Unit.LSIsValidTarget(float.MaxValue, false) || !input.Unit.IsVisible || !input.Unit.IsHPBarRendered)
             {
                 return new PredictionOutput();
             }
@@ -405,7 +405,7 @@ namespace SebbyLib.Prediction
             if (ft)
             {
                 //Increase the delay due to the latency and server tick:
-                input.Delay += EloBuddy.Game.Ping / 2000f + 0.06f;
+                input.Delay += EloBuddy.Game.Ping / 2000f + 0.04f;
 
                 if (input.Aoe)
                 {
