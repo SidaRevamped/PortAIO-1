@@ -282,7 +282,7 @@ namespace YasuoSharpV2
             }
             if (YasuoSharp.smartW["smartW"].Cast<CheckBox>().CurrentValue)
                 putWallBehind(target);
-            if (YasuoSharp.smartR["useEWall"].Cast<CheckBox>().CurrentValue)
+            if (YasuoSharp.comboMenu["useEWall"].Cast<CheckBox>().CurrentValue)
                 eBehindWall(target);
 
             Obj_AI_Base goodTarg = canDoEQEasly(target);
@@ -549,30 +549,6 @@ namespace YasuoSharpV2
         }
 
 
-        public static List<AIHeroClient> getKockUpEnemies(ref float lessKnockTime)
-        {
-            List<AIHeroClient> enemKonck = new List<AIHeroClient>();
-            foreach (AIHeroClient enem in ObjectManager.Get<AIHeroClient>().Where(enem => enem.IsEnemy))
-            {
-                foreach (BuffInstance buff in enem.Buffs)
-                {
-                    if (buff.Type == BuffType.Knockback || buff.Type == BuffType.Knockup)
-                    {
-                        if (buff.Type == BuffType.Knockup)
-                            lessKnockTime = (buff.EndTime - Game.Time) < lessKnockTime
-                                ? (buff.EndTime - Game.Time)
-                                : lessKnockTime;
-                        enemKonck.Add(enem);
-                        break;
-                    }
-                }
-            }
-            if (!YasuoSharp.smartR["useRHitTime"].Cast<CheckBox>().CurrentValue)
-                lessKnockTime = 0;
-            return enemKonck;
-        }
-
-
         public static void setUpWall()
         {
             if (wall == null)
@@ -766,9 +742,27 @@ namespace YasuoSharpV2
 
         }
 
+        private const int RWidth = 400;
 
         public static void useRSmart()
         {
+            var obj = (from enemy in HeroManager.Enemies.Where(i => R.IsInRange(i) && CanCastR(i))
+                       let sub = enemy.GetEnemiesInRange(RWidth).Where(CanCastR).ToList()
+                       where
+                           (sub.Count > 1 && R.IsKillable(enemy))
+                           || sub.Any(i => i.HealthPercent < YasuoSharp.smartR["useRHP"].Cast<Slider>().CurrentValue)
+                           || sub.Count >= YasuoSharp.smartR["useRHit"].Cast<Slider>().CurrentValue
+                       orderby sub.Count descending
+                       select enemy).ToList();
+            if (obj.Any())
+            {
+                var target = !YasuoSharp.smartR["useRHitTime"].Cast<CheckBox>().CurrentValue ? obj.FirstOrDefault() : obj.Where(i => TimeLeftR(i) * 1000 < 150 + Game.Ping * 2).MinOrDefault(TimeLeftR);
+                if (target != null && R.CastOnUnit(target))
+                {
+                    return;
+                }
+            }
+            /*
             float timeToLand = float.MaxValue;
             List<AIHeroClient> enemInAir = getKockUpEnemies(ref timeToLand);
             foreach (AIHeroClient enem in enemInAir)
@@ -778,14 +772,44 @@ namespace YasuoSharpV2
                 {
                     if (Vector3.DistanceSquared(enem.ServerPosition, enem2.ServerPosition) < 400 * 400)
                         aroundAir++;
-
                 }
                 if (aroundAir >= YasuoSharp.smartR["useRHit"].Cast<Slider>().CurrentValue && timeToLand < 0.4f)
                     R.Cast(enem);
             }
+            */
         }
 
+        private static float TimeLeftR(AIHeroClient target)
+        {
+            var buff = target.Buffs.FirstOrDefault(i => i.Type == BuffType.Knockback || i.Type == BuffType.Knockup);
+            return buff != null ? buff.EndTime - Game.Time : -1;
+        }
 
+        public static List<AIHeroClient> getKockUpEnemies(ref float lessKnockTime)
+        {
+            List<AIHeroClient> enemKonck = new List<AIHeroClient>();
+            foreach (AIHeroClient enem in ObjectManager.Get<AIHeroClient>().Where(enem => enem.IsEnemy))
+            {
+                foreach (BuffInstance buff in enem.Buffs)
+                {
+                    if (buff.Type == BuffType.Knockback || buff.Type == BuffType.Knockup)
+                    {
+                        if (buff.Type == BuffType.Knockup)
+                            lessKnockTime = (buff.EndTime - Game.Time) < lessKnockTime ? (buff.EndTime - Game.Time) : lessKnockTime;
+                        enemKonck.Add(enem);
+                        break;
+                    }
+                }
+            }
+            if (!YasuoSharp.smartR["useRHitTime"].Cast<CheckBox>().CurrentValue)
+                lessKnockTime = 0;
+            return enemKonck;
+        }
+
+        private static bool CanCastR(AIHeroClient target)
+        {
+            return target.HasBuffOfType(BuffType.Knockup) || target.HasBuffOfType(BuffType.Knockback);
+        }
 
         public static bool isMissileCommingAtMe(MissileClient missle)
         {

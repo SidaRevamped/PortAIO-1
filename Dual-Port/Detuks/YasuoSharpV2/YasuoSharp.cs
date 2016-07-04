@@ -66,13 +66,15 @@ namespace YasuoSharpV2
                 //Combo
                 comboMenu = Config.AddSubMenu("Combo Sharp", "combo");
                 comboMenu.Add("comboItems", new CheckBox("Use Items"));
+                comboMenu.Add("useEWall", new CheckBox("E behind Wall to safe"));
 
                 //SmartR
                 smartR = Config.AddSubMenu("Smart R");
-                smartR.Add("smartR", new CheckBox("Smart R"));
-                smartR.Add("useRHit", new Slider("Use R if hit", 3, 1, 5));
-                smartR.Add("useRHitTime", new CheckBox("Use R when they land"));
-                smartR.Add("useEWall", new CheckBox("use E to safe"));
+                smartR.Add("smartR", new CheckBox("Use Smart R?"));
+                smartR.AddGroupLabel("Settings : ");
+                smartR.Add("useRHitTime", new CheckBox("Use R Delay"));
+                smartR.Add("useRHit", new Slider("R if hit : ", 3, 1, 5));
+                smartR.Add("useRHP", new Slider("R if Enemy HP less than : ", 25, 0, 100));
 
                 //Flee away
                 flee = Config.AddSubMenu("Flee");
