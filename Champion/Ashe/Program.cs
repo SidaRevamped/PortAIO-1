@@ -139,7 +139,7 @@ namespace PortAIO.Champion.Ashe
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack()
-                || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
+                || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
             if (RMenu["spell" + args.SData.Name] != null && !getCheckBoxItem(RMenu, "spell" + args.SData.Name))
