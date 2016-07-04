@@ -27,7 +27,6 @@ namespace UnderratedAIO.Champions
         public static bool PingCasted;
         public static Vector3 blade, bladeOnCast;
         public static bool justW;
-        public static IncomingDamage IncDamages;
 
         private static readonly Render.Text Text = new Render.Text(
             0, 0, "", 11, new ColorBGRA(255, 0, 0, 255), "monospace");
@@ -36,7 +35,6 @@ namespace UnderratedAIO.Champions
 
         public Shen()
         {
-            IncDamages = new IncomingDamage();
             InitShen();
             InitMenu();
             Game.OnUpdate += Game_OnGameUpdate;
@@ -196,7 +194,7 @@ namespace UnderratedAIO.Champions
             {
                 foreach (var ally in HeroManager.Allies.Where(a => a.LSDistance(blade) < bladeRadius))
                 {
-                    var data = IncDamages.GetAllyData(ally.NetworkId);
+                    var data = Program.IncDamages.GetAllyData(ally.NetworkId);
                     if (getSliderItem(menuU, "autowAgg") <= data.AADamageCount)
                     {
                         W.Cast();
@@ -244,11 +242,11 @@ namespace UnderratedAIO.Champions
                     .Where(
                         i =>
                             i.IsAlly && !i.IsMe && !i.IsDead &&
-                            (((IncDamages.GetAllyData(i.NetworkId).DamageTaken > i.Health ||
-                               (i.Health - IncDamages.GetAllyData(i.NetworkId).DamageTaken)*100f/
+                            (((Program.IncDamages.GetAllyData(i.NetworkId).DamageTaken > i.Health ||
+                               (i.Health - Program.IncDamages.GetAllyData(i.NetworkId).DamageTaken)*100f/
                                i.MaxHealth <= getSliderItem(menuU, "atpercent")) &&
                               i.LSCountEnemiesInRange(700) > 0) ||
-                             IncDamages.GetAllyData(i.NetworkId).SkillShotDamage > i.Health)))
+                             Program.IncDamages.GetAllyData(i.NetworkId).SkillShotDamage > i.Health)))
             {
                 if (getCheckBoxItem(menuU, "user") &&
                     !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && R.IsReady() &&
@@ -314,7 +312,7 @@ namespace UnderratedAIO.Champions
             {
                 foreach (var ally in HeroManager.Allies.Where(a => a.LSDistance(blade) < bladeRadius))
                 {
-                    var data = IncDamages.GetAllyData(ally.NetworkId);
+                    var data = Program.IncDamages.GetAllyData(ally.NetworkId);
                     if (data.AADamageTaken >= target.GetAutoAttackDamage(ally) - 10)
                     {
                         W.Cast();

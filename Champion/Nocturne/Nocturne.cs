@@ -21,13 +21,11 @@ namespace UnderratedAIO.Champions
         public static int[] rRanges = {2500, 3250, 4000};
         private static float lastR;
         public static readonly AIHeroClient player = ObjectManager.Player;
-        public static IncomingDamage IncDamages;
 
         public static Menu menuD, menuC, menuH, menuLC;
 
         public Nocturne()
         {
-            IncDamages = new IncomingDamage();
             InitNocturne();
             InitMenu();
             Drawing.OnDraw += Game_OnDraw;
@@ -73,7 +71,7 @@ namespace UnderratedAIO.Champions
             {
                 return;
             }
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (getCheckBoxItem(menuC, "usew") && W.IsReady() && data.AnyCC)
             {
                 W.Cast();

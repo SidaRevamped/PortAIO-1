@@ -28,12 +28,10 @@ namespace UnderratedAIO.Champions
         private static float lastE;
         private static Vector3 lastEpos;
         private static Bool wChancel = false;
-        public static IncomingDamage IncDamages;
 
 
         public static void OnLoad()
         {
-            IncDamages = new IncomingDamage();
             InitRenekton();
             InitMenu();
             Chat.Print("<font color='#9933FF'>Soresu </font><font color='#FFFFFF'>- Renekton</font>");
@@ -233,7 +231,7 @@ namespace UnderratedAIO.Champions
                     lastE = 0;
                 }
             }
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (((player.Health * 100 / player.MaxHealth) <= getSliderItem(comboMenu, "user") &&
                  data.DamageTaken > 30) ||
                 getSliderItem(comboMenu, "userindanger") < player.CountEnemiesInRange(R.Range))

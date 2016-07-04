@@ -19,7 +19,6 @@ namespace UnderratedAIO.Champions
         public static Spell Q, W, E, R;
         public static readonly AIHeroClient player = ObjectManager.Player;
         public static bool justR, justQ, justE;
-        public static IncomingDamage IncDamages = new IncomingDamage();
 
         public static Menu config, drawMenu, comboMenu, harassMenu, laneClearMenu, miscMenu;
 
@@ -254,7 +253,7 @@ namespace UnderratedAIO.Champions
                     HeroManager.Allies.Where(i => i.IsValid && i.LSDistance(player) < W.Range)
                         .OrderByDescending(TargetSelector.GetPriority))
             {
-                var incDamage = IncDamages.GetAllyData(h.NetworkId);
+                var incDamage = Program.IncDamages.GetAllyData(h.NetworkId);
                 if (incDamage != null &&
                     (incDamage.DamageCount >= getSliderItem(miscMenu, "Wmin") ||
                      CheckDamageToW(incDamage)) && (combo || (!combo && CheckAutoW())))

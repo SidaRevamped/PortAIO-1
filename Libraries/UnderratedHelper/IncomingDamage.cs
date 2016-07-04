@@ -1,38 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using EloBuddy;
-using EloBuddy.SDK;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
 using UnderratedAIO.Helpers.SkillShot;
-using Utility = LeagueSharp.Common.Utility;
+using Color = System.Drawing.Color;
+using EloBuddy;
 
 namespace UnderratedAIO.Helpers
 {
     internal class IncomingDamage
     {
-        public bool enabled, skillShotChecked;
-        public float Globalreset;
         public List<IncData> IncomingDamagesAlly = new List<IncData>();
         public List<IncData> IncomingDamagesEnemy = new List<IncData>();
-
-        public IncomingDamage()
-        {
-            Obj_AI_Base.OnProcessSpellCast += Game_ProcessSpell;
-            Game.OnUpdate += Game_OnGameUpdate;
-            // from H3h3 SpellDetector Lib
-            SkillshotDetector.Init();
-            foreach (var ally in ObjectManager.Get<AIHeroClient>().Where(h => h.IsAlly))
-            {
-                IncomingDamagesAlly.Add(new IncData(ally));
-            }
-            foreach (var Enemy in ObjectManager.Get<AIHeroClient>().Where(h => h.IsEnemy))
-            {
-                IncomingDamagesEnemy.Add(new IncData(Enemy));
-            }
-            enabled = true;
-        }
-
+        public float Globalreset;
+        public bool enabled, skillShotChecked;
         //public List<Skillshot> SkillShots = new List<Skillshot>();
 
         public IncData GetAllyData(int networkId)
@@ -57,6 +44,23 @@ namespace UnderratedAIO.Helpers
                 Console.WriteLine("\t AADamageTaken: " + d.AADamageTaken);
                 Console.WriteLine("\t TargetedCC: " + d.AnyCC);
             }
+        }
+
+        public IncomingDamage()
+        {
+            Obj_AI_Base.OnProcessSpellCast += Game_ProcessSpell;
+            Game.OnUpdate += Game_OnGameUpdate;
+            // from H3h3 SpellDetector Lib
+            SkillshotDetector.Init();
+            foreach (var ally in ObjectManager.Get<AIHeroClient>().Where(h => h.IsAlly))
+            {
+                IncomingDamagesAlly.Add(new IncData(ally));
+            }
+            foreach (var Enemy in ObjectManager.Get<AIHeroClient>().Where(h => h.IsEnemy))
+            {
+                IncomingDamagesEnemy.Add(new IncData(Enemy));
+            }
+            enabled = true;
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -92,14 +96,14 @@ namespace UnderratedAIO.Helpers
             if (!skillShotChecked)
             {
                 skillShotChecked = true;
-                Utility.DelayAction.Add(70, () => skillShotChecked = false);
-                for (var i = 0; i < SkillshotDetector.ActiveSkillshots.Count; i++)
+                LeagueSharp.Common.Utility.DelayAction.Add(70, () => skillShotChecked = false);
+                for (int i = 0; i < SkillshotDetector.ActiveSkillshots.Count; i++)
                 {
                     if (
                         CombatHelper.BuffsList.Any(
                             b =>
                                 SkillshotDetector.ActiveSkillshots[i].SkillshotData.Slot == b.Slot &&
-                                ((AIHeroClient) SkillshotDetector.ActiveSkillshots[i].Caster).ChampionName ==
+                                ((AIHeroClient)SkillshotDetector.ActiveSkillshots[i].Caster).ChampionName ==
                                 b.ChampionName))
                     {
                         SkillshotDetector.ActiveSkillshots.RemoveAt(i);
@@ -125,13 +129,14 @@ namespace UnderratedAIO.Helpers
                                 IncomingDamagesAlly.Concat(IncomingDamagesEnemy)
                                     .FirstOrDefault(h => h.Hero.NetworkId == Hero.NetworkId);
                             var missileSpeed =
-                                SkillshotDetector.ActiveSkillshots[i].GetMissilePosition(0).LSDistance(Hero)/
-                                SkillshotDetector.ActiveSkillshots[i].SkillshotData.MissileSpeed;
+                                (SkillshotDetector.ActiveSkillshots[i].GetMissilePosition(0).LSDistance(Hero) /
+                                 SkillshotDetector.ActiveSkillshots[i].SkillshotData.MissileSpeed);
                             missileSpeed = missileSpeed > 5f ? 5f : missileSpeed;
                             var newData = new Dmg(
                                 Hero,
                                 (float)
-                                    ((AIHeroClient) SkillshotDetector.ActiveSkillshots[i].Caster).LSGetSpellDamage(Hero,
+                                    Damage.LSGetSpellDamage(
+                                        (AIHeroClient)SkillshotDetector.ActiveSkillshots[i].Caster, Hero,
                                         SkillshotDetector.ActiveSkillshots[i].SkillshotData.Slot), missileSpeed, false,
                                 false, SkillshotDetector.ActiveSkillshots[i]);
                             if (data == null ||
@@ -163,13 +168,16 @@ namespace UnderratedAIO.Helpers
                                     SkillshotDetector.ActiveSkillshots.RemoveAt(i);
                                     break;
                                 }
-                                /*Console.WriteLine(
+                                else
+                                {
+                                    /*Console.WriteLine(
                                         SkillshotDetector.ActiveSkillshots[i].SkillshotData.SpellName + " --> " +
                                         Hero.Name + " - " +
                                         SkillshotDetector.ActiveSkillshots[i].SkillshotData.IsDangerous);*/
-                                data.Damages.Add(newData);
-                                SkillshotDetector.ActiveSkillshots[i].SkillshotData.PossibleTargets.Add(
-                                    Hero.NetworkId);
+                                    data.Damages.Add(newData);
+                                    SkillshotDetector.ActiveSkillshots[i].SkillshotData.PossibleTargets.Add(
+                                        Hero.NetworkId);
+                                }
                             }
                         }
                     }
@@ -182,7 +190,7 @@ namespace UnderratedAIO.Helpers
             foreach (var incDamage in
                 IncomingDamagesAlly.Concat(IncomingDamagesEnemy))
             {
-                for (var index = 0; index < incDamage.Damages.Count; index++)
+                for (int index = 0; index < incDamage.Damages.Count; index++)
                 {
                     var d = incDamage.Damages[index];
                     if (Game.Time - d.Time > d.delete)
@@ -206,7 +214,7 @@ namespace UnderratedAIO.Helpers
         {
             if (enabled)
             {
-                var target = args.Target as AIHeroClient;
+                AIHeroClient target = args.Target as AIHeroClient;
                 if (target != null && target.Team != sender.Team)
                 {
                     if (sender.IsValid && !sender.IsDead)
@@ -216,14 +224,19 @@ namespace UnderratedAIO.Helpers
                                 .FirstOrDefault(i => i.Hero.NetworkId == target.NetworkId);
                         if (data != null)
                         {
-                            var missileSpeed = sender.LSDistance(target)/args.SData.MissileSpeed +
+                            var missileSpeed = (sender.LSDistance(target) / args.SData.MissileSpeed) +
                                                args.SData.SpellCastTime;
                             missileSpeed = missileSpeed > 1f ? 0.8f : missileSpeed;
                             if (Orbwalking.IsAutoAttack(args.SData.Name))
                             {
-                                var dmg = sender.GetAutoAttackDamage(target, true);
-                                data.Damages.Add(new Dmg(target, dmg, missileSpeed,
-                                    !sender.Name.ToLower().Contains("turret")));
+                                var dmg =
+                                    (float)(sender.LSGetAutoAttackDamage(target, true));
+                                if (args.SData.Name.ToLower().Contains("crit"))
+                                {
+                                    dmg = dmg * 2;
+                                }
+                                data.Damages.Add(
+                                    new Dmg(target, dmg, missileSpeed, !sender.Name.ToLower().Contains("turret")));
                             }
                             else
                             {
@@ -235,7 +248,7 @@ namespace UnderratedAIO.Helpers
                                     data.Damages.Add(
                                         new Dmg(
                                             target,
-                                            (float) hero.LSGetSpellDamage((Obj_AI_Base) args.Target, args.Slot),
+                                            (float)Damage.LSGetSpellDamage(hero, (Obj_AI_Base)args.Target, args.Slot),
                                             missileSpeed, false,
                                             SpellDatabase.CcList.Any(
                                                 cc =>
@@ -254,11 +267,6 @@ namespace UnderratedAIO.Helpers
     {
         public List<Dmg> Damages = new List<Dmg>();
         public AIHeroClient Hero;
-
-        public IncData(AIHeroClient _hero)
-        {
-            Hero = _hero;
-        }
 
 
         public float DamageTaken
@@ -324,21 +332,26 @@ namespace UnderratedAIO.Helpers
         {
             get
             {
-                return Hero.Health < DamageTaken ||
-                       CombatHelper.CheckCriticalBuffsNextSec(Hero) && !CombatHelper.IsInvulnerable2(Hero);
+                return (Hero.Health < DamageTaken ||
+                        CombatHelper.CheckCriticalBuffsNextSec(Hero) && !CombatHelper.IsInvulnerable2(Hero));
             }
+        }
+
+        public IncData(AIHeroClient _hero)
+        {
+            this.Hero = _hero;
         }
     }
 
     internal class Dmg
     {
         public float Damage;
+        public float Time;
         public float delete;
         public bool isAA;
+        public bool TargetedCC;
         public Skillshot SkillShot;
         public AIHeroClient Target;
-        public bool TargetedCC;
-        public float Time;
 
         public Dmg(AIHeroClient target,
             float dmg,
@@ -347,7 +360,7 @@ namespace UnderratedAIO.Helpers
             bool TargetedCC = false,
             Skillshot spell = null)
         {
-            Target = target;
+            this.Target = target;
             Damage = dmg;
             Time = Game.Time;
             this.delete = delete;

@@ -20,14 +20,12 @@ namespace UnderratedAIO.Champions
         public static Spell Q, W, WSkillShot, E, R;
         public static readonly AIHeroClient player = ObjectManager.Player;
         public static bool justWOut, justQ, blockW;
-        public static IncomingDamage IncDamages;
 
         public static Menu menuD, menuC, menuH, menuLC, menuM, AllyDef, Shield;
         public Team lastWtarget = Team.Null;
 
         public TahmKench()
         {
-            IncDamages = new IncomingDamage();
             InitTahmKench();
             InitMenu();
             Drawing.OnDraw += Game_OnDraw;
@@ -106,7 +104,7 @@ namespace UnderratedAIO.Champions
 
         private void UseShield()
         {
-            var playerData = IncDamages.GetAllyData(player.NetworkId);
+            var playerData = Program.IncDamages.GetAllyData(player.NetworkId);
             if (playerData == null)
             {
                 return;
@@ -136,7 +134,7 @@ namespace UnderratedAIO.Champions
             {
                 for (var i = 0; i <= allies.Count() - 1; i++)
                 {
-                    var allyData = IncDamages.GetAllyData(allies[i].NetworkId);
+                    var allyData = Program.IncDamages.GetAllyData(allies[i].NetworkId);
                     if (allyData == null || !getCheckBoxItem(AllyDef, "useEat" + allies[i].NetworkId))
                     {
                         continue;
@@ -226,7 +224,7 @@ namespace UnderratedAIO.Champions
         {
             if (target.GetBuffCount("TahmKenchPDebuffCounter") == 3 && !CombatHelper.CheckCriticalBuffs(target) &&
                 !target.HasBuffOfType(BuffType.Stun) && !target.HasBuffOfType(BuffType.Snare) && !Q.CanCast(target) &&
-                !justQ && !IncDamages.GetEnemyData(target.NetworkId).IncSkillShot)
+                !justQ && !Program.IncDamages.GetEnemyData(target.NetworkId).IncSkillShot)
             {
                 Orbwalker.DisableMovement = true;
                 if (Game.CursorPos.LSDistance(target.Position) < 300)

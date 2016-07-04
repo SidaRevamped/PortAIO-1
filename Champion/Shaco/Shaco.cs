@@ -27,13 +27,11 @@ namespace UnderratedAIO.Champions
         public static int GhostRange = 2200;
         public static int LastAATick;
         public static float cloneTime, lastBox;
-        public static IncomingDamage IncDamages;
 
         public static Menu menuD, menuC, menuH, menuLC, menuM;
 
         public Shaco()
         {
-            IncDamages = new IncomingDamage();
             InitShaco();
             InitMenu();
             Game.OnUpdate += Game_OnGameUpdate;
@@ -159,7 +157,7 @@ namespace UnderratedAIO.Champions
             {
                 moveClone();
             }
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (getCheckBoxItem(menuC, "userCC") && R.IsReady() && target != null && player.LSDistance(target) < Q.Range &&
                 data.AnyCC)
             {

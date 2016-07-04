@@ -29,12 +29,10 @@ namespace UnderratedAIO.Champions
         public static Spell Q, W, E, R;
         public static Vector3 lastQpos, lastQCast;
         public static readonly AIHeroClient player = ObjectManager.Player;
-        public static IncomingDamage IncDamages;
 
 
         public static void OnLoad()
         {
-            IncDamages = new IncomingDamage();
             InitOlaf();
             InitMenu();
             Chat.Print("<font color='#9933FF'>Soresu </font><font color='#FFFFFF'>- Olaf</font>");
@@ -199,7 +197,7 @@ namespace UnderratedAIO.Champions
             }
             if (getCheckBoxItem(comboMenu, "usee") && E.CanCast(target) &&
                 (((E.GetDamage(target) > target.Health) || player.HealthPercent > 25) ||
-                 IncDamages.GetAllyData(player.NetworkId).IsAboutToDie))
+                 Program.IncDamages.GetAllyData(player.NetworkId).IsAboutToDie))
             {
                 E.Cast(target);
             }
@@ -213,7 +211,7 @@ namespace UnderratedAIO.Champions
                 R.Cast();
             }
             if (getCheckBoxItem(comboMenu, "userbeforeCCed") && R.IsReady() &&
-                IncDamages.GetAllyData(player.NetworkId).AnyCC)
+                Program.IncDamages.GetAllyData(player.NetworkId).AnyCC)
             {
                 R.Cast();
             }

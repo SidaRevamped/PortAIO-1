@@ -26,7 +26,6 @@ namespace UnderratedAIO.Champions
         public static readonly AIHeroClient player = ObjectManager.Player;
         public static bool justQ, justE;
         public static float qStart;
-        public static IncomingDamage IncDamages;
         public static Vector2 QCastPos = new Vector2();
 
         public static Menu menuD, menuC, menuH, menuLC, menuM;
@@ -35,7 +34,6 @@ namespace UnderratedAIO.Champions
 
         public Sion()
         {
-            IncDamages = new IncomingDamage();
             InitSion();
             InitMenu();
             Drawing.OnDraw += Game_OnDraw;
@@ -115,7 +113,7 @@ namespace UnderratedAIO.Champions
                 Clear();
             }
 
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (data != null && !activatedW && getCheckBoxItem(menuM, "AshieldB") && data.DamageCount >= getSliderItem(menuM, "wMinAggro") && player.ManaPercent > getSliderItem(menuM, "minmanaAgg"))
             {
                 W.Cast(getCheckBoxItem(config, "packets"));
@@ -296,7 +294,7 @@ namespace UnderratedAIO.Champions
                 return;
             }
 
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (!activatedW && W.IsReady() && getCheckBoxItem(menuC, "usew") && W.IsInRange(target))
             {
                 if (data.DamageTaken > player.Health || (data.DamageTaken > getWShield()/100*getSliderItem(menuC, "shieldDmg")) || (target.LSDistance(player) < W.Range && getCheckBoxItem(menuC, "usewir")))
@@ -368,9 +366,9 @@ namespace UnderratedAIO.Champions
             if (objAiHeroes.Any())
             {
                 var escaping = objAiHeroes.Count(h => poly.IsOutside(Prediction.GetPrediction(h, 0.2f).UnitPosition.LSTo2D()));
-                var data = IncDamages.GetAllyData(player.NetworkId);
-                if ((escaping > 0 && (objAiHeroes.Count() == 1 || (objAiHeroes.Count() >= 2 && System.Environment.TickCount - qStart > 1000))) || data.DamageTaken > player.Health || IncDamages.GetAllyData(player.NetworkId).AnyCC ||
-                    IncDamages.GetEnemyData(target.NetworkId).DamageTaken > target.Health)
+                var data = Program.IncDamages.GetAllyData(player.NetworkId);
+                if ((escaping > 0 && (objAiHeroes.Count() == 1 || (objAiHeroes.Count() >= 2 && System.Environment.TickCount - qStart > 1000))) || data.DamageTaken > player.Health || Program.IncDamages.GetAllyData(player.NetworkId).AnyCC ||
+                    Program.IncDamages.GetEnemyData(target.NetworkId).DamageTaken > target.Health)
                 {
                     Q.Cast(target, true);
                 }

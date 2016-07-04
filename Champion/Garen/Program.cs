@@ -18,7 +18,6 @@ namespace UnderratedAIO.Champions
         public static Menu config, drawMenu, comboMenu, laneClearMenu, miscMenu;
         public static readonly AIHeroClient player = ObjectManager.Player;
         public static Spell Q, W, E, R;
-        public static IncomingDamage IncDamages = new IncomingDamage();
 
         public static int[] spins = {5, 6, 7, 8, 9, 10};
         public static double[] baseEDamage = {15, 18.8, 22.5, 26.3, 30};
@@ -136,7 +135,7 @@ namespace UnderratedAIO.Champions
             {
                         R.Cast(target, getCheckBoxItem(config, "packets"));
             }
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (getCheckBoxItem(comboMenu, "usew") && W.IsReady() && target.IsFacing(player) &&
                 data.DamageTaken > 40)
             {

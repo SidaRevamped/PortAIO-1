@@ -694,7 +694,7 @@ namespace PortAIO
                         }
                         break;
                     case "chogath": // Underrated Cho'Gath
-                        UnderratedAIO.Champions.Chogath.Load();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "corki": // ElCorki & OKTW
                         switch (Loader.corki)
@@ -743,7 +743,7 @@ namespace PortAIO
                                 OlafxQx.Program.Init();
                                 break;
                             case 2:
-                                new UnderratedAIO.Champions.Olaf();
+                                UnderratedAIO.Program.Init();
                                 break;
                             default:
                                 ExorAIO.AIO.OnLoad();
@@ -765,7 +765,7 @@ namespace PortAIO
                                 ExorAIO.AIO.OnLoad();
                                 break;
                             case 1:
-                                UnderratedAIO.Champions.Renekton.OnLoad();
+                                UnderratedAIO.Program.Init();
                                 break;
                             default:
                                 ExorAIO.AIO.OnLoad();
@@ -888,21 +888,21 @@ namespace PortAIO
                         MathFizz.Program.Game_OnGameLoad();
                         break;
                     case "galio": // Underrated AIO
-                        UnderratedAIO.Champions.Galio.OnLoad();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "gangplank": // Underrated AIO
                         switch (Loader.gangplank)
                         {
                             case 0:
-                                UnderratedAIO.Champions.Gangplank.OnLoad();
+                                UnderratedAIO.Program.Init();
                                 break;
                             default:
-                                UnderratedAIO.Champions.Gangplank.OnLoad();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;
                     case "garen": // Underrated AIO
-                        UnderratedAIO.Champions.Garen.OnLoad();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "gnar": // Slutty Gnar
                         switch (Loader.gnar)
@@ -1132,7 +1132,7 @@ namespace PortAIO
                         ElAurelion_Sol.AurelionSol.OnGameLoad();
                         break;
                     case "kennen": // Underrated AIO
-                        new UnderratedAIO.Champions.Kennen();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "khazix": // SephKhaZix
                         new SephKhazix.Khazix();
@@ -1442,7 +1442,7 @@ namespace PortAIO
                         }
                         break;
                     case "maokai": // Underrated AIO
-                        new UnderratedAIO.Champions.Maokai();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "masteryi": // MasterSharp
                         MasterSharp.MasterSharp.OnLoad();
@@ -1505,19 +1505,19 @@ namespace PortAIO
                         }
                         break;
                     case "nocturne": // Underrated AIO
-                        new UnderratedAIO.Champions.Nocturne();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "poppy": // Underrated AIO
                         switch (Loader.poppy)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Poppy();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 BadaoKingdom.BadaoChampion.BadaoPoppy.BadaoPoppy.BadaoActivate();
                                 break;
                             default:
-                                new UnderratedAIO.Champions.Poppy();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;
@@ -1604,7 +1604,7 @@ namespace PortAIO
                         switch (Loader.rumble)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Rumble();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 ElRumble.Rumble.OnLoad();
@@ -1621,21 +1621,21 @@ namespace PortAIO
                         switch (Loader.shaco)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Shaco();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 ChewyMoonsShaco.ChewyMoonShaco.OnGameLoad();
                                 break;
                             default:
-                                new UnderratedAIO.Champions.Shaco();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;
                     case "shen": // Underrated AIO
-                        new UnderratedAIO.Champions.Shen();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "skarner": // Underrated AIO
-                        new UnderratedAIO.Champions.Skarner();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "sona": // vSeries Support & ElEasy Sona
                         switch (Loader.sona)
@@ -1696,7 +1696,7 @@ namespace PortAIO
                         Ziggs.Program.Game_OnGameLoad();
                         break;
                     case "yorick": // UnderratedAIO
-                        new UnderratedAIO.Champions.Yorick();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "zyra": // D-Zyra
                         D_Zyra.Program.Game_OnGameLoad();
@@ -1711,19 +1711,19 @@ namespace PortAIO
                         ElSinged.Singed.Game_OnGameLoad();
                         break;
                     case "tahmkench": // Underrated AIO
-                        new UnderratedAIO.Champions.TahmKench();
+                        UnderratedAIO.Program.Init();
                         break;
                     case "sion": // Underrated AIO
                         switch (Loader.sion)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Sion();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 Sion.Program.Game_OnGameLoad();
                                 break;
                             default:
-                                new UnderratedAIO.Champions.Sion();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;
@@ -1734,13 +1734,13 @@ namespace PortAIO
                         switch (Loader.volibear)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Volibear();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 VoliPower.Program.Game_OnLoad();
                                 break;
                             default:
-                                new UnderratedAIO.Champions.Volibear();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;
@@ -1765,13 +1765,13 @@ namespace PortAIO
                         switch (Loader.zac)
                         {
                             case 0:
-                                new UnderratedAIO.Champions.Zac();
+                                UnderratedAIO.Program.Init();
                                 break;
                             case 1:
                                 Zac_The_Secret_Flubber.Program.Game_OnGameLoad();
                                 break;
                             default:
-                                new UnderratedAIO.Champions.Zac();
+                                UnderratedAIO.Program.Init();
                                 break;
                         }
                         break;

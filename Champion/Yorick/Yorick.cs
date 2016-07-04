@@ -24,12 +24,10 @@ namespace UnderratedAIO.Champions
         public static bool GhostDelay;
         public static int GhostRange = 2200;
         public static int LastAATick;
-        public static IncomingDamage IncDamages;
         public static Menu menuD, menuC, menuH, menuLC, menuM;
 
         public Yorick()
         {
-            IncDamages = new IncomingDamage();
             InitYorick();
             InitMenu();
             Game.OnUpdate += Game_OnGameUpdate;
@@ -175,7 +173,7 @@ namespace UnderratedAIO.Champions
                     i =>
                         !i.IsDead &&
                         ((i.Health * 100 / i.MaxHealth) <= menuC["atpercenty"].Cast<Slider>().CurrentValue ||
-                         IncDamages.GetAllyData(i.NetworkId).IsAboutToDie) && player.LSDistance(i) < R.Range &&
+                         Program.IncDamages.GetAllyData(i.NetworkId).IsAboutToDie) && player.LSDistance(i) < R.Range &&
                         !menuM["ulty" + i.NetworkId].Cast<CheckBox>().CurrentValue && i.CountEnemiesInRange(750) > 0)
                     .OrderByDescending(i => Environment.Hero.GetAdOverTime(player, i, 5))
                     .FirstOrDefault();

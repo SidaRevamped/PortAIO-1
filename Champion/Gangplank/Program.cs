@@ -27,7 +27,6 @@ namespace UnderratedAIO.Champions
         public static bool justQ, justE;
         public static Vector3 ePos;
         public static List<Barrel> savedBarrels = new List<Barrel>();
-        public static IncomingDamage IncDamages = new IncomingDamage();
         public static double[] Rwave = { 50, 70, 90 };
         public static double[] EDamage = { 60, 90, 120, 150, 180 };
 
@@ -165,14 +164,14 @@ namespace UnderratedAIO.Champions
                             e =>
                                 ((e.UnderTurret(true) &&
                                   e.MaxHealth / 100 * getSliderItem(miscMenu, "Rhealt") * 0.75f >
-                                  e.Health - IncDamages.GetEnemyData(e.NetworkId).DamageTaken) ||
+                                  e.Health - Program.IncDamages.GetEnemyData(e.NetworkId).DamageTaken) ||
                                  (!e.UnderTurret(true) &&
                                   e.MaxHealth / 100 * getSliderItem(miscMenu, "Rhealt") >
-                                  e.Health - IncDamages.GetEnemyData(e.NetworkId).DamageTaken)) &&
+                                  e.Health - Program.IncDamages.GetEnemyData(e.NetworkId).DamageTaken)) &&
                                 e.HealthPercent > getSliderItem(miscMenu, "RhealtMin") && e.LSIsValidTarget() &&
                                 e.LSDistance(player) > 1500))
                 {
-                    var pred = IncDamages.GetEnemyData(enemy.NetworkId);
+                    var pred = Program.IncDamages.GetEnemyData(enemy.NetworkId);
                     if (pred != null && pred.DamageTaken < enemy.Health)
                     {
                         var ally =
@@ -453,7 +452,7 @@ namespace UnderratedAIO.Champions
             var ignitedmg = (float)player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
             var hasIgnite = player.Spellbook.CanUseSpell(player.GetSpellSlot("SummonerDot")) == SpellState.Ready;
             if (getCheckBoxItem(comboMenu, "useIgnite") &&
-                ignitedmg > target.Health - IncDamages.GetEnemyData(target.NetworkId).DamageTaken && hasIgnite &&
+                ignitedmg > target.Health - Program.IncDamages.GetEnemyData(target.NetworkId).DamageTaken && hasIgnite &&
                 !CombatHelper.CheckCriticalBuffs(target) && !Q.IsReady() && !justQ)
             {
                 player.Spellbook.CastSpell(player.GetSpellSlot("SummonerDot"), target);

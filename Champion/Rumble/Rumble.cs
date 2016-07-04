@@ -23,14 +23,12 @@ namespace UnderratedAIO.Champions
         public static Spell Q, W, E, R;
         public static readonly AIHeroClient player = ObjectManager.Player;
         public static bool justE;
-        public static IncomingDamage IncDamages;
 
         public static Menu menuC, menuD, menuH, menuLC, menuM;
         public float lastE;
 
         public Rumble()
         {
-            IncDamages = new IncomingDamage();
             InitRumble();
             InitMenu();
             Drawing.OnDraw += Game_OnDraw;
@@ -106,7 +104,7 @@ namespace UnderratedAIO.Champions
                 Clear();
             }
 
-            var data = IncDamages.GetAllyData(player.NetworkId);
+            var data = Program.IncDamages.GetAllyData(player.NetworkId);
             if (data != null && W.IsReady() && getCheckBoxItem(menuM, "usew") &&
                 (preventSilence(W) || (!getCheckBoxItem(menuM, "blockW") && !preventSilence(W))) &&
                 (data.DamageTaken > getShield() * getSliderItem(menuM, "shieldPercent") / 100 ||
@@ -380,7 +378,7 @@ namespace UnderratedAIO.Champions
                 }
             }
             if (getCheckBoxItem(menuM, "usew") && sender is AIHeroClient && sender.IsEnemy &&
-                player.LSDistance(sender) < Q.Range && IncDamages.GetAllyData(player.NetworkId).AnyCC)
+                player.LSDistance(sender) < Q.Range && Program.IncDamages.GetAllyData(player.NetworkId).AnyCC)
             {
                 W.Cast();
             }
