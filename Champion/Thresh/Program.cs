@@ -63,6 +63,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             eMenu.Add("inter", new CheckBox("OnPossibleToInterrupt", true));
             eMenu.Add("Gap", new CheckBox("OnEnemyGapcloser", true));
             eMenu.Add("Emin", new Slider("Min pull range E", 200, 0, (int)E.Range));
+            eMenu.Add("FlayPush", new KeyBind("Flay Push Key", false, KeyBind.BindTypes.HoldActive, 'T'));
+            eMenu.Add("FlayPull", new KeyBind("Flay Pull Key", false, KeyBind.BindTypes.HoldActive, 'H'));
 
             rMenu = Config.AddSubMenu("R Option");
             rMenu.Add("rCount", new Slider("Auto R if x enemies in range", 2, 0, 5));
@@ -188,6 +190,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
+        static void Pull(Obj_AI_Base target)
+        {
+            var pos = target.Position.LSExtend(Player.Position, Player.LSDistance(target.Position) + 200);
+            E.Cast(pos);
+        }
+
+        static void Push(Obj_AI_Base target)
+        {
+            var pos = target.Position.LSExtend(Player.Position, Player.LSDistance(target.Position) - 200);
+            E.Cast(pos);
+        }
+
+
         private static void Game_OnGameUpdate(EventArgs args)
         {
 
@@ -201,6 +216,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else
                 Orbwalker.DisableAttacking = false;
+
+            var Etarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+            if (getKeyBindItem(eMenu, "FlayPush") && Etarget != null &&
+                E.IsReady())
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
+                    Orbwalker.OrbwalkTo(Game.CursorPos);
+                Push(Etarget);
+            }
+
+            if (getKeyBindItem(eMenu, "FlayPull") && Etarget != null &&
+                E.IsReady())
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
+                    Orbwalker.OrbwalkTo(Game.CursorPos);
+                Pull(Etarget);
+            }
 
             if (getKeyBindItem(wMenu, "ThrowLantern"))
             {
