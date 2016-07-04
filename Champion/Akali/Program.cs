@@ -74,7 +74,7 @@ namespace PortAIO.Champion.Akali
             Q = new Spell(SpellSlot.Q, 600f);
             W = new Spell(SpellSlot.W, 700f);
             E = new Spell(SpellSlot.E, 290f);
-            R = new Spell(SpellSlot.R, 800f);
+            R = new Spell(SpellSlot.R, 700f);
 
             SpellList.Add(Q);
             SpellList.Add(W);
