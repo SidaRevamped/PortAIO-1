@@ -405,7 +405,7 @@ namespace SebbyLib.Prediction
             if (ft)
             {
                 //Increase the delay due to the latency and server tick:
-                input.Delay += EloBuddy.Game.Ping / 2000f + 0.04f;
+                input.Delay += EloBuddy.Game.Ping / 2000f + 0.06f;
 
                 if (input.Aoe)
                 {
@@ -445,7 +445,7 @@ namespace SebbyLib.Prediction
             if (Math.Abs(input.Range - float.MaxValue) > float.Epsilon)
             {
                 if (result.Hitchance >= HitChance.High &&
-                    input.RangeCheckFrom.LSDistance(input.Unit.Position, true) >
+                    input.RangeCheckFrom.LSDistance(input.Unit.ServerPosition, true) >
                     Math.Pow(input.Range + input.RealRadius * 3 / 4, 2))
                 {
                     result.Hitchance = HitChance.Medium;
@@ -534,7 +534,7 @@ namespace SebbyLib.Prediction
             {
                 OktwCommon.debug("CAN'T MOVE SPELLS");
                 result.Hitchance = HitChance.VeryHigh;
-                result.CastPosition = input.Unit.Position;
+                result.CastPosition = input.Unit.ServerPosition;
                 return result;
             }
 
@@ -587,14 +587,14 @@ namespace SebbyLib.Prediction
 
                 // WALL LOGIC  ///////////////////////////////////////////////////////////////////////////////////
 
-                var points = OktwCommon.CirclePoints(15, 350, input.Unit.Position).Where(x => x.LSIsWall());
+                var points = OktwCommon.CirclePoints(15, 350, input.Unit.ServerPosition).Where(x => x.LSIsWall());
 
                 if (points.Count() > 2)
                 {
                     var runOutWall = true;
                     foreach (var point in points)
                     {
-                        if (input.Unit.Position.LSDistance(point) > lastWaypiont.LSDistance(point))
+                        if (input.Unit.ServerPosition.LSDistance(point) > lastWaypiont.LSDistance(point))
                         {
                             runOutWall = false;
                         }
@@ -727,7 +727,7 @@ namespace SebbyLib.Prediction
                 var endP = dashData.Path.Last();
                 var dashPred = GetPositionOnPath(
                     input, new List<Vector2> { input.Unit.ServerPosition.LSTo2D(), endP }, dashData.Speed);
-                if (dashPred.Hitchance >= HitChance.High && dashPred.UnitPosition.LSTo2D().LSDistance(input.Unit.Position.LSTo2D(), endP, true) < 200)
+                if (dashPred.Hitchance >= HitChance.High && dashPred.UnitPosition.LSTo2D().LSDistance(input.Unit.ServerPosition.LSTo2D(), endP, true) < 200)
                 {
                     dashPred.CastPosition = dashPred.UnitPosition;
                     dashPred.Hitchance = HitChance.Dashing;
@@ -767,7 +767,7 @@ namespace SebbyLib.Prediction
                 return new PredictionOutput
                 {
                     CastPosition = input.Unit.ServerPosition,
-                    UnitPosition = input.Unit.Position,
+                    UnitPosition = input.Unit.ServerPosition,
                     Hitchance = HitChance.Immobile
                 };
             }
@@ -1311,10 +1311,7 @@ namespace SebbyLib.Prediction
                             break;
                         case CollisionableObject.Heroes:
                             foreach (var hero in
-                                HeroManager.Enemies.FindAll(
-                                    hero =>
-                                        hero.LSIsValidTarget(
-                                            Math.Min(input.Range + input.Radius + 100, 2000), true, input.RangeCheckFrom))
+                                HeroManager.Enemies.FindAll(hero => hero.LSIsValidTarget(Math.Min(input.Range + input.Radius + 100, 2000), true, input.RangeCheckFrom) && hero.IsVisible && hero.IsHPBarRendered)
                                 )
                             {
                                 input.Unit = hero;
