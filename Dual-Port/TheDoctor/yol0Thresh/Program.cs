@@ -77,7 +77,7 @@ namespace yol0Thresh
 
 
             flayMenu = Config.AddSubMenu("Flay Settings", "flay");
-            flayMenu.Add("fullEnemy", new KeyBind("Pull Enemy", false, KeyBind.BindTypes.HoldActive, 'H'));
+            flayMenu.Add("pullEnemy", new KeyBind("Pull Enemy", false, KeyBind.BindTypes.HoldActive, 'H'));
             flayMenu.Add("pushEnemy", new KeyBind("Push Enemy", false, KeyBind.BindTypes.HoldActive, 'T'));
             flayMenu.AddLabel("Per-Enemy Settings");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(unit => unit.Team != Player.Team))
@@ -195,6 +195,7 @@ namespace yol0Thresh
 
             if (getKeyBindItem(flayMenu, "pullEnemy"))
             {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
                 var target = TargetSelector.GetTarget(_E.Range, DamageType.Physical);
                 if (target != null)
                     PullFlay(target);
@@ -202,6 +203,7 @@ namespace yol0Thresh
 
             if (getKeyBindItem(flayMenu, "pushEnemy"))
             {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
                 var target = TargetSelector.GetTarget(_E.Range, DamageType.Physical);
                 if (target != null)
                     PushFlay(target);
@@ -387,7 +389,7 @@ namespace yol0Thresh
         private static bool ShouldPull(AIHeroClient unit)
         {
             return
-                getBoxItem(miscMenu, "ActionToTake") == 0;
+                getBoxItem(flayMenu, unit.ChampionName) == 0;
         }
 
         private static bool IsFirstQ()
