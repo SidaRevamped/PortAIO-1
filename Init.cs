@@ -24,7 +24,6 @@ namespace PortAIO
         private static void Main()
         {
             Loading.OnLoadingComplete += Initialize;
-            Game.OnUpdate += Game_OnUpdate;
         }
 
         private static void Game_OnUpdate(EventArgs args)
@@ -54,6 +53,8 @@ namespace PortAIO
 
         private static void Initialize(EventArgs args)
         {
+            Game.OnUpdate += Game_OnUpdate;
+
             LeagueSharp.SDK.Bootstrap.Init();
 
             Notifications.Show(new SimpleNotification("PortAIO", "Welcome to PortAIO, this is a complete AIO made for every single champion. If you experience bugs or have suggestions or just have something to report please go to the github and view the instructions to post a new issue. Enjoy using PortAIO and GLHF!"), 8000);
