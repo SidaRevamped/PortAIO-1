@@ -70,7 +70,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
             {
-                W.Cast(Player.Position.LSExtend(args.EndPosition, Player.LSDistance(args.EndPosition) + 100));
+                W.Cast(Player.Position.LSExtend(args.EndPosition, Player.LSDistance(args.EndPosition) + 50));
                 LeagueSharp.Common.Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
@@ -90,6 +90,8 @@ namespace OneKeyToWin_AIO_Sebby
             qMenu = Config.AddSubMenu("Q Config");
             qMenu.Add("autoQ2", new CheckBox("Auto Q", true));
             qMenu.Add("autoQ", new CheckBox("Reduce Q use", true));
+            qMenu.Add("Qaoe", new CheckBox("Q aoe", true));
+            qMenu.Add("Qslow", new CheckBox("Q slow", true));
 
             wMenu = Config.AddSubMenu("W Config");
             wMenu.Add("overrideW", new CheckBox("Override Manual W?", true));
@@ -106,6 +108,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             eMenu = Config.AddSubMenu("E Config");
             eMenu.Add("autoE", new CheckBox("Auto E", true));
+            eMenu.Add("Ehitchance", new CheckBox("Auto E dash and immobile target", true));
             eMenu.Add("harrasEQ", new CheckBox("Harass E + Q", true));
             eMenu.Add("EQks", new CheckBox("Ks E + Q + AA", true));
             eMenu.Add("useE", new KeyBind("Dash E HotKeySmartcast", false, KeyBind.BindTypes.HoldActive, 'T'));
@@ -327,10 +330,10 @@ namespace OneKeyToWin_AIO_Sebby
                         Q.Cast(enemy, true);
                     if (Player.LSCountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
                     {
-                        if (t.HasBuffOfType(BuffType.Slow))
+                        if (t.HasBuffOfType(BuffType.Slow) && getCheckBoxItem(qMenu, "Qslow"))
                             Q.Cast(t);
-
-                        Q.CastIfWillHit(t, 2, true);
+                        if (getCheckBoxItem(qMenu, "Qaoe"))
+                            Q.CastIfWillHit(t, 2, true);
                     }
                 }
             }
@@ -370,12 +373,19 @@ namespace OneKeyToWin_AIO_Sebby
                         }
                     }
 
-                    if (Player.Mana > RMANA + EMANA && Player.Health < Player.MaxHealth * 0.3)
+                    if (Player.Mana > RMANA + EMANA)
                     {
-                        if (GetRealDistance(t) < 500)
-                            E.Cast(t, true);
-                        if (Player.LSCountEnemiesInRange(250) > 0)
-                            E.Cast(t, true);
+                        if (getCheckBoxItem(eMenu, "Ehitchance"))
+                        {
+                            E.CastIfHitchanceEquals(t, HitChance.Dashing);
+                        }
+                        if (Player.Health < Player.MaxHealth * 0.3)
+                        {
+                            if (GetRealDistance(t) < 500)
+                                E.Cast(t, true);
+                            if (Player.CountEnemiesInRange(250) > 0)
+                                E.Cast(t, true);
+                        }
                     }
 
                 }
