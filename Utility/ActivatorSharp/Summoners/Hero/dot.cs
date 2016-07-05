@@ -22,7 +22,7 @@ namespace Activators.Summoners
 
             foreach (var tar in Activator.Heroes)
             {
-                if (!tar.Player.LSIsValidTarget(600))
+                if (!tar.Player.LSIsValidTarget(1500))
                 {
                     continue;
                 }
@@ -47,14 +47,16 @@ namespace Activators.Summoners
                 if (Menu["mode" + Name].Cast<ComboBox>().CurrentValue == 0)
                 {
                     if (tar.Player.Health <= ignotedmg)
-                        UseSpellOn(tar.Player);
+                    {
+                        if (tar.Player.LSDistance(Player.ServerPosition) <= 600)
+                            UseSpellOn(tar.Player);
+                    }
                 }
 
                 // combo ignite
                 if (Menu["mode" + Name].Cast<ComboBox>().CurrentValue == 1)
                 {
                     var totaldmg = 0d;
-                    var finaldmg = 0d;
                     switch (Player.ChampionName)
                     {
                         case "Ahri":
@@ -70,7 +72,7 @@ namespace Activators.Summoners
                                 continue;
 
                             totaldmg += Player.GetSpell(SpellSlot.E).State == SpellState.Ready
-                                ? Player.LSGetSpellDamage(tar.Player, SpellSlot.E) * 3
+                                ? Player.LSGetSpellDamage(tar.Player, SpellSlot.E) * 5
                                 : 0;
 
                             break;
@@ -99,7 +101,16 @@ namespace Activators.Summoners
                                     ? entry.Key(Player, tar.Player, Player.GetSpell(entry.Value).Level - 1)
                                     : 0);
 
-                    finaldmg = totaldmg * Menu["idmgcheck"].Cast<Slider>().CurrentValue / 100;
+                    var finaldmg = totaldmg * Menu["idmgcheck"].Cast<Slider>().CurrentValue / 100;
+
+                    if (Menu["idraw"].Cast<CheckBox>().CurrentValue)
+                    {
+                        var pdmg = finaldmg > tar.Player.Health ? 100 : finaldmg * 100 / tar.Player.Health;
+                        var drawdmg = Math.Round(pdmg);
+                        var pos = Drawing.WorldToScreen(tar.Player.Position);
+
+                        Drawing.DrawText(pos[0], pos[1], System.Drawing.Color.Yellow, drawdmg + " %");
+                    }
 
                     if (finaldmg + ignotedmg >= tar.Player.Health)
                     {
@@ -125,7 +136,10 @@ namespace Activators.Summoners
                             continue;
                         }
 
-                        UseSpellOn(tar.Player, true);
+                        if (tar.Player.LSDistance(Player.ServerPosition) <= 600)
+                        {
+                            UseSpellOn(tar.Player, true);
+                        }
                     }
                 }
             }

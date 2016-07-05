@@ -280,7 +280,16 @@ namespace Activators
         {
             try
             {
-                return Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsClass && t.Namespace == "Activators." + nspace && t.Name != "CoreItem" && t.Name != "CoreSpell" && t.Name != "CoreSum" && !t.Name.Contains("c__") && !t.Name.Contains("<>c")).ToList(); // kek
+                var allowedTypes = new[] { typeof(CoreItem), typeof(CoreSpell), typeof(CoreSum) };
+
+                return
+                    Assembly.GetExecutingAssembly()
+                        .GetTypes()
+                        .Where(
+                            t =>
+                                t.IsClass && t.Namespace == "Activators." + nspace && !t.Name.Contains("Core") &&
+                                allowedTypes.Any(x => x.IsAssignableFrom(t)))
+                        .ToList();
             }
 
             catch (Exception e)

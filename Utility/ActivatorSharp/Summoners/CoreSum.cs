@@ -106,7 +106,7 @@ namespace Activators.Summoners
 
                     Menu.Add("itu", new CheckBox("Dont Ignite Near Turret"));
                     Menu.Add("igtu", new Slider("-> Ignore after Level", 11, 1, 18));
-                    Menu.Add("mode" + Name, new ComboBox("Mode: ", 1, "Killsteal", "Combo"));
+                    Menu.Add("mode" + Name, new ComboBox("Mode: ", 0, "Killsteal", "Combo"));
                     Menu.AddSeparator();
                 }
 
