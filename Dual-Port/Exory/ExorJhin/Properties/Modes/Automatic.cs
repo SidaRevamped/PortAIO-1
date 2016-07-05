@@ -33,7 +33,7 @@ namespace ExorAIO.Champions.Jhin
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
                 GameObjects.Player.ManaPercent >
                     ManaManager.GetNeededMana(Vars.Q.Slot, Vars.getSliderItem(Vars.QMenu, "lasthit")) &&
-                Vars.getSliderItem(Vars.QMenu, "lasthit") != 101)
+                Vars.getSliderItem(Vars.QMenu, "lasthit") != 101 && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 foreach (var minion in Targets.Minions.Where(
                     m =>
@@ -50,7 +50,7 @@ namespace ExorAIO.Champions.Jhin
             /// </summary>
             if (Vars.W.IsReady() &&
                 !GameObjects.Player.IsUnderEnemyTurret() &&
-                Vars.getCheckBoxItem(Vars.WMenu, "logical"))
+                Vars.getCheckBoxItem(Vars.WMenu, "logical") && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 foreach (var target in GameObjects.EnemyHeroes.Where(
                     t =>
@@ -77,7 +77,7 @@ namespace ExorAIO.Champions.Jhin
             ///     The Automatic E Logic.
             /// </summary>
             if (Vars.E.IsReady() &&
-                Vars.getCheckBoxItem(Vars.EMenu, "logical"))
+                Vars.getCheckBoxItem(Vars.EMenu, "logical") && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 foreach (var target in GameObjects.EnemyHeroes.Where(
                     t =>

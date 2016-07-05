@@ -208,13 +208,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
 
 
-            if (Program.LagFree(4) && E.IsReady())
+            if (Program.LagFree(4) && E.IsReady() && !IsCastingR)
                 LogicE();
 
-            if (Program.LagFree(2) && Q.IsReady() && getCheckBoxItem(qMenu, "autoQ"))
+            if (Program.LagFree(2) && Q.IsReady() && getCheckBoxItem(qMenu, "autoQ") && !IsCastingR)
                 LogicQ();
 
-            if (Program.LagFree(3) && W.IsReady() && !Player.Spellbook.IsAutoAttacking && getCheckBoxItem(wMenu, "autoW"))
+            if (Program.LagFree(3) && W.IsReady() && !Player.Spellbook.IsAutoAttacking && getCheckBoxItem(wMenu, "autoW") && !IsCastingR)
                 LogicW();
         }
 
