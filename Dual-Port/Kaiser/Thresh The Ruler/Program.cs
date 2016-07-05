@@ -179,17 +179,20 @@ namespace ThreshTherulerofthesoul
                 }
             }
 
+            if (getKeyBindItem(comboMenu, "FlayPush") || getKeyBindItem(comboMenu, "FlayPull"))
+            {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
+            }
+
             if (getKeyBindItem(comboMenu, "FlayPush") && Etarget != null && 
                 E.IsReady())
             {
-                Orbwalker.OrbwalkTo(Game.CursorPos);
                 Push(Etarget);
             }
 
             if (getKeyBindItem(comboMenu, "FlayPull") && Etarget != null &&
                 E.IsReady())
             {
-                Orbwalker.OrbwalkTo(Game.CursorPos);
                 Pull(Etarget);
             }
 
