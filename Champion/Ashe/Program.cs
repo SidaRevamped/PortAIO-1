@@ -151,7 +151,7 @@ namespace PortAIO.Champion.Ashe
         private static void Interrupter2_OnInterruptableTarget(AIHeroClient sender,
             Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (getCheckBoxItem(RMenu, "autoRinter") && R.IsReady() && sender.LSIsValidTarget(R.Range))
+            if (getCheckBoxItem(RMenu, "autoRinter") && R.IsReady() && sender.LSIsValidTarget(2500))
                 R.Cast(sender);
         }
 
