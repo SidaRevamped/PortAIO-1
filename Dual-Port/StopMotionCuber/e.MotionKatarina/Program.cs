@@ -129,7 +129,8 @@ namespace e.Motion_Katarina
             comboMenu.Add("motion.katarina.combo.usew", new CheckBox("Use W"));
             comboMenu.Add("motion.katarina.combo.usee", new CheckBox("Use E"));
             comboMenu.Add("motion.katarina.combo.user", new CheckBox("Use R"));
-            comboMenu.Add("motion.katarina.combo.mode", new ComboBox("Combo mode", 0, "Smart [#recommend]", "Fast [#notrecommend]"));
+            comboMenu.Add("motion.katarina.combo.rsafe", new CheckBox("Advanced R Checks"));
+            comboMenu.Add("motion.katarina.combo.mode", new ComboBox("Combo mode", 0, "Smart", "Fast"));
             comboMenu.Add("motion.katarina.combo.order", new ComboBox("Rotation Order", 0, "Q -> E -> W -> R", "E -> Q -> W -> R", "Dynamic"));
 
             //Harrass-Menü
@@ -215,7 +216,16 @@ namespace e.Motion_Katarina
             #endregion
         }
 
-
+        private static bool KillableByUlt()
+        {
+            List<AIHeroClient> enemies = Player.Position.GetEnemiesInRange(R.Range);
+            if (!getCheckBoxItem(comboMenu, "motion.katarina.combo.rsafe") || enemies.Count > 1 || enemies[0].Position.GetAlliesInRange(800).Count > 0 ||
+                R.GetDamage(enemies[0], 1) + (enemies[0].HasBuff("katarinaqmark") ? Q.GetDamage(enemies[0], 1) : 0) > enemies[0].Health)
+            {
+                return true;
+            }
+            return false;
+        }
 
         private static void OnDraw(EventArgs args)
         {
@@ -360,7 +370,7 @@ namespace e.Motion_Katarina
                     W.Cast();
                     return;
                 }
-                if (target.LSDistance(Player) < R.Range - 200 && user)
+                if (target.LSDistance(Player) < R.Range - 200 && user && KillableByUlt())
                 {
                     R.Cast();
                 }
