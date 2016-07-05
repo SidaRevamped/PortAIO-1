@@ -1879,6 +1879,11 @@
     <Compile Include="Utility\NabbActivator\Activator\Utilities\Properties\Targets.cs" />
     <Compile Include="Utility\NabbActivator\Activator\Utilities\Vars.cs" />
     <Compile Include="Utility\NabbActivator\NabbActivator.cs" />
+    <Compile Include="Utility\SharpPredictioner\EventHandlers.cs" />
+    <Compile Include="Utility\SharpPredictioner\Program.cs" />
+    <Compile Include="Utility\SharpPredictioner\SpellData.cs" />
+    <Compile Include="Utility\SharpPredictioner\SpellDatabase.cs" />
+    <Compile Include="Utility\SharpPredictioner\SPredictioner.cs" />
     <Compile Include="Utility\PastingSharp\Program.cs" />
     <Compile Include="Utility\RandomUlt\Helpers\LastPositions.cs" />
     <Compile Include="Utility\RandomUlt\Program.cs" />

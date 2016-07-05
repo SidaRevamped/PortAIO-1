@@ -173,6 +173,9 @@ namespace PortAIO
                         case 3:
                             SPredictioner.Program.Init();
                             break;
+                        case 4:
+                            SharpPredictioner.Program.Init();
+                            break;
                         default:
                             EBPredictioner.Program.Init();
                             break;
