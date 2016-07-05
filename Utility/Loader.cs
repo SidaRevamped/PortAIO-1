@@ -573,7 +573,7 @@ namespace PortAIO.Utility
             Miscc.Add("evadeCB", new ComboBox("Which Evade?", 0, "ezEvade", "Evade#"));
             Miscc.Add("activatorCB", new ComboBox("Which Activator?", 0, "ElUtilitySuite", "NabbActivator", "Activator#"));
             Miscc.Add("trackerCB", new ComboBox("Which Tracker?", 0, "NabbTracker"));
-            Miscc.Add("predictionerCB", new ComboBox("Which Predictioner?", 0, "EB", "SDK", "OKTW", "SPred"));
+            Miscc.Add("predictionerCB", new ComboBox("Which Predictioner?", 0, "EB", "SDK", "OKTW", "SPred", "L#"));
             Miscc.AddSeparator();
             Miscc.AddGroupLabel("Util Changes");
             Miscc.AddLabel("Please F5 after making any changes below >>");

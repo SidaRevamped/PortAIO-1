@@ -143,7 +143,7 @@ namespace Two_Girls_One_Donger
 
         private static void OnGameUpdate(EventArgs args)
         {
-            if (Player.IsDead)
+            if (Player.IsDead || Player.LSIsRecalling())
                 return;
             var lanemana = getSliderItem(laneClearMenu, "LaneMana");
             var MinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, W.Range + W.Width);
@@ -218,8 +218,8 @@ namespace Two_Girls_One_Donger
                     if (ObjectManager.Player.ServerPosition.LSDistance(prediction.CastPosition) > 300)
                     {
                         p = prediction.CastPosition -
-                            100*
-                            (prediction.CastPosition.LSTo2D() - ObjectManager.Player.ServerPosition.LSTo2D()).Normalized()
+                            100 *
+                            (prediction.CastPosition.LSTo2D() - ObjectManager.Player.ServerPosition.LSTo2D()).LSNormalized()
                                 .To3D();
                     }
                     else
@@ -230,7 +230,7 @@ namespace Two_Girls_One_Donger
                     E1.Cast(p);
                 }
                 else if (ObjectManager.Player.ServerPosition.LSDistance(prediction.CastPosition) <=
-                         (E1.Range + E1.Range)/2)
+                         (E1.Range + E1.Range) / 2)
                 {
                     var p = ObjectManager.Player.ServerPosition.LSTo2D()
                         .LSExtend(prediction.CastPosition.LSTo2D(), E1.Range - 100);
@@ -242,8 +242,8 @@ namespace Two_Girls_One_Donger
                 else
                 {
                     var p = ObjectManager.Player.ServerPosition.LSTo2D() +
-                            E1.Range*
-                            (prediction.CastPosition.LSTo2D() - ObjectManager.Player.ServerPosition.LSTo2D()).Normalized
+                            E1.Range *
+                            (prediction.CastPosition.LSTo2D() - ObjectManager.Player.ServerPosition.LSTo2D()).LSNormalized
                                 ();
 
                     {
@@ -258,7 +258,7 @@ namespace Two_Girls_One_Donger
         {
             var fullHP = Player.MaxHealth;
             var HP = Player.Health;
-            var critHP = fullHP/4;
+            var critHP = fullHP / 4;
             if (HP <= critHP)
             {
                 var target = TargetSelector.GetTarget(1000, DamageType.Magical);
@@ -275,16 +275,14 @@ namespace Two_Girls_One_Donger
             var target = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             if (target == null)
                 return;
-            var qtarget = TargetSelector.GetTarget(600, DamageType.Magical);
-            if (qtarget == null)
-                return;
+
             var wpred = W.GetPrediction(target);
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 if (Q.IsReady() && R.IsReady() && getCheckBoxItem(comboMenu, "UseQRCombo") &&
-                    getCheckBoxItem(comboMenu, "UseQCombo") && qtarget.LSIsValidTarget(650) &&
-                    Player.Position.CountEnemiesInRange(650) >=
+                    getCheckBoxItem(comboMenu, "UseQCombo") && target.LSIsValidTarget(650) &&
+                    Player.Position.LSCountEnemiesInRange(650) >=
                     getSliderItem(comboMenu, "QRcount"))
                 {
                     R.Cast();
@@ -292,8 +290,8 @@ namespace Two_Girls_One_Donger
                 }
                 else
                 {
-                    if (Q.IsReady() && getCheckBoxItem(comboMenu, "UseQCombo") && qtarget.LSIsValidTarget(650) &&
-                        Player.Position.CountEnemiesInRange(650) >= 1)
+                    if (Q.IsReady() && getCheckBoxItem(comboMenu, "UseQCombo") && target.LSIsValidTarget(650) &&
+                        Player.Position.LSCountEnemiesInRange(650) >= 1)
                     {
                         Q.Cast(Player.Position.LSExtend(target.Position, +300));
                     }
@@ -339,7 +337,7 @@ namespace Two_Girls_One_Donger
                 return;
             var harassmana = getSliderItem(miscMenu, "ManaW");
             var useW = getKeyBindItem(miscMenu, "AutoHarras");
-            if (W.IsReady() && target.LSIsValidTarget() && useW && Player.Mana/Player.MaxMana*100 > harassmana)
+            if (W.IsReady() && target.LSIsValidTarget() && useW && Player.Mana / Player.MaxMana * 100 > harassmana)
             {
                 W.CastIfHitchanceEquals(target, HitChance.High, true);
             }
@@ -349,12 +347,12 @@ namespace Two_Girls_One_Donger
         {
             //Calculate Combo Damage
 
-            var aa = Player.GetAutoAttackDamage(target, true);
+            var aa = Player.LSGetAutoAttackDamage(target, true);
             var damage = aa;
 
             if (Ignite != SpellSlot.Unknown &&
                 Player.Spellbook.CanUseSpell(Ignite) == SpellState.Ready)
-                damage += (float) ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
+                damage += (float)ObjectManager.Player.GetSummonerSpellDamage(target, Damage.SummonerSpell.Ignite);
 
 
             if (getCheckBoxItem(comboMenu, "UseE")) // edamage
@@ -377,9 +375,9 @@ namespace Two_Girls_One_Donger
             if (W.IsReady() && getCheckBoxItem(comboMenu, "UseW"))
             {
                 if (R.IsReady() && getCheckBoxItem(comboMenu, "UseW") && getCheckBoxItem(comboMenu, "UseR"))
-                    damage += (float) (W.GetDamage(target)*2.2);
+                    damage += (float)(W.GetDamage(target) * 2.2);
             }
-            return (int) damage;
+            return (int)damage;
         }
 
         private static void KS()
@@ -429,9 +427,9 @@ namespace Two_Girls_One_Donger
             var damage = 0d;
 
             if (W.IsReady())
-                damage += Player.GetSpellDamage(target, SpellSlot.W);
+                damage += Player.LSGetSpellDamage(target, SpellSlot.W);
 
-            return (float) damage*2;
+            return (float)damage * 2;
         }
 
         private static float GetW1Damage()
@@ -443,7 +441,7 @@ namespace Two_Girls_One_Donger
             if (W1.IsReady() && R.IsReady())
                 damage += Player.LSGetSpellDamage(target, SpellSlot.W, 1);
 
-            return (float) damage*2;
+            return (float)damage * 2;
         }
 
         private static float GetEDamage()
@@ -453,9 +451,9 @@ namespace Two_Girls_One_Donger
             var damage = 0d;
 
             if (E.IsReady())
-                damage += Player.GetSpellDamage(target, SpellSlot.E);
+                damage += Player.LSGetSpellDamage(target, SpellSlot.E);
 
-            return (float) damage*2;
+            return (float)damage * 2;
         }
 
         #endregion

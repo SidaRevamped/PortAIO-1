@@ -77,7 +77,7 @@ namespace Infected_Twitch.Event
 
             if (!SafeTarget(Target)) return;
             if (!MenuConfig.KillstealE || MenuConfig.UseExploit) return;
-            if (!(Dmg.EDamage(Target) >= Target.Health)) return;
+            if (!(EDamage(Target) >= Target.Health + Target.AttackShield)) return;
 
             E.Cast();
 
@@ -85,6 +85,30 @@ namespace Infected_Twitch.Event
             {
                 Chat.Print("Killteal E Active");
             }
+        }
+
+        /* Doc7 - Twitch for calculations */
+
+        public static int[] stack = { 0, 15, 20, 25, 30, 35 };
+        public static int[] _base = { 0, 20, 35, 50, 65, 80 };
+
+        private static float EDamage(Obj_AI_Base target)
+        {
+            var stacks = Stack(target);
+            return Player.CalculateDamageOnUnit(target, DamageType.Physical, _base[E.Level] + stacks * (0.25f * ObjectManager.Player.FlatPhysicalDamageMod + 0.2f * ObjectManager.Player.FlatMagicDamageMod + stack[E.Level]));
+        }
+
+        private static int Stack(Obj_AI_Base obj)
+        {
+            var Ec = 0;
+            for (var t = 1; t < 7; t++)
+            {
+                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(s => s.Position.Distance(obj.ServerPosition) <= 175 && s.Name == "twitch_poison_counter_0" + t + ".troy"))
+                {
+                    Ec = t;
+                }
+            }
+            return Ec;
         }
 
         private static void Combo()
@@ -96,7 +120,7 @@ namespace Infected_Twitch.Event
             if (MenuConfig.ComboE)
             {
                 if (!E.IsReady()) return;
-                if (Target.Health <= Dmg.EDamage(Target))
+                if (Target.Health + Target.AttackShield <= EDamage(Target))
                 {
                     E.Cast();
 

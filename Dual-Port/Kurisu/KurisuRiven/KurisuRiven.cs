@@ -380,15 +380,6 @@ namespace KurisuRiven
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None) ||
                     Getkeybindvalue(keybindsMenu, "shycombo"))
                 {
-                    if (Player.IssueOrder(GameObjectOrder.MoveTo, movepos))
-                    {
-                        didq = false;
-                        Utility.DelayAction.Add(40, () =>
-                        {
-                            canmv = true;
-                            canaa = true;
-                        });
-                    }
                 }
 
                 else if (qtarg.LSIsValidTarget(q.Range) && Getcheckboxvalue(keybindsMenu, "semiq"))

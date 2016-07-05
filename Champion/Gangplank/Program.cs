@@ -122,6 +122,19 @@ namespace UnderratedAIO.Champions
             R.SetSkillshot(1f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
         }
 
+        public static float RDamage(Obj_AI_Base target)
+        {
+            var lvl = Player.Instance.Spellbook.GetSpell(SpellSlot.R).Level - 1;
+            var AP = Player.Instance.FlatMagicDamageMod;
+            var dmg = 0f;
+
+            if (R.IsReady())
+            {
+                dmg += new float[] { 150, 210, 270 }[lvl] + 1.2f * AP;
+            }
+            return Player.Instance.CalculateDamageOnUnit(target, DamageType.Physical, dmg - 10);
+        }
+
         private static void Game_OnGameUpdate(EventArgs args)
         {
             Orbwalker.DisableMovement = false;
@@ -191,6 +204,17 @@ namespace UnderratedAIO.Champions
                                 }
                             }
                         }
+                    }
+                }
+
+                var target = TargetSelector.GetTarget(int.MaxValue, DamageType.Physical);
+                if (target != null && !target.IsZombie && !target.HasUndyingBuff())
+                {
+                    if (R.IsReady() && EloBuddy.SDK.Prediction.Health.GetPrediction(target, 350) <= RDamage(target) &&
+                    !Player.Instance.IsInRange(target, 900) &&
+                    EloBuddy.SDK.Prediction.Health.GetPrediction(target, 350) <= 200)
+                    {
+                        Player.Instance.Spellbook.CastSpell(SpellSlot.R, target.ServerPosition.Extend(target.Direction.To2D().Perpendicular(), 200).To3D());
                     }
                 }
             }

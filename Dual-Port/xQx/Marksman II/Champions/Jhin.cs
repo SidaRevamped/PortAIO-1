@@ -120,6 +120,11 @@ namespace Marksman.Champions
             }
         }
 
+        public static bool IsActive(AIHeroClient unit, LeagueSharp.Common.Spell spell)
+        {
+            return spell.Instance.Name == "JhinRShot";
+        }
+
         public override void Game_OnGameUpdate(EventArgs args)
         {
             if (!ComboActive)
@@ -135,7 +140,7 @@ namespace Marksman.Champions
 
                 if (t.HasBuffOfType(BuffType.Stun) || t.HasBuffOfType(BuffType.Snare) || t.HasBuffOfType(BuffType.Charm)
                     || t.HasBuffOfType(BuffType.Fear) || t.HasBuffOfType(BuffType.Taunt)
-                    || t.HasBuff("zhonyasringshield") || t.HasBuff("Recall"))
+                    || t.HasBuff("zhonyasringshield") || t.HasBuff("Recall") && !IsActive(ObjectManager.Player, R))
                 {
                     W.Cast(t.Position);
                 }
@@ -156,7 +161,7 @@ namespace Marksman.Champions
                     }
                 }
 
-                if (useW && W.IsReady() && t.LSIsValidTarget())
+                if (useW && W.IsReady() && t.LSIsValidTarget() && !IsActive(ObjectManager.Player, R))
                 {
                     W.Cast(t);
                 }
@@ -170,12 +175,9 @@ namespace Marksman.Champions
                     t = TargetSelector.GetTarget(maxRRange, DamageType.Physical);
                     if (!t.LSIsValidTarget()) return;
 
-                    var aaDamage = Orbwalking.InAutoAttackRange(t)
-                                       ? ObjectManager.Player.LSGetAutoAttackDamage(t, true)
-                                       : 0;
+                    var aaDamage = Orbwalking.InAutoAttackRange(t) ? ObjectManager.Player.LSGetAutoAttackDamage(t, true) : 0;
 
-                    if (t.Health > aaDamage && t.Health <= ObjectManager.Player.LSGetSpellDamage(t, SpellSlot.R)
-                        && ObjectManager.Player.LSDistance(t) >= minRRange)
+                    if (t.Health > aaDamage && t.Health <= ObjectManager.Player.LSGetSpellDamage(t, SpellSlot.R) && ObjectManager.Player.LSDistance(t) >= minRRange)
                     {
                         R.Cast(t);
                     }

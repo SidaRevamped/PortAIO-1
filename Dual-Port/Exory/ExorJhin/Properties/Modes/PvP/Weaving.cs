@@ -29,7 +29,7 @@ namespace ExorAIO.Champions.Jhin
             /// </summary>
             if (Vars.Q.IsReady() &&
                 (args.Target as AIHeroClient).LSIsValidTarget(Vars.Q.Range) &&
-                Vars.getCheckBoxItem(Vars.QMenu, "combo"))
+                Vars.getCheckBoxItem(Vars.QMenu, "combo") && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 Vars.Q.CastOnUnit(args.Target as AIHeroClient);
             }

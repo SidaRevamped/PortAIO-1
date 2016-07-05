@@ -309,7 +309,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var enemy in
                     Program.Enemies.Where(enemy => enemy.LSIsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
-                if (getCheckBoxItem(eMenu, "Eks") && (E.GetDamage(enemy) + E.GetDamage(enemy, 1)) > enemy.Health)
+                if (getCheckBoxItem(eMenu, "Eks") && EDamage(enemy) > enemy.Health + enemy.AttackShield)
                 {
                     Program.debug("DUPAAA1");
                     E.Cast();
@@ -333,23 +333,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
             JungleE();
-        }
-
-        private static float passiveDmg(Obj_AI_Base target)
-        {
-            if (!target.HasBuff("TwitchDeadlyVenom"))
-                return 0;
-            float dmg = 6;
-            if (Player.Level < 17)
-                dmg = 5;
-            if (Player.Level < 13)
-                dmg = 4;
-            if (Player.Level < 9)
-                dmg = 3;
-            if (Player.Level < 5)
-                dmg = 2;
-            var buffTime = OktwCommon.GetPassiveTime(target, "TwitchDeadlyVenom");
-            return dmg*OktwCommon.GetBuffCount(target, "TwitchDeadlyVenom")*buffTime - target.HPRegenRate*buffTime;
         }
 
         private static void JungleE()
@@ -431,7 +414,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var enemy in
                     Program.Enemies.Where(enemy => enemy.LSIsValidTarget(2000) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
-                if (passiveDmg(enemy) > enemy.Health)
+                if (EDamage(enemy) > enemy.Health + enemy.AttackShield)
                     drawText("IS DEAD", enemy, Color.Yellow);
             }
 
@@ -456,6 +439,30 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else
                     Utility.DrawCircle(ObjectManager.Player.Position, R.Range, Color.Gray, 1, 1);
             }
+        }
+
+        /* Doc7 - Twitch for calculations */
+
+        public static int[] stack = { 0, 15, 20, 25, 30, 35 };
+        public static int[] _base = { 0, 20, 35, 50, 65, 80 };
+
+        private static float EDamage(Obj_AI_Base target)
+        {
+            var stacks = Stack(target);
+            return Player.CalculateDamageOnUnit(target, DamageType.Physical, _base[E.Level] + stacks * (0.25f * ObjectManager.Player.FlatPhysicalDamageMod + 0.2f * ObjectManager.Player.FlatMagicDamageMod + stack[E.Level]));
+        }
+
+        private static int Stack(Obj_AI_Base obj)
+        {
+            var Ec = 0;
+            for (var t = 1; t < 7; t++)
+            {
+                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(s => s.Position.Distance(obj.ServerPosition) <= 175 && s.Name == "twitch_poison_counter_0" + t + ".troy"))
+                {
+                    Ec = t;
+                }
+            }
+            return Ec;
         }
     }
 }
