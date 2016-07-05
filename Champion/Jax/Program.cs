@@ -143,6 +143,8 @@ namespace JaxQx
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Orbwalker.OnPreAttack += OrbwalkingBeforeAttack;
+            Orbwalker.OnPostAttack += Orbwalking_AfterAttack;
+
             Obj_AI_Base.OnBuffLose += (sender, eventArgs) =>
             {
                 if (sender.IsMe && eventArgs.Buff.Name.ToLower() == "sheen")
@@ -168,6 +170,29 @@ namespace JaxQx
                     eCounterStrike = true;
                 }
             };
+        }
+
+        private static void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args)
+        {
+            AIHeroClient t = TargetSelector.GetTarget(1100, DamageType.Physical);
+            if (!W.IsReady() || !target.IsValidTarget() || !target.IsEnemy)
+            {
+                return;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target is AIHeroClient &&
+                getCheckBoxItem(miscMenu, "Misc.AutoW") && t != null && target.NetworkId == t.NetworkId)
+            {
+                W.Cast();
+                Orbwalker.ResetAutoAttack();
+            }
+            if ((Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) && !(target is AIHeroClient) &&
+                getCheckBoxItem(laneClearMenu, "UseWLaneClear") &&
+                MinionManager.GetMinions(Orbwalking.GetRealAutoAttackRange(target), MinionTypes.All, MinionTeam.NotAlly)
+                    .Count(m => m.Health > Player.GetAutoAttackDamage((Obj_AI_Base)target, true)) > 0)
+            {
+                W.Cast();
+                Orbwalker.ResetAutoAttack();
+            }
         }
 
         private static void OrbwalkingBeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
@@ -222,8 +247,7 @@ namespace JaxQx
                 return;
             }
 
-            if (arg.Slot == SpellSlot.Q && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
-                E.IsReady())
+            if (arg.Slot == SpellSlot.Q && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && E.IsReady() && arg.Target.IsValid<AIHeroClient>())
             {
                 if (getBoxItem(comboMenu, "Combo.CastE") == 0)
                 {
@@ -313,7 +337,8 @@ namespace JaxQx
                     case 0:
                         if (E.IsReady() && Q.IsReady() && t.LSIsValidTarget(Q.Range))
                         {
-                            if (Player.LSDistance(t) >= minQRange && t.LSIsValidTarget(Q.Range)) Q.CastOnUnit(t);
+                            if (Player.LSDistance(t) >= minQRange && t.LSIsValidTarget(Q.Range))
+                                Q.CastOnUnit(t);
                             E.Cast();
                         }
                         break;
@@ -500,7 +525,7 @@ namespace JaxQx
             Interrupter2.InterruptableTargetEventArgs args)
         {
             var interruptSpells = getCheckBoxItem(miscMenu, "InterruptSpells");
-            if (!interruptSpells || !E.IsReady()) return;
+            if (!interruptSpells || !E.IsReady() || unit.IsAlly) return;
 
             if (Player.LSDistance(unit) <= E.Range)
             {
