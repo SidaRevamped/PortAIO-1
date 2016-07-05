@@ -132,6 +132,7 @@ namespace PortAIO.Utility
         public static int udyr { get { return Miscc["udyr"].Cast<ComboBox>().CurrentValue; } }
         public static int veigar { get { return Miscc["veigar"].Cast<ComboBox>().CurrentValue; } }
         public static int warwick { get { return Miscc["warwick"].Cast<ComboBox>().CurrentValue; } }
+        public static int illaoi { get { return Miscc["illaoi"].Cast<ComboBox>().CurrentValue; } }    
         public static bool predictioner { get { return Miscc["predictioner"].Cast<CheckBox>().CurrentValue; } }
         public static int predictionerCB { get { return Miscc["predictionerCB"].Cast<ComboBox>().CurrentValue; } }
 
@@ -225,6 +226,7 @@ namespace PortAIO.Utility
             "Udyr", //77
             "Veigar", // 78
             "Warwick", //79
+            "Illaoi", //80
         });
 
         public static void Menu()
@@ -556,6 +558,10 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[79]))
                 {
                     Miscc.Add("warwick", new ComboBox("Use addon for Warwick : ", 0, "Warwick | The Blood Hunter", "ExorAIO"));
+                }
+                if (Player.ChampionName.Equals(Champion[80]))
+                {
+                    Miscc.Add("illaoi", new ComboBox("Use addon for Illaoi : ", 0, "Tentacle Kitty", "Flowers Illaoi"));
                 }
             }
             else

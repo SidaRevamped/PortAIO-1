@@ -940,7 +940,18 @@ namespace PortAIO
                         Two_Girls_One_Donger.Program.Game_OnGameLoad();
                         break;
                     case "illaoi": // Tentacle Kitty
-                        Illaoi___Tentacle_Kitty.Program.Game_OnGameLoad();
+                        switch (Loader.illaoi)
+                        {
+                            case 0:
+                                Illaoi___Tentacle_Kitty.Program.Game_OnGameLoad();
+                                break;
+                            case 1:
+                                Flowers__Illaoi.Program.Load();
+                                break;
+                            default:
+                                Illaoi___Tentacle_Kitty.Program.Game_OnGameLoad();
+                                break;
+                        }
                         break;
                     case "irelia": // Challenger Series Irelia & IreliaGod
                         switch (Loader.irelia)
