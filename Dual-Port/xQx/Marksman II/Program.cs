@@ -346,7 +346,7 @@ namespace Marksman
             Console.Clear();
         }
 
-        public static Menu MenuExtraTools, MenuActivator, combo, harass, laneclear, jungleClear, menuAllies, misc, marksmanDrawings;
+        public static Menu MenuExtraTools, MenuActivator, combo, harass, laneclear, jungleClear, misc, marksmanDrawings;
 
         private static void CheckAutoWindUp()
         {
