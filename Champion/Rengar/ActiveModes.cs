@@ -41,11 +41,6 @@ namespace ElRengarRevamped
                 return;
             }
 
-             if (TargetSelector.SelectedTarget != null)
-            {
-                Orbwalker.ForcedTarget = target;
-            }
-
             #region RengarR
 
             if (Ferocity <= 4)
