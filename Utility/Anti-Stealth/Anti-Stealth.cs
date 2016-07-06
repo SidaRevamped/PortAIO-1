@@ -21,15 +21,6 @@
 
         #endregion
 
-        #region Static Fields
-
-        /// <summary>
-        ///     The random
-        /// </summary>
-        private static Random random;
-
-        #endregion
-
         #region Fields
 
         private float lastReveal;
@@ -54,7 +45,7 @@
             Spells = new List<AntiStealthSpell>
                          {
                              new AntiStealthSpell { ChampionName = "Akali", SDataName = "akalismokebomb" },
-                             new AntiStealthSpell { ChampionName = "Twitch", SDataName = "hideinshadows" },
+                             new AntiStealthSpell { ChampionName = "Twitch", SDataName = "twitchhideinshadows" },
                              new AntiStealthSpell { ChampionName = "Shaco", SDataName = "deceive" },
                              new AntiStealthSpell { ChampionName = "Monkeyking", SDataName = "monkeykingdecoy" },
                              new AntiStealthSpell { ChampionName = "Khazix", SDataName = "khazixrlong" },
@@ -136,7 +127,6 @@
             }
 
             this.Menu = protectMenu;
-            random = new Random(Environment.TickCount);
         }
 
         public Menu protectMenu;
@@ -219,9 +209,7 @@
                             var item = this.GetBestWardItem();
                             if (item != null)
                             {
-                                LeagueSharp.Common.Utility.DelayAction.Add(
-                                    random.Next(100, 1000),
-                                    () => this.Player.Spellbook.CastSpell(item.Slot, this.Player.Position));
+                                this.Player.Spellbook.CastSpell(item.Slot, this.Player.Position);
                             }
                         }
                     }
@@ -297,15 +285,13 @@
                     {
                         var spellCastPosition = this.Player.LSDistance(args.End) > 600 ? this.Player.Position : args.End;
 
-                        LeagueSharp.Common.Utility.DelayAction.Add(
-                            random.Next(100, 1000),
-                            () => this.Player.Spellbook.CastSpell(item.Slot, spellCastPosition));
+                        this.Player.Spellbook.CastSpell(item.Slot, spellCastPosition);
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("An error occurred: '{0}'", e);
+                Console.WriteLine($"An error occurred: '{0}'", e);
             }
         }
 
