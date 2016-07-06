@@ -363,11 +363,6 @@ namespace Zed
 
         }
 
-        private static void _CastQ(AIHeroClient target)
-        {
-            throw new NotImplementedException();
-        }
-
         private static void Harass(AIHeroClient t)
         {
             var target = t;
@@ -626,7 +621,7 @@ namespace Zed
             if (ObjectManager.Get<AIHeroClient>()
                 .Count(
                     hero =>
-                        hero.LSIsValidTarget() &&
+                        hero.LSIsValidTarget() && hero.IsVisible && hero.IsHPBarRendered &&
                         (hero.LSDistance(ObjectManager.Player.ServerPosition) <= _e.Range ||
                          (WShadow != null && hero.LSDistance(WShadow.ServerPosition) <= _e.Range))) > 0)
                 _e.Cast();
@@ -687,7 +682,7 @@ namespace Zed
                 var t = TargetSelector.GetTarget(_e.Range, DamageType.Physical);
                 if (t != null)
                 {
-                    if (_e.GetDamage(t) > t.Health && (_player.LSDistance(t.ServerPosition) <= _e.Range || WShadow.LSDistance(t.ServerPosition) <= _e.Range))
+                    if (_e.GetDamage(t) > t.Health && (_player.LSDistance(t.ServerPosition) <= _e.Range || WShadow.LSDistance(t.ServerPosition) <= _e.Range) && t.IsVisible && t.IsHPBarRendered)
                     {
                         _e.Cast();
                     }
