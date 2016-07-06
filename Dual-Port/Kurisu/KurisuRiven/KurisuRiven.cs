@@ -278,10 +278,22 @@ namespace KurisuRiven
                                     if (!riventarget().IsMelee)
                                     {
                                         e.Cast(riventarget().ServerPosition);
+                                        if (Item.CanUseItem(3077))
+                                            Item.UseItem(3077);
+                                        if (Item.CanUseItem(3074))
+                                            Item.UseItem(3074);
+                                        if (Item.CanUseItem(3748))
+                                            Item.UseItem(3748);
                                     }
                                     else
                                     {
                                         e.Cast(Game.CursorPos);
+                                        if (Item.CanUseItem(3077))
+                                            Item.UseItem(3077);
+                                        if (Item.CanUseItem(3074))
+                                            Item.UseItem(3074);
+                                        if (Item.CanUseItem(3748))
+                                            Item.UseItem(3748);
                                     }
                                 }
                             }
@@ -295,6 +307,12 @@ namespace KurisuRiven
                             if (w.IsReady() && riventarget().LSDistance(player.ServerPosition) <= w.Range + 25)
                             {
                                 w.Cast();
+                                if (Item.CanUseItem(3077))
+                                    Item.UseItem(3077);
+                                if (Item.CanUseItem(3074))
+                                    Item.UseItem(3074);
+                                if (Item.CanUseItem(3748))
+                                    Item.UseItem(3748);
                             }
                         }
 
@@ -727,6 +745,12 @@ namespace KurisuRiven
                     if (target.LSDistance(player.ServerPosition) <= q.Range + 90 && q.IsReady())
                     {
                         DoOneQ(target.ServerPosition);
+                        if (Item.CanUseItem(3077))
+                            Item.UseItem(3077);
+                        if (Item.CanUseItem(3074))
+                            Item.UseItem(3074);
+                        if (Item.CanUseItem(3748))
+                            Item.UseItem(3748);
                     }
                 }
             }
@@ -744,12 +768,24 @@ namespace KurisuRiven
                         if (ende.CountEnemiesInRange(200) <= 2)
                         {
                             e.Cast(target.IsMelee ? Game.CursorPos : target.ServerPosition);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
                         }
                     }
 
                     else
                     {
                         e.Cast(target.IsMelee ? Game.CursorPos : target.ServerPosition);
+                        if (Item.CanUseItem(3077))
+                            Item.UseItem(3077);
+                        if (Item.CanUseItem(3074))
+                            Item.UseItem(3074);
+                        if (Item.CanUseItem(3748))
+                            Item.UseItem(3748);
                     }
                 }
 
@@ -820,12 +856,24 @@ namespace KurisuRiven
                         if (endq.CountEnemiesInRange(200) <= 2)
                         {
                             q.Cast(target.ServerPosition);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
                         }
                     }
 
                     else
                     {
                         q.Cast(target.ServerPosition);
+                        if (Item.CanUseItem(3077))
+                            Item.UseItem(3077);
+                        if (Item.CanUseItem(3074))
+                            Item.UseItem(3074);
+                        if (Item.CanUseItem(3748))
+                            Item.UseItem(3748);
                     }
                 }
             }
@@ -839,6 +887,12 @@ namespace KurisuRiven
                         if (q.IsReady() && Utils.GameTimeTickCount - laste >= 600)
                         {
                             q.Cast(target.ServerPosition);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
                         }
                     }
                 }
@@ -853,6 +907,12 @@ namespace KurisuRiven
                         if (Utils.GameTimeTickCount - lastq >= 250)
                         {
                             q.Cast(target.ServerPosition);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
                         }
                     }
                 }
@@ -1557,7 +1617,15 @@ namespace KurisuRiven
                             w.Cast();
 
                         else if (q.IsReady() && riventarget().LSIsValidTarget())
+                        {
                             q.Cast(riventarget().ServerPosition);
+                            if (Item.CanUseItem(3077))
+                                Item.UseItem(3077);
+                            if (Item.CanUseItem(3074))
+                                Item.UseItem(3074);
+                            if (Item.CanUseItem(3748))
+                                Item.UseItem(3748);
+                        }
 
                         break;
                 }
