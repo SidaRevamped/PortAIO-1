@@ -139,7 +139,7 @@ namespace PortAIO.Champion.Ashe
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack()
-                || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.LSIsValidTarget() || args.SData.Name.ToLower() == "tormentedsoil")
+                || !sender.IsValid<AIHeroClient>() || !sender.IsHPBarRendered || !sender.IsVisible || !sender.LSIsValidTarget() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
             if (RMenu["spell" + args.SData.Name] != null && getCheckBoxItem(RMenu, "spell" + args.SData.Name))
@@ -151,7 +151,7 @@ namespace PortAIO.Champion.Ashe
         private static void Interrupter2_OnInterruptableTarget(AIHeroClient sender,
             Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (getCheckBoxItem(RMenu, "autoRinter") && R.IsReady() && sender.LSIsValidTarget(2500))
+            if (getCheckBoxItem(RMenu, "autoRinter") && R.IsReady() && sender.LSIsValidTarget(2500) && sender.IsHPBarRendered && sender.IsVisible)
                 R.Cast(sender);
         }
 
@@ -160,7 +160,7 @@ namespace PortAIO.Champion.Ashe
             if (R.IsReady())
             {
                 var Target = gapcloser.Sender;
-                if (Target.LSIsValidTarget(800) && getCheckBoxItem(RMenu, "GapCloser" + Target.NetworkId))
+                if (Target.LSIsValidTarget(800) && getCheckBoxItem(RMenu, "GapCloser" + Target.NetworkId) && Target.IsHPBarRendered && Target.IsVisible)
                 {
                     R.Cast(Target.ServerPosition, true);
                     SebbyLib.Program.debug("AGC " + Target.ChampionName);
@@ -187,19 +187,19 @@ namespace PortAIO.Champion.Ashe
                     if (getBoxItem(RMenu, "Semi-manual") == 0)
                     {
                         var t = TargetSelector.GetTarget(1800, DamageType.Physical);
-                        if (t.LSIsValidTarget())
+                        if (t.LSIsValidTarget() && t.IsHPBarRendered && t.IsVisible)
                             SebbyLib.Program.CastSpell(R, t);
                     }
                     else if (getBoxItem(RMenu, "Semi-manual") == 1)
                     {
                         var t = HeroManager.Enemies.OrderBy(x => x.Distance(Player)).FirstOrDefault();
-                        if (t.LSIsValidTarget())
+                        if (t.LSIsValidTarget() && t.IsHPBarRendered && t.IsVisible)
                             SebbyLib.Program.CastSpell(R, t);
                     }
                     else
                     {
                         var t = HeroManager.Enemies[getBoxItem(RMenu, "Semi-manual") - 2];
-                        if (t.LSIsValidTarget())
+                        if (t.LSIsValidTarget() && t.IsHPBarRendered && t.IsVisible)
                             SebbyLib.Program.CastSpell(R, t);
                     }
                 }
@@ -251,7 +251,7 @@ namespace PortAIO.Champion.Ashe
                 foreach (
                     var target in
                         SebbyLib.Program.Enemies.Where(
-                            target => target.LSIsValidTarget(2000) && OktwCommon.ValidUlt(target)))
+                            target => target.LSIsValidTarget(2000) && OktwCommon.ValidUlt(target) && target.IsHPBarRendered && target.IsVisible))
                 {
                     var rDmg = OktwCommon.GetKsDamage(target, R);
                     if (SebbyLib.Program.Combo && target.LSCountEnemiesInRange(250) > 2 &&
@@ -277,7 +277,7 @@ namespace PortAIO.Champion.Ashe
                         SebbyLib.Program.Enemies.Where(
                             enemy =>
                                 enemy.LSIsValidTarget(300) && enemy.IsMelee &&
-                                getCheckBoxItem(RMenu, "GapCloser" + enemy.NetworkId) && !OktwCommon.ValidUlt(enemy))
+                                getCheckBoxItem(RMenu, "GapCloser" + enemy.NetworkId) && !OktwCommon.ValidUlt(enemy) && enemy.IsHPBarRendered && enemy.IsVisible)
                     )
                 {
                     R.Cast(enemy);
