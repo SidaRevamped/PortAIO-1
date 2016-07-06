@@ -601,9 +601,25 @@ namespace Marksman.Champions
 
         public override void PermaActive()
         {
-            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            if (!ComboActive)
             {
                 return;
+            }
+
+            if (Program.combo["UseEC"].Cast<ComboBox>().CurrentValue == 2 && E.IsReady())
+            {
+                var nRange = ObjectManager.Player.HealthPercent < 25 ? 550 : 450;
+                var nSum = HeroManager.Enemies.Where(e => e.IsValidTarget(nRange) && e.IsFacing(ObjectManager.Player)).Sum(e => e.HealthPercent);
+                if (nSum > ObjectManager.Player.HealthPercent)
+                {
+                    var nResult = HeroManager.Enemies.FirstOrDefault(e => e.IsValidTarget(nRange));
+                    if (nResult != null)
+                    {
+                        var nPosition = ObjectManager.Player.Position.Extend(nResult.Position, -E.Range);
+                        E.Cast(nPosition);
+                    }
+                }
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, nRange, Color.DarkSalmon);
             }
 
             var enemy = HeroManager.Enemies.Find(e => e.LSIsValidTarget(E.Range + (Q.IsReady() ? Q.Range : Orbwalking.GetRealAutoAttackRange(null) + 65)) && !e.IsZombie);
@@ -615,7 +631,7 @@ namespace Marksman.Champions
                     {
                         W.Cast(enemy.Position);
                     }
-                    else if (E.IsReady() && Program.combo["UseEC"].Cast<ComboBox>().CurrentValue != 0)
+                    else if (E.IsReady() && Program.combo["UseEC"].Cast<ComboBox>().CurrentValue == 1)
                     {
                         E.Cast(enemy.Position);
                     }
@@ -630,7 +646,7 @@ namespace Marksman.Champions
                     //                    if (enemy.LSDistance(ObjectManager.Player) > Orbwalking.GetRealAutoAttackRange(null) + 65))
                 }
 
-                if (E.IsReady() && Q.IsReady() && Program.combo["UseEC"].Cast<ComboBox>().CurrentValue != 0)
+                if (E.IsReady() && Q.IsReady() && Program.combo["UseEC"].Cast<ComboBox>().CurrentValue == 1)
                 {
                     E.Cast(enemy.Position);
                 }

@@ -38,7 +38,7 @@ namespace Marksman.Utils
             public static void Ping(Vector2 position, int pingCount = 4,
                 PingCategory pingCategory = PingCategory.Fallback)
             {
-                if (LeagueSharp.Common.Utils.TickCount - LastPingT < 30*1000)
+                if (LeagueSharp.Common.Utils.TickCount - LastPingT < 30 * 1000)
                 {
                     return;
                 }
@@ -49,10 +49,10 @@ namespace Marksman.Utils
 
                 for (int i = 1; i <= pingCount; i++)
                 {
-                    LeagueSharp.Common.Utility.DelayAction.Add(i*400, (() =>
-                    {
-                        TacticalMap.ShowPing(pingCategory, PingLocation, true);
-                    }));
+                    LeagueSharp.Common.Utility.DelayAction.Add(i * 400, (() =>
+                      {
+                          TacticalMap.ShowPing(pingCategory, PingLocation, true);
+                      }));
                 }
                 /*                
                 Utility.DelayAction.Add(150, SimplePing);
@@ -111,32 +111,24 @@ namespace Marksman.Utils
 
         public static Obj_AI_Base GetMobs(float spellRange, MobTypes mobTypes = MobTypes.All, int minMobCount = 1)
         {
-            List<Obj_AI_Base> mobs = MinionManager.GetMinions(
-                spellRange + 200,
-                MinionTypes.All,
-                MinionTeam.Neutral,
-                MinionOrderTypes.MaxHealth);
+            List<Obj_AI_Base> mobs = MinionManager.GetMinions(spellRange + 200, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
 
             if (mobs == null) return null;
 
             if (mobTypes == MobTypes.BigBoys)
             {
                 Obj_AI_Base oMob = (from fMobs in mobs
-                    from fBigBoys in
-                        new[]
-                        {
-                            "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red",
-                            "SRU_Krug", "SRU_Dragon", "SRU_Baron", "Sru_Crab"
-                        }
-                    where fBigBoys == fMobs.BaseSkinName
-                    select fMobs).FirstOrDefault();
+                                    from fBigBoys in
+                                        new[]
+                                        {
+                                        "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red", "SRU_Krug", "Dragon", "Baron", "Sru_Crab"
+                                        }
+                                    where fMobs.BaseSkinName.Contains(fBigBoys)
+                                    select fMobs).FirstOrDefault();
 
-                if (oMob != null)
+                if (oMob.IsValidTarget(spellRange))
                 {
-                    if (oMob.LSIsValidTarget(spellRange))
-                    {
-                        return oMob;
-                    }
+                    return oMob;
                 }
             }
             else if (mobs.Count >= minMobCount)
@@ -160,9 +152,9 @@ namespace Marksman.Utils
         {
             if (shadow)
             {
-                vFont.DrawText(null, vText, (int) vPosX + 2, (int) vPosY + 2, SharpDX.Color.Black);
+                vFont.DrawText(null, vText, (int)vPosX + 2, (int)vPosY + 2, SharpDX.Color.Black);
             }
-            vFont.DrawText(null, vText, (int) vPosX, (int) vPosY, vColor);
+            vFont.DrawText(null, vText, (int)vPosX, (int)vPosY, vColor);
         }
 
 
@@ -171,7 +163,7 @@ namespace Marksman.Utils
             var a = new Geometry.Polygon.Line(from, to);
             a.Draw(color, 3);
 
-            Vector3[] x = new[] {from, to};
+            Vector3[] x = new[] { from, to };
             var aX = Drawing.WorldToScreen(new Vector3(CenterOfVectors(x).X, CenterOfVectors(x).Y, CenterOfVectors(x).Z));
             Drawing.DrawText(aX.X - 15, aX.Y - 15, System.Drawing.Color.White, text);
         }
@@ -229,7 +221,7 @@ namespace Marksman.Utils
                 return sum;
 
             sum = vectors.Aggregate(sum, (current, vec) => current + vec);
-            return sum/vectors.Length;
+            return sum / vectors.Length;
         }
     }
 
@@ -257,7 +249,7 @@ namespace Marksman.Utils
             if (target.ChampionName == "Blitzcrank" && !target.HasBuff("BlitzcrankManaBarrierCD")
                 && !target.HasBuff("ManaBarrier"))
             {
-                totalHealth += target.Mana/2;
+                totalHealth += target.Mana / 2;
             }
             return (ObjectManager.Player.LSGetSpellDamage(target, spell) >= totalHealth);
         }
@@ -386,14 +378,14 @@ namespace Marksman.Utils
                 if (minionType == MinionType.BigMobs)
                 {
                     IEnumerable<Obj_AI_Base> oMob = (from fMobs in mobs
-                        from fBigBoys in
-                            new[]
-                            {
+                                                     from fBigBoys in
+                                                         new[]
+                                                         {
                                 "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red",
                                 "SRU_Krug", "SRU_Dragon", "SRU_Baron", "Sru_Crab"
-                            }
-                        where fBigBoys == fMobs.BaseSkinName
-                        select fMobs).AsEnumerable();
+                                                         }
+                                                     where fBigBoys == fMobs.BaseSkinName
+                                                     select fMobs).AsEnumerable();
 
                     mobs = oMob;
                 }
@@ -423,25 +415,25 @@ namespace Marksman.Utils
         public static bool GetMinionTotalAaCont(this LeagueSharp.Common.Spell spell, int minionCount = 1)
         {
             var totalAa =
-                ObjectManager.Get<Obj_AI_Minion>().Where(m => m.LSIsValidTarget(spell.Range)).Sum(mob => (int) mob.Health);
+                ObjectManager.Get<Obj_AI_Minion>().Where(m => m.LSIsValidTarget(spell.Range)).Sum(mob => (int)mob.Health);
 
-            totalAa = (int) (totalAa/ObjectManager.Player.TotalAttackDamage);
+            totalAa = (int)(totalAa / ObjectManager.Player.TotalAttackDamage);
             return totalAa >= minionCount;
         }
 
         public static bool GetMinionTotalAaCont(float range, int minionCount = 1)
         {
             var totalAa =
-                ObjectManager.Get<Obj_AI_Minion>().Where(m => m.LSIsValidTarget(range)).Sum(mob => (int) mob.Health);
+                ObjectManager.Get<Obj_AI_Minion>().Where(m => m.LSIsValidTarget(range)).Sum(mob => (int)mob.Health);
 
-            totalAa = (int) (totalAa/ObjectManager.Player.TotalAttackDamage);
+            totalAa = (int)(totalAa / ObjectManager.Player.TotalAttackDamage);
             return totalAa >= minionCount;
         }
 
         public static Vector2 GetCircularFarmMinions(this LeagueSharp.Common.Spell spell, int minionCount = 1)
         {
             List<Obj_AI_Base> minions = MinionManager.GetMinions(ObjectManager.Player.Position, spell.Range);
-            MinionManager.FarmLocation location = spell.GetCircularFarmLocation(minions, spell.Width*0.75f);
+            MinionManager.FarmLocation location = spell.GetCircularFarmLocation(minions, spell.Width * 0.75f);
             if (location.MinionsHit >= minionCount && spell.IsInRange(location.Position.To3D()))
             {
                 return location.Position;
@@ -464,7 +456,7 @@ namespace Marksman.Utils
             input.CollisionObjects[0] = CollisionableObjects.Minions;
 
             return
-                Collision.GetCollision(new List<Vector3> {targetposition}, input)
+                Collision.GetCollision(new List<Vector3> { targetposition }, input)
                     .OrderBy(obj => obj.LSDistance(source, false))
                     .ToList();
         }
@@ -523,14 +515,14 @@ namespace Marksman.Utils
             {
 
                 IEnumerable<Obj_AI_Base> oMob = (from fMobs in list
-                    from fBigBoys in
-                        new[]
-                        {
+                                                 from fBigBoys in
+                                                     new[]
+                                                     {
                             "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red",
                             "SRU_Krug", "SRU_Dragon", "SRU_Baron", "Sru_Crab"
-                        }
-                    where fBigBoys == fMobs.BaseSkinName
-                    select fMobs).AsEnumerable();
+                                                     }
+                                                 where fBigBoys == fMobs.BaseSkinName
+                                                 select fMobs).AsEnumerable();
                 list = oMob;
             }
             return list;
@@ -579,14 +571,14 @@ namespace Marksman.Utils
                 {
 
                     IEnumerable<Obj_AI_Base> oMob = (from fMobs in mobs
-                        from fBigBoys in
-                            new[]
-                            {
+                                                     from fBigBoys in
+                                                         new[]
+                                                         {
                                 "SRU_Blue", "SRU_Gromp", "SRU_Murkwolf", "SRU_Razorbeak", "SRU_Red",
                                 "SRU_Krug", "SRU_Dragon", "SRU_Baron", "Sru_Crab"
-                            }
-                        where fBigBoys == fMobs.BaseSkinName
-                        select fMobs).AsEnumerable();
+                                                         }
+                                                     where fBigBoys == fMobs.BaseSkinName
+                                                     select fMobs).AsEnumerable();
 
                     mobs = oMob;
                 }
@@ -639,19 +631,19 @@ namespace Marksman.Utils
                 && ObjectManager.Player.Spellbook.CanUseSpell(ObjectManager.Player.GetSpellSlot("summonerdot"))
                 == SpellState.Ready && ObjectManager.Player.LSDistance(t) < 550)
             {
-                fComboDamage += (float) ObjectManager.Player.GetSummonerSpellDamage(t, LeagueSharp.Common.Damage.SummonerSpell.Ignite);
+                fComboDamage += (float)ObjectManager.Player.GetSummonerSpellDamage(t, LeagueSharp.Common.Damage.SummonerSpell.Ignite);
             }
 
             if (Items.CanUseItem(3144) && ObjectManager.Player.LSDistance(t) < 550)
             {
-                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Bilgewater);
+                fComboDamage += (float)ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Bilgewater);
             }
 
             if (Items.CanUseItem(3153) && ObjectManager.Player.LSDistance(t) < 550)
             {
-                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Botrk);
+                fComboDamage += (float)ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Botrk);
             }
-            return (float) fComboDamage;
+            return (float)fComboDamage;
         }
 
         public static bool IsUnderAllyTurret(this Obj_AI_Base unit)
@@ -679,13 +671,13 @@ namespace Marksman.Utils
         }
 
         public static bool IsPositionSafe(this LeagueSharp.Common.Spell spell, Vector2 position)
-            // use underTurret and .Extend for this please
+        // use underTurret and .Extend for this please
         {
             var myPos = ObjectManager.Player.Position.LSTo2D();
             var newPos = (position - myPos);
             newPos.Normalize();
 
-            var checkPos = position + newPos*(spell.Range - Vector2.Distance(position, myPos));
+            var checkPos = position + newPos * (spell.Range - Vector2.Distance(position, myPos));
             var enemy = HeroManager.Enemies.Find(e => e.LSDistance(checkPos) < 350);
             return enemy == null;
         }
@@ -777,7 +769,7 @@ namespace Marksman.Utils
         public static GameObjectTeam Team(this Obj_AI_Base mob)
         {
             mobTeams = new Dictionary<Vector2, GameObjectTeam>();
-            if (Game.MapId == (GameMapId) 11)
+            if (Game.MapId == (GameMapId)11)
             {
                 mobTeams.Add(new Vector2(7756f, 4118f), GameObjectTeam.Order); // blue team :red;
                 mobTeams.Add(new Vector2(3824f, 7906f), GameObjectTeam.Order); // blue team :blue
@@ -798,7 +790,7 @@ namespace Marksman.Utils
 
                 return
                     mobTeams.Where(
-                        hp => mob.LSDistance(hp.Key) <= (Orbwalking.GetRealAutoAttackRange(null)*2))
+                        hp => mob.LSDistance(hp.Key) <= (Orbwalking.GetRealAutoAttackRange(null) * 2))
                         .Select(hp => hp.Value)
                         .FirstOrDefault();
             }

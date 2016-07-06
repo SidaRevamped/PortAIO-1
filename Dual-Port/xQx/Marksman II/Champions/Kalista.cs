@@ -68,7 +68,7 @@ namespace Marksman.Champions
 
         public Kalista()
         {
-            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 1150);
+            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 1100);
             W = new LeagueSharp.Common.Spell(SpellSlot.W, 5000);
             E = new LeagueSharp.Common.Spell(SpellSlot.E, 1000);
             R = new LeagueSharp.Common.Spell(SpellSlot.R, 1100);
@@ -126,7 +126,7 @@ namespace Marksman.Champions
 
         public override void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args)
         {
-
+            /*
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && Program.combo["Combo.UseQ"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 var enemy = target as AIHeroClient;
@@ -138,6 +138,7 @@ namespace Marksman.Champions
                     }
                 }
             }
+            */
         }
 
         public override void Drawing_OnDraw(EventArgs args)
@@ -606,38 +607,6 @@ namespace Marksman.Champions
 
         public override void ExecuteLaneClear()
         {
-            var prepareMinions = Program.laneclear["UseE.Prepare.Lane"].Cast<ComboBox>().CurrentValue;
-            if (prepareMinions != 0)
-            {
-                List<Obj_AI_Minion> list = new List<Obj_AI_Minion>();
-                IEnumerable<Obj_AI_Minion> minions =
-                    from m in
-                        ObjectManager.Get<Obj_AI_Minion>()
-                            .Where(
-                                m =>
-                                    m.Health > ObjectManager.Player.TotalAttackDamage
-                                    && m.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65))
-                    select m;
-                if (prepareMinions == 2)
-                {
-                    minions = minions.Where(m => m.IsUnderAllyTurret());
-                }
-
-                var objAiMinions = minions as Obj_AI_Minion[] ?? minions.ToArray();
-                foreach (var m in objAiMinions)
-                {
-                    if (m.GetBuffCount(kalistaEBuffName) >= 0)
-                    {
-                        Render.Circle.DrawCircle(m.Position, 105f, Color.Blue);
-                        list.Add(m);
-                    }
-                    else
-                    {
-                        list.Remove(m);
-                    }
-                }
-            }
-
             if (Q.IsReady())
             {
                 var qCount = Program.laneclear["UseQ.Lane"].Cast<ComboBox>().CurrentValue;

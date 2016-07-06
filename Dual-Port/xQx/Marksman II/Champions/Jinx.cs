@@ -33,7 +33,7 @@ namespace Marksman.Champions
             W.SetSkillshot(0.6f, 60f, 3300f, true, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.7f, 120f, 1750f, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.6f, 140f, 1700f, false, SkillshotType.SkillshotLine);
-            
+
             Obj_AI_Base.OnBuffGain += (sender, args) =>
             {
                 if (E.IsReady())
@@ -128,6 +128,13 @@ namespace Marksman.Champions
 
         public override void Game_OnGameUpdate(EventArgs args)
         {
+            if (Program.combo["PingCH"].Cast<CheckBox>().CurrentValue)
+            {
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => R.IsReady() && enemy.IsValidTarget() && R.GetDamage(enemy) > enemy.Health))
+                {
+                    //Marksman.Utils.Utils.MPing.Ping(enemy.Position.To2D());
+                }
+            }
             if (Q.IsReady() && Program.misc["SwapDistance"].Cast<CheckBox>().CurrentValue && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 var activeQ = ObjectManager.Player.Spellbook.GetSpell(SpellSlot.Q).Level * 25 + 650;
@@ -188,10 +195,14 @@ namespace Marksman.Champions
                         var castPosition =
                             LeagueSharp.Common.Prediction.GetPrediction(
                                 new PredictionInput
-                                    {
-                                        Unit = enemy, Delay = 0.7f, Radius = 120f, Speed = 1750f, Range = 900f,
-                                        Type = SkillshotType.SkillshotCircle
-                                    }).CastPosition;
+                                {
+                                    Unit = enemy,
+                                    Delay = 0.7f,
+                                    Radius = 120f,
+                                    Speed = 1750f,
+                                    Range = 900f,
+                                    Type = SkillshotType.SkillshotCircle
+                                }).CastPosition;
 
 
                         if (GetSlowEndTime(enemy) >= (Game.Time + E.Delay + 0.5f))
@@ -201,18 +212,18 @@ namespace Marksman.Champions
                     }
 
                     if (E.IsReady()
-                            && (enemy.HasBuffOfType(BuffType.Stun) 
+                            && (enemy.HasBuffOfType(BuffType.Stun)
                             || enemy.HasBuffOfType(BuffType.Snare)
-                            || enemy.HasBuffOfType(BuffType.Charm) 
-                            || enemy.HasBuffOfType(BuffType.Fear) 
+                            || enemy.HasBuffOfType(BuffType.Charm)
+                            || enemy.HasBuffOfType(BuffType.Fear)
                             || enemy.HasBuffOfType(BuffType.Slow)
-                            || enemy.HasBuffOfType(BuffType.Taunt) 
+                            || enemy.HasBuffOfType(BuffType.Taunt)
                             || enemy.HasBuff("zhonyasringshield")
                             || enemy.HasBuff("Recall")))
                     {
                         E.CastIfHitchanceEquals(enemy, HitChance.High);
                     }
-                    else 
+                    else
                     if (W.IsReady()
                             && (enemy.HasBuffOfType(BuffType.Stun)
                             || enemy.HasBuffOfType(BuffType.Snare)
@@ -231,7 +242,7 @@ namespace Marksman.Champions
                     }
                 }
             }
-            
+
             if (Program.misc["CastR"].Cast<KeyBind>().CurrentValue && R.IsReady())
             {
                 var t = TargetSelector.GetTarget(1500, DamageType.Physical);
@@ -468,7 +479,7 @@ namespace Marksman.Champions
                 config.Add("Lane.UseQ", new ComboBox("Q:", 0, strQ));
             }
             config.Add("Lane.UseQ.Mode", new ComboBox("Q Mode:", 2, "Under Ally Turret", "Out of AA Range", "Botch"));
-            
+
             // W
             config.Add("Lane.UseW", new ComboBox("W:", 1, "Off", "Out of AA Range"));
             return true;
@@ -488,7 +499,7 @@ namespace Marksman.Champions
                 }
                 config.Add("Lane.UseQ", new ComboBox("Q:", 3, strQ));
             }
-            
+
             // W
             config.Add("Lane.UseW", new ComboBox("W [Just Big Mobs]:", 0, "Off", "On", "Just Slows the Mob"));
 
@@ -519,6 +530,7 @@ namespace Marksman.Champions
             config.Add("ROverKill", new CheckBox("R: Kill Steal"));
             config.Add("MinRRange", new Slider("R: Min. range", 300, 0, 1500));
             config.Add("MaxRRange", new Slider("R: Max. range", 1700, 0, 4000));
+            config.Add("PingCH", new CheckBox("R: Ping Killable Enemy with R"));
             return true;
         }
 

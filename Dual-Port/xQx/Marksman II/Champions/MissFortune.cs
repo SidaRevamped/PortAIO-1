@@ -45,14 +45,16 @@ namespace Marksman.Champions
             var t = target as AIHeroClient;
             if (t != null && (ComboActive || HarassActive))
             {
-                var useQ = ComboActive ? Program.combo["UseQC"].Cast<CheckBox>().CurrentValue : Program.harass["UseQH"].Cast<CheckBox>().CurrentValue; 
+                //var useQ = ComboActive ? Program.combo["UseQC"].Cast<CheckBox>().CurrentValue : Program.harass["UseQH"].Cast<CheckBox>().CurrentValue; 
                 var useW = ComboActive ? Program.combo["UseWC"].Cast<CheckBox>().CurrentValue : Program.harass["UseWH"].Cast<CheckBox>().CurrentValue;
             
-                if (useQ)
-                    Q.CastOnUnit(t);
+                //if (useQ)
+                    //Q.CastOnUnit(t);
 
                 if (useW && W.IsReady())
+                {
                     W.CastOnUnit(ObjectManager.Player);
+                }
             }
         }
 

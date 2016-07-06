@@ -116,12 +116,16 @@ namespace Marksman.Champions
             }
         }
 
-        public override void Game_OnGameUpdate(EventArgs args)
+        public override void Game_OnUpdate(EventArgs args)
         {
             if (!ComboActive)
             {
                 var t = TargetSelector.GetTarget(W.Range, DamageType.Physical);
-                if (!t.LSIsValidTarget() || !W.IsReady()) return;
+
+                if (!t.LSIsValidTarget() || !W.IsReady())
+                {
+                    return;
+                }
 
                 if (Program.harass["UseWTH"].Cast<KeyBind>().CurrentValue)
                 {

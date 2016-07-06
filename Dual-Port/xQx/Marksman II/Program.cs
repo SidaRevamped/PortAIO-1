@@ -225,6 +225,7 @@ namespace Marksman
                 }
 
                 /*----------------------------------------------------------------------------------------------------------*/
+                /*
                 Obj_AI_Base ally = (from aAllies in HeroManager.Allies from aSupportedChampions in new[] { "janna", "tahm", "leona", "lulu", "lux", "nami", "shen", "sona", "braum", "bard" } where aSupportedChampions == aAllies.ChampionName.ToLower() select aAllies).FirstOrDefault();
 
                 if (ally != null)
@@ -275,6 +276,7 @@ namespace Marksman
                         }
                     }
                 }
+                */
                 /*----------------------------------------------------------------------------------------------------------*/
 
                 misc = Config.AddSubMenu("Misc", "Misc");

@@ -86,7 +86,7 @@ namespace Marksman.Champions
 
         public void AIHeroClient_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!E.IsReady() || !(sender is AIHeroClient))
+            if (!E.IsReady() || !(sender is AIHeroClient) || !sender.IsMe)
             {
                 return;
             }
@@ -101,8 +101,9 @@ namespace Marksman.Champions
                     E.Cast();
                 }
             }
-
-            if (((AIHeroClient) sender).ChampionName.ToLower() == "vayne" && args.SData.Name == ((AIHeroClient) sender).GetSpell(SpellSlot.E).Name)
+            return;
+            /*
+            if (((AIHeroClient)sender).ChampionName.ToLower() == "vayne" && args.SData.Name == ((AIHeroClient)sender).GetSpell(SpellSlot.E).Name)
             {
                 for (var i = 1; i < 8; i++)
                 {
@@ -113,6 +114,7 @@ namespace Marksman.Champions
                     }
                 }
             }
+            */
         }
 
         public override void Game_OnGameUpdate(EventArgs args)
@@ -287,8 +289,8 @@ namespace Marksman.Champions
         {
             config.Add("AutoQ", new CheckBox("Auto Q on Stun/Slow/Fear/Taunt/Snare"));
             config.Add("Misc.UseW.Turret", new CheckBox("Use W for Turret", false));
-            config.Add("Misc.UseW.Inhibitor", new CheckBox("Use W for Inhibitor"));
-            config.Add("Misc.UseW.Nexus", new CheckBox("Use W for Nexus"));
+            config.Add("Misc.UseW.Inhibitor", new CheckBox("Use W for Inhibitor", false));
+            config.Add("Misc.UseW.Nexus", new CheckBox("Use W for Nexus", false));
             return true;
         }
 
