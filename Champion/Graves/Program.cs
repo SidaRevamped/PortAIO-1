@@ -185,7 +185,7 @@ namespace OneKeyToWin_AIO_Sebby
         private static void LogicQ()
         {
             var t = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            if (t.LSIsValidTarget())
+            if (t.LSIsValidTarget() && t.IsVisible && t.IsHPBarRendered)
             {
                 var step = t.LSDistance(Player)/20;
                 for (var i = 0; i < 20; i++)
@@ -294,7 +294,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             foreach (
                 var target in
-                    Program.Enemies.Where(target => target.LSIsValidTarget(R1.Range) && OktwCommon.ValidUlt(target)))
+                    Program.Enemies.Where(target => target.LSIsValidTarget(R1.Range) && OktwCommon.ValidUlt(target) && target.IsVisible && target.IsHPBarRendered))
             {
                 double rDmg = OktwCommon.GetKsDamage(target, R);
 
