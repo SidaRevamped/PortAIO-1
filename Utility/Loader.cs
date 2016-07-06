@@ -379,7 +379,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[34]))
                 {
-                    Miscc.Add("trundle", new ComboBox("Use addon for Trundle : ", 0, "ElTrundle", "FastTrundle"));
+                    Miscc.Add("trundle", new ComboBox("Use addon for Trundle : ", 0, "ElTrundle", "FastTrundle", "UnderratedAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[35]))
                 {
