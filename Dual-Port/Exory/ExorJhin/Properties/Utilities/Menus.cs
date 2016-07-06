@@ -61,7 +61,7 @@ namespace ExorAIO.Champions.Jhin
             /// </summary>
             Vars.RMenu = Vars.Menu.AddSubMenu("Use R to:");
             {
-                Vars.RMenu.Add("combo", new CheckBox("Combo", true));
+                Vars.RMenu.Add("logical", new CheckBox("Automatic", true));
                 Vars.RMenu.Add("killsteal", new CheckBox("KillSteal", true));
                 Vars.RMenu.Add("nearmouse", new CheckBox("Focus the enemy nearest to your cursor"));
                 Vars.RMenu.AddGroupLabel("- You need to manually start the Ultimate. -");

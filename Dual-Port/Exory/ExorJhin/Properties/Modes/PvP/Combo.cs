@@ -6,7 +6,6 @@ using LeagueSharp.SDK;
 using EloBuddy;
 using LeagueSharp.SDK.Core.Utils;
 using Geometry = ExorAIO.Utilities.Geometry;
-using SharpDX;
 
 namespace ExorAIO.Champions.Jhin
 {
@@ -21,44 +20,6 @@ namespace ExorAIO.Champions.Jhin
         /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
         public static void Combo(EventArgs args)
         {
-            /// <summary>
-            ///     The R Combo Logic.
-            /// </summary>
-            if (Vars.R.IsReady() &&
-                Vars.R.Instance.Name.Equals("JhinRShot") &&
-                Vars.getCheckBoxItem(Vars.RMenu, "combo"))
-            {
-                if (GameObjects.EnemyHeroes.Any(
-                    t =>
-                        t.LSIsValidTarget(Vars.R.Range) &&
-                        !Vars.Cone.IsOutside((Vector2)t.ServerPosition)))
-                {
-                    foreach (var target in GameObjects.EnemyHeroes.Where(
-                        t =>
-                            t.LSIsValidTarget(Vars.R.Range) &&
-                            !Vars.Cone.IsOutside((Vector2)t.ServerPosition)))
-                    {
-                        if (Vars.getCheckBoxItem(Vars.RMenu, "nearmouse"))
-                        {
-                            Vars.R.Cast(Vars.R.GetPrediction(GameObjects.EnemyHeroes.Where(
-                                t =>
-                                    !Vars.Cone.IsOutside((Vector2)t.ServerPosition) &&
-                                    t.LSIsValidTarget(Vars.R.Range)).OrderBy(
-                                        o =>
-                                            o.Distance(Game.CursorPos)).FirstOrDefault()).UnitPosition);
-                        }
-                        else
-                        {
-                            Vars.R.Cast(Vars.R.GetPrediction(target).UnitPosition);
-                        }
-                    }
-                }
-                else
-                {
-                    Vars.R.Cast(Game.CursorPos);
-                }
-            }
-
             if (Bools.HasSheenBuff() ||
 				!Targets.Target.LSIsValidTarget() ||
                 Invulnerable.Check(Targets.Target) ||

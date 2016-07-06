@@ -22,20 +22,15 @@ namespace ExorAIO.Champions.Jinx
             ///     The R Combo Logic.
             /// </summary>
             if (Vars.R.IsReady() &&
-                Vars.getCheckBoxItem(Vars.RMenu, "combo"))
+                Vars.getSliderItem(Vars.RMenu, "aoe") != 6)
             {
-                if (GameObjects.EnemyHeroes.Count(
+                foreach (var target in GameObjects.EnemyHeroes.Where(
                     t =>
-                        t.HealthPercent < 50 &&
-                        !Invulnerable.Check(t) &&
-                        t.LSIsValidTarget(Vars.R.Range)) >= 2)
+                        t.LSIsValidTarget(Vars.W.Range) &&
+                        t.CountEnemyHeroesInRange(225f) >=
+                            Vars.getSliderItem(Vars.RMenu, "aoe")))
                 {
-                    Vars.R.CastIfWillHit(
-                        GameObjects.EnemyHeroes.Where(
-                        t =>
-                            t.HealthPercent < 50 &&
-                            !Invulnerable.Check(t) &&
-                            t.LSIsValidTarget(Vars.R.Range)).First(), 2);
+                    Vars.R.Cast(target.ServerPosition);
                 }
             }
 

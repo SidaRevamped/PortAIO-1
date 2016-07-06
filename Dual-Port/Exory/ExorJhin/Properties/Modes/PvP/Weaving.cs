@@ -28,7 +28,7 @@ namespace ExorAIO.Champions.Jhin
             ///     The Q Weaving Logic.
             /// </summary>
             if (Vars.Q.IsReady() &&
-                (args.Target as AIHeroClient).LSIsValidTarget(Vars.Q.Range) &&
+                (args.Target as AIHeroClient).LSIsValidTarget() &&
                 Vars.getCheckBoxItem(Vars.QMenu, "combo") && !Vars.R.Instance.Name.Equals("JhinRShot"))
             {
                 Vars.Q.CastOnUnit(args.Target as AIHeroClient);

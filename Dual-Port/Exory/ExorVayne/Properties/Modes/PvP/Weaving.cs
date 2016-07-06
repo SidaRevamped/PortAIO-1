@@ -30,19 +30,17 @@ namespace ExorAIO.Champions.Vayne
             if (Vars.Q.IsReady() &&
                 Vars.getCheckBoxItem(Vars.QMenu, "combo"))
             {
-                if (Vars.getCheckBoxItem(Vars.MiscMenu, "wstacks"))
+                if (Vars.getCheckBoxItem(Vars.MiscMenu, "wstacks") &&
+                    (args.Target as AIHeroClient).GetBuffCount("vaynesilvereddebuff") != 1)
                 {
-                    if ((args.Target as AIHeroClient).GetBuffCount("vaynesilvereddebuff") != 1)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 if (!Vars.getCheckBoxItem(Vars.MiscMenu, "alwaysq"))
                 {
                     if (GameObjects.Player.Distance(Game.CursorPos) > Vars.AARange &&
-                        (args.Target as AIHeroClient).Distance(
-                            GameObjects.Player.Position.LSExtend(Game.CursorPos, Vars.Q.Range - Vars.AARange)) < Vars.AARange)
+                        GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 300f).CountEnemyHeroesInRange(1000f) < 3 &&
+                        Targets.Target.Distance(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 300f)) < Vars.AARange)
                     {
                         Vars.Q.Cast(Game.CursorPos);
                     }

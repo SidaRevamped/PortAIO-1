@@ -50,7 +50,7 @@ namespace ExorAIO.Champions.Jinx
             /// </summary>
             Vars.RMenu = Vars.Menu.AddSubMenu("Use R to:");
             {
-                Vars.RMenu.Add("combo", new CheckBox("Combo", true));
+                Vars.RMenu.Add("aoe", new Slider("AoE / If can hit >= x enemies", 3, 2, 6));
                 Vars.RMenu.Add("killsteal", new CheckBox("KillSteal", true));
             }
 

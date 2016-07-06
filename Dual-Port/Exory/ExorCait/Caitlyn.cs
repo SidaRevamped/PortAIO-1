@@ -100,7 +100,9 @@ namespace ExorAIO.Champions.Caitlyn
                             if (Vars.W.IsReady() &&
                                 Vars.getCheckBoxItem(Vars.WMenu, "combo"))
                             {
-                                Vars.W.Cast(Vars.E.GetPrediction(Targets.Target).CastPosition);
+                                Vars.W.Cast(GameObjects.Player.ServerPosition.LSExtend(
+                                    args.End,
+                                    GameObjects.Player.Distance(args.End) + Vars.W.Width));
                             }
                             break;
                         default:

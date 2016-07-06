@@ -37,18 +37,14 @@ namespace ExorAIO.Champions.Lucian
                     switch (Vars.getBoxItem(Vars.EMenu, "mode"))
                     {
                         case 0:
-                            if (GameObjects.Player.Distance(Game.CursorPos) < Vars.AARange ||
-                                (args.Target as AIHeroClient).CountEnemyHeroesInRange(700f) >= 2)
-                            {
-                                Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, GameObjects.Player.BoundingRadius));
-                                return;
-                            }
-
-                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange));
+                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos,
+                                GameObjects.Player.Distance(Game.CursorPos) < Vars.AARange
+                                    ? GameObjects.Player.BoundingRadius
+                                    : 475f));
                             break;
 
                         case 1:
-                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange));
+                            Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 475f));
                             break;
 
                         default:

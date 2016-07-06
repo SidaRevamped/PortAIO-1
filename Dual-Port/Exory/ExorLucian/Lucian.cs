@@ -142,11 +142,12 @@ namespace ExorAIO.Champions.Lucian
                 args.Sender.IsMelee &&
                 args.Sender.LSIsValidTarget(Vars.E.Range) &&
                 args.SkillType == GapcloserType.Targeted &&
-                GameObjects.Player.Distance(args.End) <
-                    args.Sender.GetRealAutoAttackRange(args.Sender) &&
                 Vars.getCheckBoxItem(Vars.EMenu, "gapcloser"))
             {
-                Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(args.Sender.ServerPosition, -(Vars.E.Range - Vars.AARange)));
+                if (args.Target.IsMe)
+                {
+                    Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(args.Sender.ServerPosition, -475f));
+                }
             }
         }
 

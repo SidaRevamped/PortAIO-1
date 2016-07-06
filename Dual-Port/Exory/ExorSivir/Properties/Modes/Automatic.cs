@@ -120,8 +120,8 @@ namespace ExorAIO.Champions.Sivir
                     return;
                 }
 
-                if (args.SData.Name.Equals("KatarinaE") ||
-                    args.SData.Name.Equals("SummonerDot") ||
+                if (args.SData.Name.Contains("Summoner") ||
+                    args.SData.Name.Equals("KatarinaE") ||
                     args.SData.Name.Equals("TalonCutthroat") ||
                     args.SData.Name.Equals("HextechGunblade") ||
                     args.SData.Name.Equals("BilgewaterCutlass") ||
@@ -168,9 +168,6 @@ namespace ExorAIO.Champions.Sivir
                                 break;
 
                             case "Caitlyn":
-                                DelayAction.Add(500, () => { Vars.E.Cast(); });
-                                break;
-
                             case "Nocturne":
                                 DelayAction.Add(750, () => { Vars.E.Cast(); });
                                 break;

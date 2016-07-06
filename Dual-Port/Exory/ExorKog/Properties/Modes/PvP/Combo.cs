@@ -18,7 +18,8 @@ namespace ExorAIO.Champions.KogMaw
         /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
         public static void Combo(EventArgs args)
         {
-            if (Bools.HasSheenBuff())
+            if (Bools.HasSheenBuff() &&
+                GameObjects.EnemyHeroes.Any(t => t.LSIsValidTarget(Vars.AARange)))
             {
                 return;
             }

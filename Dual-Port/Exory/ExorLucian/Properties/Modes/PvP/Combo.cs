@@ -29,12 +29,11 @@ namespace ExorAIO.Champions.Lucian
                 !Targets.Target.LSIsValidTarget(Vars.AARange) &&
                 Vars.getCheckBoxItem(Vars.EMenu, "engager"))
             {
-                if (GameObjects.Player.ServerPosition
-                        .LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange).CountEnemyHeroesInRange(1000f) < 3 &&
-                    Targets.Target.Distance(GameObjects.Player.ServerPosition
-                        .LSExtend(Game.CursorPos, Vars.E.Range - Vars.AARange)) < Vars.AARange)
+                if (GameObjects.Player.Distance(Game.CursorPos) > Vars.AARange &&
+                    GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 475f).CountEnemyHeroesInRange(1000f) < 3 &&
+                    Targets.Target.Distance(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 475f)) < Vars.AARange)
                 {
-                    Vars.E.Cast(Game.CursorPos);
+                    Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(Game.CursorPos, 475f));
                 }
             }
 

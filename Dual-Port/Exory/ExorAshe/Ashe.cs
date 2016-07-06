@@ -88,12 +88,15 @@ namespace ExorAIO.Champions.Ashe
         public static void OnGapCloser(object sender, Events.GapCloserEventArgs args)
         {
             if (Vars.R.IsReady() &&
-                args.IsDirectedToPlayer &&
-                !Invulnerable.Check(args.Sender) &&
-                args.Sender.LSIsValidTarget(Vars.R.Range) &&
+                args.Sender.IsMelee &&
+                args.Sender.IsValidTarget(Vars.R.Range) &&
+                args.SkillType == LeagueSharp.Data.Enumerations.GapcloserType.Targeted &&
                 Vars.getCheckBoxItem(Vars.RMenu, "gapcloser"))
             {
-                Vars.R.Cast(args.End);
+                if (args.Target.IsMe)
+                {
+                    Vars.R.Cast(args.Sender.ServerPosition);
+                }
             }
         }
 
