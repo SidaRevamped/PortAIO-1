@@ -620,7 +620,7 @@ namespace ThreshTherulerofthesoul
             int RequireCount = getSliderItem(Rmenu, "minNoEnemies");
 
             // Enemeis count in R range
-            var hit = HeroManager.Enemies.Where(i => i.LSIsValidTarget(R.Range)).ToList();
+            var hit = HeroManager.Enemies.Where(i => i.LSIsValidTarget(R.Range) && i.IsVisible && i.IsHPBarRendered).ToList();
 
             if (RequireCount <= hit.Count && R.IsReady())
             {
