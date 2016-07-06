@@ -40,7 +40,7 @@ namespace Azir_Free_elo_Machine
                 {
                     if (target.IsVisible && target.IsValid)
                     {
-                        var pos = target.ServerPosition.Extend(Game.CursorPos, -300);
+                        var pos = target.ServerPosition.LSExtend(Game.CursorPos, -300);
                         //     Render.Circle.DrawCircle(pos, 100, System.Drawing.Color.GreenYellow);
                     }
                 }
