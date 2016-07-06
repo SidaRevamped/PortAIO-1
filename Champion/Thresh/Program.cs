@@ -217,12 +217,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else
                 Orbwalker.DisableAttacking = false;
 
+            if (getKeyBindItem(eMenu, "FlayPush") || getKeyBindItem(eMenu, "FlayPull"))
+            {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
+            }
+
             var Etarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
             if (getKeyBindItem(eMenu, "FlayPush") && Etarget != null &&
                 E.IsReady())
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
-                    Orbwalker.OrbwalkTo(Game.CursorPos);
                 Push(Etarget);
             }
 
@@ -230,7 +234,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 E.IsReady())
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
-                    Orbwalker.OrbwalkTo(Game.CursorPos);
                 Pull(Etarget);
             }
 
