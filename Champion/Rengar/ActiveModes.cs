@@ -4,15 +4,14 @@ namespace ElRengarRevamped
     using System.Collections.Generic;
     using System.Linq;
 
-    using LeagueSharp;
+    using EloBuddy;
     using LeagueSharp.Common;
 
     using ItemData = LeagueSharp.Common.Data.ItemData;
     using EloBuddy.SDK;
-    using EloBuddy.SDK.Events;    // ReSharper disable once ClassNeverInstantiated.Global
-    using EloBuddy;
     using EloBuddy.SDK.Menu.Values;
-    using EloBuddy.SDK.Menu;
+
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ActiveModes : Standards
     {
         #region Public Methods and Operators
@@ -22,118 +21,104 @@ namespace ElRengarRevamped
         /// </summary>
         public static void Combo()
         {
-            try
+            /*var target = TargetSelector.SelectedTarget
+                             ?? TargetSelector.GetTarget(spells[Spells.E].Range, DamageType.Physical);
+            if (target == null)
             {
-                var target = TargetSelector.SelectedTarget ?? TargetSelector.GetTarget(spells[Spells.E].Range, DamageType.Physical);
-                if (target == null)
+                return;
+            }*/
+
+            var forced = Orbwalker.ForcedTarget;
+            if (forced != null && forced.LSIsValidTarget() && forced is AIHeroClient &&
+                    Orbwalking.InAutoAttackRange(forced))
+            {
+                return;
+            }
+
+            var target = TargetSelector.GetTarget(spells[Spells.E].Range, DamageType.Physical);
+            if (target == null)
+            {
+                return;
+            }
+
+             if (TargetSelector.SelectedTarget != null)
+            {
+                Orbwalker.ForcedTarget = target;
+            }
+
+            #region RengarR
+
+            if (Ferocity <= 4)
+            {
+                if (spells[Spells.Q].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Q")
+                    && Player.LSCountEnemiesInRange(Player.AttackRange + Player.BoundingRadius + 100) != 0)
                 {
-                    return;
+                    spells[Spells.Q].Cast();
                 }
 
-                #region RengarR
-
-                if (Ferocity <= 4)
+                if (!RengarR)
                 {
-                    if (spells[Spells.Q].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Q")
-                         && Player.LSCountEnemiesInRange(Player.AttackRange
-                            + Player.BoundingRadius + 100) != 0)
+                    if (!HasPassive)
                     {
-                        spells[Spells.Q].Cast();
-                    }
-
-                    if (!RengarR)
-                    {
-                        if (!HasPassive)
+                        if (spells[Spells.E].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.E"))
                         {
-                            if (spells[Spells.E].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.E"))
+                            CastE(target);
+                        }
+                    }
+                }
+
+                CastItems(target);
+
+                if (spells[Spells.W].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.W"))
+                {
+                    CastW();
+                    CastItems(target);
+                }
+            }
+
+            if (Ferocity == 5)
+            {
+                switch (MenuInit.getBoxItem(MenuInit.comboMenu, "Combo.Prio"))
+                {
+                    case 0:
+                        if (!RengarR)
+                        {
+                            if (spells[Spells.E].IsReady() && !HasPassive)
                             {
                                 CastE(target);
+
+                                if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Switch.E") && Utils.GameTimeTickCount - LastSwitch >= 350)
+                                {
+                                    MenuInit.comboMenu["Combo.Prio"].Cast<ComboBox>().CurrentValue = 2;
+                                    LastSwitch = Utils.GameTimeTickCount;
+                                }
                             }
                         }
-                        else
+                        break;
+                    case 1:
+                        if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.W") && spells[Spells.W].IsReady() && target.LSIsValidTarget(spells[Spells.W].Range))
                         {
-                            if (spells[Spells.E].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.E"))
-                            {
-                                if (Player.LSIsDashing())
-                                {
-                                    CastE(target);
-                                }
-                            }
+                            CastW();
                         }
-                    }
-
-                    CastItems(target);
-
-                    if (spells[Spells.W].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.W"))
-                    {
-                        CastW();
-                        CastItems(target);
-                    }
+                        break;
+                    case 2:
+                        if (spells[Spells.Q].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Q")
+                            && Player.LSCountEnemiesInRange(Player.AttackRange + Player.BoundingRadius + 100) != 0)
+                        {
+                            spells[Spells.Q].Cast();
+                        }
+                        break;
                 }
-
-                if (Ferocity == 5)
-                {
-                    switch (MenuInit.getBoxItem(MenuInit.comboMenu, "Combo.Prio"))
-                    {
-                        case 0:
-                            if (!RengarR)
-                            {
-                                if (spells[Spells.E].IsReady() && !HasPassive)
-                                {
-                                    CastE(target);
-
-                                    if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Switch.E") && Utils.GameTimeTickCount - LastSwitch >= 350)
-                                    {
-                                        MenuInit.comboMenu["Combo.Prio"].Cast<ComboBox>().CurrentValue = 2;
-                                        LastSwitch = Utils.GameTimeTickCount;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (spells[Spells.E].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.E"))
-                                {
-                                    if (Player.LSIsDashing())
-                                    {
-                                        CastE(target);
-                                    }
-                                }
-                            }
-                            break;
-                        case 1:
-                            if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.W") && spells[Spells.W].IsReady() && target.LSIsValidTarget(spells[Spells.W].Range))
-                            {
-                                CastW();
-                            }
-                            break;
-                        case 2:
-                            if (spells[Spells.Q].IsReady() && MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Q") && Player.LSCountEnemiesInRange(Player.AttackRange + Player.BoundingRadius + 100) != 0)
-                            {
-                                spells[Spells.Q].Cast();
-                            }
-                           break;
-                    }
-                }
-
-                #region Summoner spells
-
-
-                if (Youmuu.IsReady() && Youmuu.IsOwned() && target.LSIsValidTarget(spells[Spells.Q].Range))
-                {
-                    Youmuu.Cast();
-                }
-
-                if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Ignite") && target.LSIsValidTarget(600f) && IgniteDamage(target) >= target.Health)
-                {
-                    Player.Spellbook.CastSpell(Ignite, target);
-                }
-
-                #endregion
             }
-            catch (Exception e)
+
+            #region Summoner spells
+
+            if (MenuInit.getCheckBoxItem(MenuInit.comboMenu, "Combo.Use.Ignite") && target.LSIsValidTarget(600f) && IgniteDamage(target) >= target.Health)
             {
-                Console.WriteLine(e);
+                Player.Spellbook.CastSpell(Ignite, target);
             }
+
+            #endregion
         }
 
         #endregion
@@ -224,6 +209,8 @@ namespace ElRengarRevamped
             var target = TargetSelector.SelectedTarget != null
                              ? TargetSelector.SelectedTarget
                              : TargetSelector.GetTarget(spells[Spells.Q].Range, DamageType.Physical);
+
+            
 
             if (target.LSIsValidTarget() == false)
             {
@@ -317,16 +304,15 @@ namespace ElRengarRevamped
 
                 LaneItems(minion);
 
-                if (Ferocity == 5
-                    && (Player.Health / Player.MaxHealth) * 100
-                    <= 20)
+                if (Ferocity == 5 && (Player.Health / Player.MaxHealth) * 100 <= 20)
                 {
                     spells[Spells.W].Cast();
                 }
 
                 if (!HasPassive)
                 {
-                    if (MenuInit.getCheckBoxItem(MenuInit.jungleClear, "Jungle.Use.W") && spells[Spells.W].IsReady() && minion.LSIsValidTarget(spells[Spells.W].Range))
+                    if (MenuInit.getCheckBoxItem(MenuInit.jungleClear, "Jungle.Use.W") && spells[Spells.W].IsReady()
+                        && minion.LSIsValidTarget(spells[Spells.W].Range))
                     {
                         if (Ferocity == 5 && spells[Spells.Q].IsReady())
                         {
@@ -339,7 +325,6 @@ namespace ElRengarRevamped
                 if (MenuInit.getCheckBoxItem(MenuInit.jungleClear, "Jungle.Use.E") && spells[Spells.E].IsReady()
                     && minion.LSIsValidTarget(spells[Spells.E].Range))
                 {
-
                     if (Ferocity == 5)
                     {
                         return;
@@ -367,7 +352,7 @@ namespace ElRengarRevamped
                     return;
                 }
 
-                if (Player.Spellbook.IsAutoAttacking || Orbwalker.IsAutoAttacking)
+                if (Player.Spellbook.IsAutoAttacking || Player.Spellbook.IsAutoAttacking)
                 {
                     return;
                 }
@@ -395,7 +380,8 @@ namespace ElRengarRevamped
                     spells[Spells.W].Cast();
                 }
 
-                if (MenuInit.getCheckBoxItem(MenuInit.laneClear, "Clear.Use.E") && spells[Spells.E].IsReady() && minion.LSIsValidTarget(spells[Spells.E].Range))
+                if (MenuInit.getCheckBoxItem(MenuInit.laneClear, "Clear.Use.E") && spells[Spells.E].IsReady()
+                    && minion.LSIsValidTarget(spells[Spells.E].Range))
                 {
                     if (Ferocity == 5)
                     {
@@ -411,26 +397,6 @@ namespace ElRengarRevamped
             }
         }
 
-        public static bool getCheckBoxItem(Menu m, string item)
-        {
-            return m[item].Cast<CheckBox>().CurrentValue;
-        }
-
-        public static int getSliderItem(Menu m, string item)
-        {
-            return m[item].Cast<Slider>().CurrentValue;
-        }
-
-        public static bool getKeyBindItem(Menu m, string item)
-        {
-            return m[item].Cast<KeyBind>().CurrentValue;
-        }
-
-        public static int getBoxItem(Menu m, string item)
-        {
-            return m[item].Cast<ComboBox>().CurrentValue;
-        }
-
         /// <summary>
         ///     Gets Youmuus Ghostblade
         /// </summary>
@@ -438,7 +404,7 @@ namespace ElRengarRevamped
         ///     Youmuus Ghostblade
         /// </value>
         private static new Item Youmuu => new Item(ItemId.Youmuus_Ghostblade);
-    
+
         /// <summary>
         ///     Gets Ravenous Hydra
         /// </summary>
@@ -454,7 +420,7 @@ namespace ElRengarRevamped
         ///     Tiamat Item
         /// </value>
         private static Item Tiamat => new Item(ItemId.Tiamat_Melee_Only);
-    
+
         /// <summary>
         ///     Gets Titanic Hydra
         /// </summary>
@@ -463,15 +429,14 @@ namespace ElRengarRevamped
         /// </value>
         private static Item Titanic => new Item(ItemId.Titanic_Hydra);
 
-
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
         public static bool LaneItems(Obj_AI_Base target)
         {
-            var units = MinionManager.GetMinions(385, MinionTypes.All, MinionTeam.NotAlly).Count(o => !(o is Obj_AI_Turret));
+            var units =
+                MinionManager.GetMinions(385, MinionTypes.All, MinionTeam.NotAlly).Count(o => !(o is Obj_AI_Turret));
             var count = units;
             var tiamat = Tiamat;
             if (tiamat.IsOwned() && tiamat.IsReady() && count > 0 && tiamat.Cast())
