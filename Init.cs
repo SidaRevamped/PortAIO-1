@@ -936,8 +936,19 @@ namespace PortAIO
                                 break;
                         }
                         break;
-                    case "hecarim": // JustyHecarim
-                        JustHecarim.Program.OnLoad();
+                    case "hecarim": // JustyHecarim && UnderratedAIO
+                        switch (Loader.hecarim)
+                        {
+                            case 0:
+                                JustHecarim.Program.OnLoad();
+                                break;
+                            case 1:
+                                UnderratedAIO.Program.Init();
+                                break;
+                            default:
+                                JustHecarim.Program.OnLoad();
+                                break;
+                        }
                         break;
                     case "heimerdinger": // 2 Girls 1 Dong
                         Two_Girls_One_Donger.Program.Game_OnGameLoad();
@@ -1770,6 +1781,9 @@ namespace PortAIO
                                 break;
                             case 1:
                                 FastTrundle.Trundle.Game_OnGameLoad();
+                                break;
+                            case 2:
+                                UnderratedAIO.Program.Init();
                                 break;
                             default:
                                 ElTrundle.Trundle.OnLoad();

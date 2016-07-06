@@ -84,7 +84,7 @@ namespace UnderratedAIO.Champions
                 Render.Circle.DrawCircle(
                     lastQpos, getSliderItem(miscMenu, "gotoAxeMaxDist"), Color.Cyan, 5);
             }
-            DrawHelper.DrawCircle(getCheckBoxItem(drawMenu, "drawqq"), E.Range, Color.FromArgb(180, 255, 222, 5));
+            DrawHelper.DrawCircle(getCheckBoxItem(drawMenu, "drawqq"), Q.Range, Color.FromArgb(180, 255, 222, 5));
             DrawHelper.DrawCircle(getCheckBoxItem(drawMenu, "drawee"), E.Range, Color.FromArgb(180, 255, 222, 5));
             Utility.HpBarDamageIndicator.Enabled = getCheckBoxItem(drawMenu, "drawcombo");
         }

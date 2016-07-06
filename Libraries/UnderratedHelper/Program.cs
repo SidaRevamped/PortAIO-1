@@ -85,6 +85,12 @@ namespace UnderratedAIO
                     case "zac":
                         new Champions.Zac();
                         break;
+                    case "trundle":
+                        new Champions.Trundle();
+                        break;
+                    case "hecarim":
+                        new Champions.Hecarim();
+                        break;
                 }
                 IncDamages = new IncomingDamage();
             }
