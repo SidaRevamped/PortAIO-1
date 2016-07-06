@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Azir_Creator_of_Elo
 {
-    class AzirMain
+    internal class AzirMain
     {
         private Spells _spells;
         public Menu _menu;

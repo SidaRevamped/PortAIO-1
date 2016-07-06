@@ -20,6 +20,7 @@ namespace Azir_Free_elo_Machine
         Azir_Creator_of_Elo.AzirMain azir;
         public Insec(AzirMain azir)
         {
+            Clickposition = new Vector3(0, 0, 0);
             this.azir = azir;
             Game.OnUpdate += Game_OnUpdate;
             Game.OnWndProc += Game_OnWndProc;
@@ -28,16 +29,10 @@ namespace Azir_Free_elo_Machine
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (!Menu._jumpMenu["inseckey"].Cast<KeyBind>().CurrentValue)
-            {
-
-                return;
-            }
             var target = TargetSelector.SelectedTarget;
             /*     var posWs = GeoAndExten.GetWsPosition(target.Position.To2D()).Where(x => x != null);
                  foreach (var posW in posWs)
                  {
-
                  }*/
             if (Clickposition == new Vector3(0, 0, 0))
             {
@@ -45,30 +40,33 @@ namespace Azir_Free_elo_Machine
                 {
                     if (target.IsVisible && target.IsValid)
                     {
-                        var pos = target.ServerPosition.LSExtend(Game.CursorPos, -300);
-                        Render.Circle.DrawCircle(pos, 100, System.Drawing.Color.GreenYellow);
+                        var pos = target.ServerPosition.Extend(Game.CursorPos, -300);
+                        //     Render.Circle.DrawCircle(pos, 100, System.Drawing.Color.GreenYellow);
                     }
                 }
             }
             else
             {
-                Render.Circle.DrawCircle(Clickposition, 100, System.Drawing.Color.GreenYellow);
+                 Render.Circle.DrawCircle(Clickposition, 100, System.Drawing.Color.GreenYellow);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
             }
 
         }
         Vector3 Clickposition;
-
         private void Game_OnWndProc(WndEventArgs args)
         {
-            if (args.Msg == (uint)WindowsMessages.WM_KEYDOWN)
+            if (args.Msg != (uint)WindowsMessages.WM_KEYDOWN)
             {
+                return;
+            }
+            var pressed = Menu._jumpMenu["insecposkey"].Cast<KeyBind>().CurrentValue;
+            if (pressed)
                 if (Clickposition == new Vector3(0, 0, 0))
                     Clickposition = Game.CursorPos;
                 else
                     Clickposition = new Vector3(0, 0, 0);
-            }
-        }
 
+
+        }
         Obj_AI_Minion soldier;
         private void Game_OnUpdate(EventArgs args)
         {

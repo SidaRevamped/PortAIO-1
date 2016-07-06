@@ -77,6 +77,8 @@ namespace Azir_Creator_of_Elo
             {
                 _jumpMenu.Add("fleekey", new KeyBind("Jump key", false, KeyBind.BindTypes.HoldActive, 'Z'));
                 _jumpMenu.Add("inseckey", new KeyBind("Insec key", false, KeyBind.BindTypes.HoldActive, 'T'));
+                _jumpMenu.Add("insecposkey", new KeyBind("Insec to pos key", false, KeyBind.BindTypes.HoldActive, 'G'));
+
             }
         }
     }
