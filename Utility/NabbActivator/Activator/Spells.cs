@@ -249,7 +249,7 @@ namespace NabbActivator
             {
                 foreach (var ally in GameObjects.AllyHeroes.Where(
                     a =>
-                        a.Distance(Targets.Target) <= 650f &&
+                        ObjectManager.Player.Distance(Targets.Target) <= 650f &&
                         Health.GetPrediction(a, (int)(1000 + Game.Ping / 2f)) <= a.MaxHealth / 6))
                 {
                     GameObjects.Player.Spellbook.CastSpell(SpellSlots.Exhaust, Targets.Target);
