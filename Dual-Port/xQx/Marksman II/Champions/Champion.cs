@@ -51,6 +51,11 @@ namespace Marksman.Champions
             return false;
         }
 
+        public virtual bool ToolsMenu(Menu config)
+        {
+            return false;
+        }
+
         public virtual bool MainMenu(Menu config)
         {
             return false;
@@ -78,12 +83,26 @@ namespace Marksman.Champions
             }
         }
 
+
         public virtual void ExecuteCombo() { }
         public virtual void ExecuteHarass() { }
         public virtual void ExecuteFlee() { }
         public virtual void ExecuteLaneClear() { }
         public virtual void ExecuteJungleClear() { }
         public virtual void PermaActive() { }
+
+        public virtual void DrawingOnEndScene(EventArgs args)
+        {
+            if (Drawing.Direct3DDevice == null || Drawing.Direct3DDevice.IsDisposed)
+            {
+                return;
+            }
+            if (ObjectManager.Player.IsDead)
+            {
+                return;
+            }
+
+        }
 
         public virtual void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args) { }
         public virtual void Orbwalking_BeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args) { }

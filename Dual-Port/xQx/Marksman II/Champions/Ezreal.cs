@@ -43,7 +43,7 @@ namespace Marksman.Champions
             W = new LeagueSharp.Common.Spell(SpellSlot.W, 950);
             W.SetSkillshot(0.25f, 80f, 1600f, false, SkillshotType.SkillshotLine);
 
-            E = new LeagueSharp.Common.Spell(SpellSlot.E);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 475);
 
             R = new LeagueSharp.Common.Spell(SpellSlot.R, 2500);
             R.SetSkillshot(1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
@@ -78,6 +78,30 @@ namespace Marksman.Champions
 
         public override void Drawing_OnDraw(EventArgs args)
         {
+            if (ComboActive && Program.combo["UseEC"].Cast<CheckBox>().CurrentValue && E.IsReady())
+            {
+                var nRange = ObjectManager.Player.HealthPercent < 25 ? 550 : 450;
+                var nSum = HeroManager.Enemies.Where(e => e.LSIsValidTarget(nRange) && e.LSIsFacing(ObjectManager.Player)).Sum(e => e.HealthPercent);
+                if (nSum > ObjectManager.Player.HealthPercent)
+                {
+                    var nResult = HeroManager.Enemies.FirstOrDefault(e => e.LSIsValidTarget(nRange));
+                    if (nResult != null)
+                    {
+                        var nPosition = ObjectManager.Player.Position.LSExtend(nResult.Position, -E.Range);
+                        E.Cast(nPosition);
+                    }
+                }
+                Render.Circle.DrawCircle(ObjectManager.Player.Position, nRange, Color.DarkSalmon);
+            }
+
+            var t = TargetSelector.GetTarget(1500, DamageType.Magical);
+            if (t != null)
+            {
+                var x = ObjectManager.Player.Position.LSExtend(t.Position, -E.Range);
+                //var x = t.Position.Extend(ObjectManager.Player.Position, -E.Range);
+                Render.Circle.DrawCircle(x, 105f, Color.DarkSalmon);
+
+            }
             foreach (var enemy in HeroManager.Enemies.Where(enemy => R.IsReady() && enemy.LSIsValidTarget() && R.GetDamage(enemy) > enemy.Health))
             {
                 Marksman.Common.CommonGeometry.DrawBox(new Vector2(Drawing.Width * 0.43f, Drawing.Height * 0.80f), 185, 18, Color.FromArgb(242, 255, 236, 6), 1, System.Drawing.Color.Black);
@@ -107,6 +131,28 @@ namespace Marksman.Champions
             }
         }
 
+        public override void DrawingOnEndScene(EventArgs args)
+        {
+            if (Program.misc["PingDH"].Cast<CheckBox>().CurrentValue)
+            {
+                var i = 0;
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => R.IsReady() && enemy.IsValidTarget() && R.GetDamage(enemy) > enemy.Health))
+                {
+                    //Game.PrintChat(HeroManager.Enemies[i].ChampionName);
+                    float a1 = (i + 1) * 0.025f;
+
+                    Common.CommonGeometry.DrawBox(
+                        new Vector2(Drawing.Width * 0.43f, Drawing.Height * (0.700f + (float)a1)), 150, 18,
+                        Color.FromArgb(170, 255, 0, 0), 1, System.Drawing.Color.Black);
+
+                    CommonGeometry.Text.DrawTextCentered(HeroManager.Enemies[i].ChampionName + " Killable with R",
+                        (int)(Drawing.Width * 0.475f), (int)(Drawing.Height * (0.803f + a1 - 0.093f)), SharpDX.Color.Wheat);
+
+                    i += 1;
+                }
+            }
+        }
+
         public override void Game_OnGameUpdate(EventArgs args)
         {
             Console.WriteLine(Q.GetHitchance().ToString());
@@ -124,7 +170,7 @@ namespace Marksman.Champions
                                         select Q.GetPrediction(minions)
                         into qP
                                         let hit = qP.CastPosition.LSExtend(ObjectManager.Player.Position, -140)
-                                        where qP.Hitchance >= HitChance.High
+                                        where qP.Hitchance >= Q.GetHitchance()
                                         select hit)
                     {
                         Q.Cast(hit);
@@ -148,7 +194,7 @@ namespace Marksman.Champions
                             R.IsReady() && enemy.LSIsValidTarget() && R.GetDamage(enemy) > enemy.Health
                             && enemy.LSDistance(ObjectManager.Player) > Q.Range))
                 {
-                    //Utils.MPing.Ping(enemy.Position.LSTo2D());
+                    Utils.MPing.Ping(enemy.Position.LSTo2D());
                 }
             }
 
@@ -358,7 +404,8 @@ namespace Marksman.Champions
         {
             config.Add("UseQC", new CheckBox("Q"));
             config.Add("UseWC", new CheckBox("W"));
-
+            config.Add("UseEC", new CheckBox("E"));
+        
             config.AddGroupLabel("R");
             {
                 config.Add("UseRC", new CheckBox("Use R"));
@@ -401,6 +448,7 @@ namespace Marksman.Champions
             config.AddSeparator();
             config.Add("CastR", new KeyBind("Cast R (2000 Range)", false, KeyBind.BindTypes.HoldActive, 'T'));
             config.Add("PingCH", new CheckBox("Ping Killable Enemy with R"));
+            config.Add("PingDH", new CheckBox("Draw Killable Enemy with R"));
             return true;
         }
 

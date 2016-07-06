@@ -52,6 +52,47 @@ namespace Marksman.Common
         public static Font Text;
         public static Font TextPassive;
 
+        public static void Init()
+        {
+            Text = new Font(
+                Drawing.Direct3DDevice,
+                new FontDescription
+                {
+                    FaceName = "Calibri",
+                    Height = 15,
+                    OutputPrecision = FontPrecision.Default,
+                    Quality = FontQuality.Default
+                    ,//Weight = FontWeight.Bold
+
+                });
+
+            TextPassive = new Font(
+               Drawing.Direct3DDevice,
+               new FontDescription
+               {
+                   FaceName = "Calibri",
+                   Height = 11,
+                   OutputPrecision = FontPrecision.Default,
+                   Quality = FontQuality.Draft
+               });
+
+            Drawing.OnPreReset += DrawingOnOnPreReset;
+            Drawing.OnPostReset += DrawingOnOnPostReset;
+            AppDomain.CurrentDomain.DomainUnload += CurrentDomainOnDomainUnload;
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnDomainUnload;
+        }
+
+        public static Vector3 CenterOfVectors(Vector3[] vectors)
+        {
+            var sum = Vector3.Zero;
+            if (vectors == null || vectors.Length == 0)
+                return sum;
+
+            sum = vectors.Aggregate(sum, (current, vec) => current + vec);
+
+            return sum / vectors.Length;
+        }
+
         public static bool IsWallBetween(Vector3 start, Vector3 end, int step = 3)
         {
             if (start.IsValid() && end.IsValid() && step > 0)
@@ -73,16 +114,7 @@ namespace Marksman.Common
             Text.Dispose();
             TextPassive.Dispose();
         }
-        public static Vector3 CenterOfVectors(Vector3[] vectors)
-        {
-            var sum = Vector3.Zero;
-            if (vectors == null || vectors.Length == 0)
-                return sum;
 
-            sum = vectors.Aggregate(sum, (current, vec) => current + vec);
-
-            return sum / vectors.Length;
-        }
         private static void DrawingOnOnPostReset(EventArgs args)
         {
             Text.OnResetDevice();
@@ -95,33 +127,6 @@ namespace Marksman.Common
             TextPassive.OnLostDevice();
         }
 
-        public static void Init()
-        {
-
-
-            Text = new Font(
-                Drawing.Direct3DDevice,
-                new FontDescription
-                {
-                    FaceName = "Tahoma",
-                    Height = 13,
-                    OutputPrecision = FontPrecision.Default,
-                    Quality = FontQuality.Default
-                });
-            TextPassive = new Font(
-               Drawing.Direct3DDevice,
-               new FontDescription
-               {
-                   FaceName = "Calibri",
-                   Height = 11,
-                   OutputPrecision = FontPrecision.Default,
-                   Quality = FontQuality.Draft
-               });
-            Drawing.OnPreReset += DrawingOnOnPreReset;
-            Drawing.OnPostReset += DrawingOnOnPostReset;
-            AppDomain.CurrentDomain.DomainUnload += CurrentDomainOnDomainUnload;
-            AppDomain.CurrentDomain.ProcessExit += CurrentDomainOnDomainUnload;
-        }
         public static void DrawBox(float positionX, float positionY, float width, int height, System.Drawing.Color color, int borderwidth, System.Drawing.Color borderColor, string text = "")
         {
             if (color != Color.Transparent)

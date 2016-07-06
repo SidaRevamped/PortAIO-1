@@ -553,6 +553,9 @@
     <Compile Include="Dual-Port\TheDoctor\yol0Thresh\AntiGapcloser.cs" />
     <Compile Include="Dual-Port\TheDoctor\yol0Thresh\Interrupter.cs" />
     <Compile Include="Dual-Port\TheDoctor\yol0Thresh\Program.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Common\CommonFontExtention.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Common\CommonObjectDetector.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\DangerousTargets.cs" />
     <Compile Include="Dual-Port\`LSStaff\AhriSharp\Ahri.cs" />
     <Compile Include="Dual-Port\`LSStaff\AhriSharp\Helper.cs" />
     <Compile Include="Dual-Port\`LSStaff\AhriSharp\Program.cs" />

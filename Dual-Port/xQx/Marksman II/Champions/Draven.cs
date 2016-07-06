@@ -9,6 +9,7 @@ using EloBuddy;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK;
+using Marksman.Common;
 
 namespace Marksman.Champions
 {
@@ -44,10 +45,45 @@ namespace Marksman.Champions
             GameObject.OnDelete += OnDeleteObject;
             AntiGapcloser.OnEnemyGapcloser += OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            Drawing.OnEndScene += DrawingOnOnEndScene;
             Utils.Utils.PrintMessage("Draven loaded.");
         }
 
+        public override void DrawingOnEndScene(EventArgs args)
+        {
+
+            var xComboString = "Combo Mode: ";
+            System.Drawing.Color xComboColor = System.Drawing.Color.FromArgb(100, 255, 200, 37);
+
+            string[] vComboString = new[]
+            {
+                "Offensive", "Deffensive"
+            };
+
+            System.Drawing.Color[] vComboColor = new[]
+            {
+                System.Drawing.Color.FromArgb(255, 4, 0, 255),
+                System.Drawing.Color.Red,
+                System.Drawing.Color.FromArgb(255, 46, 47, 46),
+            };
+
+            var nComboMode = Program.combo["Combo.Mode"].Cast<ComboBox>().CurrentValue;
+            xComboString = xComboString + vComboString[nComboMode];
+            xComboColor = vComboColor[nComboMode];
+
+            Common.CommonGeometry.DrawBox(new Vector2(Drawing.Width * 0.45f, Drawing.Height * 0.80f), 125, 18, xComboColor, 1, System.Drawing.Color.Black);
+            Common.CommonGeometry.DrawText(CommonGeometry.Text, xComboString, Drawing.Width * 0.455f, Drawing.Height * 0.803f, SharpDX.Color.Wheat);
+
+            var rCircle = Program.combo["DrawRMini"].Cast<CheckBox>().CurrentValue;
+            if (rCircle)
+            {
+                var maxRRange = Program.combo["UseRCMaxR"].Cast<Slider>().CurrentValue;
+                var rMax = Program.combo["DrawRMax"].Cast<CheckBox>().CurrentValue;
+#pragma warning disable 618
+                LeagueSharp.Common.Utility.DrawCircle(ObjectManager.Player.Position, maxRRange, Color.IndianRed, 1, 23, true);
+#pragma warning restore 618
+            }
+
+        }
         public void OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (E.IsReady() && Program.misc["EGapCloser"].Cast<CheckBox>().CurrentValue && gapcloser.Sender.LSIsValidTarget(E.Range))
@@ -70,7 +106,7 @@ namespace Marksman.Champions
             {
                 for (var i = 0; i < ExistingReticles.Count; i++)
                 {
-                    if (ExistingReticles[i].NetworkId == sender.NetworkId)
+                    if (Math.Abs(ExistingReticles[i].NetworkId - sender.NetworkId) < 0.00001)
                     {
                         ExistingReticles.RemoveAt(i);
                         return;
@@ -91,19 +127,6 @@ namespace Marksman.Champions
                         ReticlePos = sender.Position,
                         ExpireTime = Game.Time + 1.20
                     });
-            }
-        }
-
-        private void DrawingOnOnEndScene(EventArgs args)
-        {
-            var rCircle = Program.combo["DrawRMini"].Cast<CheckBox>().CurrentValue;
-            if (rCircle)
-            {
-                var maxRRange = Program.combo["UseRCMaxR"].Cast<Slider>().CurrentValue;
-                var rMax = Program.combo["DrawRMax"].Cast<CheckBox>().CurrentValue;
-#pragma warning disable 618
-                LeagueSharp.Common.Utility.DrawCircle(ObjectManager.Player.Position, maxRRange, Color.DarkMagenta, 1, 23, true);
-#pragma warning restore 618
             }
         }
 
@@ -249,6 +272,7 @@ namespace Marksman.Champions
 
         public override bool ComboMenu(Menu config)
         {
+            config.Add("Combo.Mode", new ComboBox("Combo Mode:", 0, "Q:R", "W:R"));
             config.Add("UseQC", new CheckBox("Use Q"));
             config.Add("UseWC", new CheckBox("Use W"));
             config.Add("UseEC", new CheckBox("Use E"));
