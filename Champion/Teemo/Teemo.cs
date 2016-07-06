@@ -56,9 +56,26 @@ namespace SharpShooter.Plugins
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            EloBuddy.SDK.Events.Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
             Orbwalker.OnPostAttack += Orbwalking_AfterAttack;
             Console.WriteLine("Sharpshooter: Teemo Loaded.");
+        }
+
+        private void Gapcloser_OnGapcloser(AIHeroClient sender, EloBuddy.SDK.Events.Gapcloser.GapcloserEventArgs e)
+        {
+            if (getCheckBoxItem(gapCloser, "antiGap") && e.Sender.IsHPBarRendered && e.Sender.IsVisible)
+            {
+                if (e.Sender.LSIsValidTarget(_q.Range))
+                    if (_q.IsReady())
+                        _q.CastOnUnit(e.Sender);
+
+                if (_w.IsReady())
+                    _w.Cast();
+
+                if (e.End.LSDistance(ObjectManager.Player.Position) <= 300)
+                    if (_r.IsReady())
+                        _r.Cast(ObjectManager.Player.Position);
+            }
         }
 
         public static bool getCheckBoxItem(Menu m, string item)
@@ -181,23 +198,6 @@ namespace SharpShooter.Plugins
                                     _q.CastOnUnit(target);
                             }
                 }
-            }
-        }
-
-        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-        {
-            if (getCheckBoxItem(gapCloser, "antiGap"))
-            {
-                if (gapcloser.Sender.LSIsValidTarget(_q.Range))
-                    if (_q.IsReady())
-                        _q.CastOnUnit(gapcloser.Sender);
-
-                if (_w.IsReady())
-                    _w.Cast();
-
-                if (gapcloser.End.LSDistance(ObjectManager.Player.Position) <= 300)
-                    if (_r.IsReady())
-                        _r.Cast(ObjectManager.Player.Position);
             }
         }
 
