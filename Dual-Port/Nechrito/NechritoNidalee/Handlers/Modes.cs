@@ -25,16 +25,19 @@ namespace Nechrito_Nidalee.Handlers
 {
     class Modes : Core
     {
-        
+
         public static void Combo()
         {
-           
+
             var Target = TargetSelector.GetTarget(1500, DamageType.Magical);
             var QPred = Champion.Javelin.GetPrediction(Target);
             var SwipePred = Champion.Swipe.GetPrediction(Target);
             var PouncePred = Champion.Pounce.GetPrediction(Target);
             var bushW = Champion.Bushwack.GetPrediction(Target).UnitPosition;
             var Hunted = Player.HasBuff("NidaleePassiveHunted") || Player.HasBuff("exposeweaknessdebuff") || Target.HasBuff("NidaleePassiveHunted") || Target.HasBuff("exposeweaknessdebuff");
+
+            if (Target == null || !Target.IsVisible || !Target.IsHPBarRendered)
+                return;
 
             // The full 1v1 rotation
             if ((Player.LSDistance(Target.Position) <= 1500) && Target != null && Target.LSIsValidTarget())
@@ -52,11 +55,11 @@ namespace Nechrito_Nidalee.Handlers
                 {
                     Champion.Bushwack.Cast(Target.ServerPosition - 75);
                 }
-               if (!CatForm() && Champion.Javelin.IsReady() && QPred.Hitchance >= LeagueSharp.Common.HitChance.VeryHigh)
+                if (!CatForm() && Champion.Javelin.IsReady() && QPred.Hitchance >= LeagueSharp.Common.HitChance.VeryHigh)
                 {
                     Champion.Javelin.Cast(QPred.CastPosition);
                 }
-                if(!CatForm() && Champion.Primalsurge.IsReady() && Player.HealthPercent <= 85)
+                if (!CatForm() && Champion.Primalsurge.IsReady() && Player.HealthPercent <= 85)
                 {
                     Champion.Primalsurge.Cast(Player);
                 }
@@ -97,9 +100,9 @@ namespace Nechrito_Nidalee.Handlers
             var minions = MinionManager.GetMinions(600f).FirstOrDefault();
             if (minions == null)
                 return;
-            if(!CatForm() && minions.LSDistance(Player) <= 325)
+            if (!CatForm() && minions.LSDistance(Player) <= 325)
             { Champion.Aspect.Cast(); }
-            if(CatForm())
+            if (CatForm())
             {
                 var m = MinionManager.GetMinions(Player.Position, 600);
                 foreach (var min in m)
@@ -110,7 +113,7 @@ namespace Nechrito_Nidalee.Handlers
                         Champion.Swipe.Cast(min.ServerPosition);
                     if (min.Health <= Champion.Pounce.GetDamage(min) && m.Count > 2)
                         Champion.Pounce.Cast(min);
-                   
+
                 }
             }
         }
@@ -121,12 +124,12 @@ namespace Nechrito_Nidalee.Handlers
             if (mobs.Count == 0)
                 return;
 
-            if(Player.HealthPercent <= MenuConfig.jnglHeal && CatForm())
+            if (Player.HealthPercent <= MenuConfig.jnglHeal && CatForm())
             { Champion.Aspect.Cast(); Champion.Primalsurge.Cast(Player); }
 
             foreach (var m in mobs)
             {
-                if(CatForm() && m.Health < (float)Program.Player.GetAutoAttackDamage(m) && m.LSDistance(Player) > 300)
+                if (CatForm() && m.Health < (float)Program.Player.GetAutoAttackDamage(m) && m.LSDistance(Player) > 300)
                 {
                     Champion.Aspect.Cast();
                 }
