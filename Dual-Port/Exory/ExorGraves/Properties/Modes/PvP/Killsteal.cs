@@ -32,6 +32,8 @@ namespace ExorAIO.Champions.Graves
                             !Invulnerable.Check(t) &&
                             t.LSIsValidTarget(Vars.W.Range) &&
                             !t.LSIsValidTarget(Vars.AARange) &&
+                            t.IsVisible &&
+                            t.IsHPBarRendered &&
                             Vars.GetRealHealth(t) <
                                 (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.W)))
                 {
@@ -52,6 +54,8 @@ namespace ExorAIO.Champions.Graves
                             !Invulnerable.Check(t) &&
                             t.LSIsValidTarget(Vars.Q.Range) &&
                             !t.LSIsValidTarget(Vars.AARange) &&
+                            t.IsVisible &&
+                            t.IsHPBarRendered &&
                             Vars.GetRealHealth(t) <
                                 (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.Q)))
                 {
@@ -72,6 +76,8 @@ namespace ExorAIO.Champions.Graves
                             !Invulnerable.Check(t) &&
                             !t.LSIsValidTarget(Vars.AARange) &&
                             t.LSIsValidTarget(Vars.R.Range+150f) &&
+                            t.IsVisible &&
+                            t.IsHPBarRendered &&
                             Vars.GetRealHealth(t) <
                                 (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.R, (t.LSIsValidTarget(Vars.R.Range)
                                     ? DamageStage.Default
