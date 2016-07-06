@@ -15,6 +15,12 @@
     using EloBuddy.SDK.Menu.Values;
     public class AntiStealth
     {
+        #region Constants
+
+        private const float Delay = 2f;
+
+        #endregion
+
         #region Static Fields
 
         /// <summary>
@@ -25,6 +31,8 @@
         #endregion
 
         #region Fields
+
+        private float lastReveal;
 
         /// <summary>
         ///     Rengar
@@ -259,7 +267,7 @@
                     return;
                 }
 
-                if (this.Player.LSDistance(sender.Position) > 800)
+                if (this.Player.LSDistance(sender.Position) > 1000f || this.lastReveal + Delay > Game.Time)
                 {
                     return;
                 }
@@ -274,13 +282,8 @@
                     var item = this.GetBestWardItem();
                     if (item != null)
                     {
-                        var spellCastPosition = this.Player.LSDistance(args.End) > 600
-                                                    ? this.Player.Position
-                                                    : args.End;
-
-                        LeagueSharp.Common.Utility.DelayAction.Add(
-                            random.Next(100, 1000),
-                            () => this.Player.Spellbook.CastSpell(item.Slot, spellCastPosition));
+                        this.Player.Spellbook.CastSpell(item.Slot, ObjectManager.Player.Position.LSExtend(args.End, 600f));
+                        this.lastReveal = Game.Time;
                     }
                 }
 
