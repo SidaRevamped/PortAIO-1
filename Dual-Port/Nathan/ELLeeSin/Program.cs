@@ -453,6 +453,11 @@
                     return;
                 }
 
+                if (target.HasQBuff())
+                {
+                    spells[Spells.Q].Cast(target);
+                }
+
                 var prediction = spells[Spells.Q].GetPrediction(target);
 
                 if (prediction.Hitchance >= HitChance.High)
@@ -491,7 +496,7 @@
 
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(spells[Spells.Q].Range, DamageType.Physical);
+            var target = TargetSelector.GetTarget(spells[Spells.Q].Range + 200, DamageType.Physical);
             if (target == null)
             {
                 return;
@@ -512,10 +517,7 @@
                 spells[Spells.R].CastOnUnit(target);
             }
 
-            if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.Q2") && spells[Spells.Q].IsReady()
-                && spells[Spells.Q].Instance.Name.Equals(
-                    "blindmonkqtwo",
-                    StringComparison.InvariantCultureIgnoreCase) && target.HasQBuff() && (castQAgain))
+            if (getCheckBoxItem(InitMenu.comboMenu, "ElLeeSin.Combo.Q2") && spells[Spells.Q].IsReady() && spells[Spells.Q].Instance.Name.Equals("blindmonkqtwo", StringComparison.InvariantCultureIgnoreCase) && target.HasQBuff() && (castQAgain))
             {
                 CastQ(target);
             }
@@ -1244,7 +1246,7 @@
                 if (args.SData.Name.Equals("BlindMonkQOne", StringComparison.InvariantCultureIgnoreCase))
                 {
                     castQAgain = false;
-                    Utility.DelayAction.Add(2900, () => { castQAgain = true; });
+                    Utility.DelayAction.Add(1, () => { castQAgain = true; });
                 }
 
                 if (spells[Spells.R].IsReady() && Player.Spellbook.CanUseSpell(flashSlot) == SpellState.Ready)
@@ -1282,7 +1284,7 @@
                 if (args.SData.Name.Equals("BlindMonkQTwo", StringComparison.InvariantCultureIgnoreCase))
                 {
                     waitingForQ2 = true;
-                    Utility.DelayAction.Add(3000, () => { waitingForQ2 = false; });
+                    Utility.DelayAction.Add(1000, () => { waitingForQ2 = false; });
                 }
                 if (args.SData.Name.Equals("BlindMonkRKick", StringComparison.InvariantCultureIgnoreCase))
                 {
