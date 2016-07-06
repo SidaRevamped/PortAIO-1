@@ -116,7 +116,7 @@ namespace Marksman.Champions
             }
         }
 
-        public override void Game_OnUpdate(EventArgs args)
+        public override void Game_OnGameUpdate(EventArgs args)
         {
             if (!ComboActive)
             {
