@@ -33,6 +33,16 @@ namespace MorganaE
         {
             if (!sender.IsEnemy || Player.Instance.IsRecalling()) return;
 
+            if (args.Slot == SpellSlot.E && args.SData.Name.IndexOf("Condemn", StringComparison.CurrentCultureIgnoreCase) >= 0 && args.Target.Type == GameObjectType.AIHeroClient && args.Target.IsAlly && sender.BaseSkinName.Contains("Vayne"))
+            {
+                CastShield(args.Target as Obj_AI_Base);
+            }
+
+            if (args.Slot == SpellSlot.Q && args.SData.Name.IndexOf("Blind", StringComparison.CurrentCultureIgnoreCase) >= 0 && args.Target.Type == GameObjectType.AIHeroClient && args.Target.IsAlly && sender.BaseSkinName.Contains("Teemo"))
+            {
+                CastShield(args.Target as Obj_AI_Base);
+            }
+
             priorAllyOrder = new List<AIHeroClient>();
 
             hpAllyOrder = new List<AIHeroClient>();
