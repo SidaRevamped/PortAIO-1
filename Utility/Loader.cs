@@ -289,7 +289,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[12]))
                 {
-                    Miscc.Add("yasuo", new ComboBox("Use addon for Yasuo : ", 0, "ValvraveSharp", "YasuoPro", "GosuMechanics", "YasuoSharpV2"));
+                    Miscc.Add("yasuo", new ComboBox("Use addon for Yasuo : ", 0, "ValvraveSharp", "YasuoPro", "GosuMechanics", "YasuoSharpV2", "Firestorm AIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[13]))
                 {

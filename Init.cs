@@ -1514,6 +1514,9 @@ namespace PortAIO
                             case 3:
                                 YasuoSharpV2.Program.Init();
                                 break;
+                            case 4:
+                                Firestorm_AIO.Program.Main();
+                                break;
                             default:
                                 Valvrave_Sharp.Program.MainA();
                                 break;
