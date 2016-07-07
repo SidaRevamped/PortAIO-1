@@ -539,8 +539,8 @@
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Update\Draw\DrawSpells.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Update\Mode.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Update\Trinket.cs" />
-    <Compile Include="Dual-Port\NightMoon\HpBarDraw.cs" />
-    <Compile Include="Dual-Port\NightMoon\Program.cs" />
+    <Compile Include="Dual-Port\NightMoon\Illaoi The Kraken Priestess\HpBarDraw.cs" />
+    <Compile Include="Dual-Port\NightMoon\Illaoi The Kraken Priestess\Program.cs" />
     <Compile Include="Dual-Port\Sebby\GENESIS Jinx\PredictionOktw.cs" />
     <Compile Include="Dual-Port\Sebby\GENESIS Jinx\Program.cs" />
     <Compile Include="Dual-Port\Sebby\OKTWLucian\Lucian.cs" />

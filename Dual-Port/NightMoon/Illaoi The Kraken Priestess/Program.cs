@@ -17,7 +17,7 @@
     {
         private static AIHeroClient Me;
         private static Menu Menu;
-        public static Menu comboMenu, harassMenu, drawMenu, ksMenu, laneMenu, jungleMenu, itemMenu;
+        public static Menu comboMenu, harassMenu, drawMenu, ksMenu, laneMenu, jungleMenu, itemMenu, blacklistMenu, miscMenu;
         private static Spell Q, W, E, R;
         private static SpellSlot Ignite = SpellSlot.Unknown;
         private static HpBarDraw DrawHpBar = new HpBarDraw();
@@ -58,6 +58,7 @@
             comboMenu = Menu.AddSubMenu("Combo", "Combo");
             {
                 comboMenu.Add("Q", new CheckBox("Use Q", true));
+                comboMenu.Add("QGhost", new CheckBox("Use Q | To Ghost", true));
                 comboMenu.Add("W", new CheckBox("Use W", true));
                 comboMenu.Add("WOutRange", new CheckBox("Use W | Out of Attack Range", true));
                 comboMenu.Add("WUlt", new CheckBox("Use W | Ult Active", true));
@@ -65,7 +66,7 @@
                 comboMenu.Add("R", new CheckBox("Use R", true));
                 comboMenu.Add("RCount", new Slider("Use R | Counts Enemies >=", 2, 1, 5));
                 comboMenu.Add("Ignite", new CheckBox("Use Ignite", true));
-                comboMenu.Add("Item", new CheckBox("Use Item", true));
+                comboMenu.Add("Item", new CheckBox("Use Items", true));
             }
 
             harassMenu = Menu.AddSubMenu("Harass", "Harass");
@@ -102,6 +103,15 @@
                 }
             }
 
+            blacklistMenu = Menu.AddSubMenu("E BlackList", "EBlackList");
+            {
+                blacklistMenu.AddGroupLabel("E BlackList");
+                if (GameObjects.EnemyHeroes.Any())
+                {
+                    GameObjects.EnemyHeroes.ForEach(i => blacklistMenu.Add(i.ChampionName.ToLower(), new CheckBox(i.ChampionName, false)));
+                }
+            }
+
             itemMenu = Menu.AddSubMenu("Items", "Items");
             {
                 itemMenu.Add("Youmuus", new CheckBox("Use Youmuus", true));
@@ -109,6 +119,11 @@
                 itemMenu.Add("Botrk", new CheckBox("Use Botrk", true));
                 itemMenu.Add("Hydra", new CheckBox("Use Hydra", true));
                 itemMenu.Add("Tiamat", new CheckBox("Use Tiamat", true));
+            }
+
+            miscMenu = Menu.AddSubMenu("Misc", "Misc");
+            {
+                miscMenu.Add("EGap", new CheckBox("Use E Anti GapCloset", true));
             }
 
             drawMenu = Menu.AddSubMenu("Draw", "Draw");
@@ -120,11 +135,25 @@
                 drawMenu.Add("DrawDamage", new CheckBox("Draw Combo Damage", true));
             }
 
+            Events.OnGapCloser += OnGapCloser;
             Obj_AI_Base.OnSpellCast += OnDoCast;
             Orbwalker.OnPostAttack += OnAction;
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
             LoadSpell();
+        }
+
+        private static void OnGapCloser(object obj, Events.GapCloserEventArgs Args)
+        {
+            if (miscMenu["EGap"].Cast<CheckBox>().CurrentValue && Args.IsDirectedToPlayer)
+            {
+                var sender = Args.Sender as AIHeroClient;
+
+                if (sender.IsEnemy && (Args.End.DistanceToPlayer() <= 200 || sender.DistanceToPlayer() <= 250) && !blacklistMenu[sender.ChampionName.ToLower()].Cast<CheckBox>().CurrentValue)
+                {
+                    E.Cast(sender);
+                }
+            }
         }
 
         private static void OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -174,19 +203,36 @@
                             }
                         }
                     }
-                
 
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-                {
-                    if (Me.ManaPercent >= harassMenu["Mana"].Cast<Slider>().CurrentValue)
+
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
                     {
-                        var target2 = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-
-                        if (target2 != null && !target2.IsDead && !target2.IsZombie && target2.IsHPBarRendered)
+                        if (Me.ManaPercent >= harassMenu["Mana"].Cast<Slider>().CurrentValue)
                         {
-                            if (harassMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && W.CanCast(target2) && !AutoAttack.IsAutoAttack(Me.ChampionName))
+                            var target2 = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+
+                            if (target2 != null && !target2.IsDead && !target2.IsZombie && target2.IsHPBarRendered)
                             {
-                                if (harassMenu["WOutRange"].Cast<CheckBox>().CurrentValue && !InAutoAttackRange(target2) && target2.LSIsValidTarget(W.Range))
+                                if (harassMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && W.CanCast(target2) && !AutoAttack.IsAutoAttack(Me.ChampionName))
+                                {
+                                    if (harassMenu["WOutRange"].Cast<CheckBox>().CurrentValue && !InAutoAttackRange(target2) && target2.LSIsValidTarget(W.Range))
+                                    {
+                                        W.Cast();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+                    {
+                        if (Me.ManaPercent >= jungleMenu["Mana"].Cast<Slider>().CurrentValue)
+                        {
+                            var Mobs = GameObjects.Jungle.Where(x => x.LSIsValidTarget(Q.Range) && !GameObjects.JungleSmall.Contains(x)).ToList();
+
+                            if (Mobs.Count() > 0)
+                            {
+                                if (jungleMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && !AutoAttack.IsAutoAttack(Me.ChampionName))
                                 {
                                     W.Cast();
                                 }
@@ -194,25 +240,8 @@
                         }
                     }
                 }
-
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
-                {
-                    if (Me.ManaPercent >= jungleMenu["Mana"].Cast<Slider>().CurrentValue)
-                    {
-                        var Mobs = GameObjects.Jungle.Where(x => x.LSIsValidTarget(Q.Range) && !GameObjects.JungleSmall.Contains(x)).ToList();
-
-                        if (Mobs.Count() > 0)
-                        {
-                            if (jungleMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && !AutoAttack.IsAutoAttack(Me.ChampionName))
-                            {
-                                W.Cast();
-                            }
-                        }
-                    }
-                }
-             }
-          }
-      }
+            }
+        }
 
         private static void OnUpdate(EventArgs Args)
         {
@@ -244,26 +273,13 @@
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-
+            var Ghost = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsEnemy && x.IsHPBarRendered && x.LSIsValidTarget(Q.Range)).FirstOrDefault(x => x.HasBuff("illaoiespirit"));
             if (target != null && !target.IsDead && !target.IsZombie && target.IsHPBarRendered)
             {
                 if (comboMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.LSIsValidTarget(Q.Range) && Q.CanCast(target) && !AutoAttack.IsAutoAttack(Me.ChampionName))
                 {
                     Q.Cast(target);
                 }
-
-               /* if (comboMenu["W"].Cast<CheckBox>().CurrentValue && W.IsReady() && W.CanCast(target) && !AutoAttack.IsAutoAttack(Me.ChampionName))
-                {
-                    if (comboMenu["WOutRange"].Cast<CheckBox>().CurrentValue && !InAutoAttackRange(target) && target.LSIsValidTarget(W.Range))
-                    {
-                        W.Cast();
-                    }
-
-                    if (comboMenu["WUlt"].Cast<CheckBox>().CurrentValue && Me.HasBuff("IllaoiR") && target.LSIsValidTarget(W.Range))
-                    {
-                        W.Cast();
-                    }
-                } */
 
                 if (comboMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && E.CanCast(target) && !AutoAttack.IsAutoAttack(Me.ChampionName) && !InAutoAttackRange(target) && target.LSIsValidTarget(E.Range))
                 {
@@ -288,6 +304,13 @@
                     Me.Spellbook.CastSpell(Ignite, target);
                 }
             }
+            else if (target == null && Ghost != null)
+            {
+                if (Ghost != null && Q.IsReady() && comboMenu["QGhost"].Cast<CheckBox>().CurrentValue && comboMenu["Q"].Cast<CheckBox>().CurrentValue)
+                {
+                    Q.Cast(Ghost);
+                }
+            }
         }
 
         private static void Harass()
@@ -295,7 +318,7 @@
             if (Me.ManaPercent >= harassMenu["Mana"].Cast<Slider>().CurrentValue)
             {
                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-
+                var Ghost = ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsEnemy && x.IsHPBarRendered && x.LSIsValidTarget(Q.Range)).FirstOrDefault(x => x.HasBuff("illaoiespirit"));
                 if (target != null && !target.IsDead && !target.IsZombie && target.IsHPBarRendered)
                 {
                     if (harassMenu["Q"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.LSIsValidTarget(Q.Range) && Q.CanCast(target) && !AutoAttack.IsAutoAttack(Me.ChampionName))
@@ -311,9 +334,20 @@
                         }
                     }
 
-                    if (harassMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && E.CanCast(target) && !AutoAttack.IsAutoAttack(Me.ChampionName) && !InAutoAttackRange(target) && target.LSIsValidTarget(E.Range))
+                    if (harassMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady() && E.CanCast(target) && !blacklistMenu[target.ChampionName.ToLower()].Cast<CheckBox>().CurrentValue && !AutoAttack.IsAutoAttack(Me.ChampionName) && !InAutoAttackRange(target) && target.IsValidTarget(E.Range))
                     {
                         E.Cast(target);
+                    }
+                }
+                else if (target == null && Ghost != null)
+                {
+                    if (Q.IsReady() && harassMenu["Q"].Cast<CheckBox>().CurrentValue)
+                        Q.Cast(Ghost);
+
+                    if (W.IsReady() && harassMenu["W"].Cast<CheckBox>().CurrentValue)
+                    {
+                        W.Cast();
+                        Orbwalker.ForcedTarget = Ghost;
                     }
                 }
             }
@@ -384,7 +418,7 @@
 
             if (ksMenu["E"].Cast<CheckBox>().CurrentValue && E.IsReady())
             {
-                var et = GameObjects.EnemyHeroes.Where(x => x.LSIsValidTarget(E.Range) && x.Health < E.GetDamage(x)).FirstOrDefault();
+                var et = GameObjects.EnemyHeroes.Where(x => !blacklistMenu[x.ChampionName.ToLower()].Cast<CheckBox>().CurrentValue && x.LSIsValidTarget(E.Range) && x.Health < E.GetDamage(x)).FirstOrDefault();
 
                 if (et != null)
                 {
