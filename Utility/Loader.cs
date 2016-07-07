@@ -497,7 +497,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[62]))
                 {
-                    Miscc.Add("reneton", new ComboBox("Use addon for Renekton : ", 0, "ExorAIO", "UnderratedAIO"));
+                    Miscc.Add("renekton", new ComboBox("Use addon for Renekton : ", 0, "ExorAIO", "UnderratedAIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[63]))
                 {
