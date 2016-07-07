@@ -23,7 +23,7 @@ namespace Leblanc.Champion
 
         public static void Init()
         {
-            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 720);
+            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 700);
             Q.SetTargetted(0.5f, 1500f);
 
             W = new LeagueSharp.Common.Spell(SpellSlot.W, 600 + 80);
@@ -34,7 +34,7 @@ namespace Leblanc.Champion
 
             R = new LeagueSharp.Common.Spell(SpellSlot.R);
 
-            Q2 = new LeagueSharp.Common.Spell(SpellSlot.R, 660);
+            Q2 = new LeagueSharp.Common.Spell(SpellSlot.R, 700);
             Q2.SetTargetted(0.5f, 1500f);
 
             W2 = new LeagueSharp.Common.Spell(SpellSlot.R, 600 + 80);
@@ -65,50 +65,55 @@ namespace Leblanc.Champion
 
         static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            var hero = args.Target as AIHeroClient;
-            if (hero != null)
-            {
-                var t = hero;
-                if (!t.LSIsValidTarget(E.Range))
-                {
-                    return;
-                }
-                // args.Process = !t.HaveImmortalBuff();
+            //        var t = hero;
+            //        if (!t.IsValidTarget(E.Range))
+            //        {
+            //            return;
+            //        }
+            //        // args.Process = !t.HasImmortalBuff();
 
-                args.Process = Environment.TickCount - LastSeen(t) >= (Modes.ModeSettings.MenuLocal["Settings.SpellCast.VisibleDelay"].Cast<ComboBox>().CurrentValue + 1)*250;
-            }
+            args.Process = !Modes.ModeCombo.Target.HasImmortalBuff();
+
+            //if (!Modes.ModeSettings.MenuSettingQ.Item("Settings.SpellCast.Active").GetValue<bool>())
+            //{
+            //    args.Process = true;
+            //}
+            //else
+            //{
+            //    var hero = args.Target as Obj_AI_Hero;
+            //    if (hero != null)
+            //    {
+            //        var t = hero;
+            //        if (!t.IsValidTarget(E.Range))
+            //        {
+            //            return;
+            //        }
+            //        // args.Process = !t.HasImmortalBuff();
+
+            //        args.Process = Environment.TickCount - LastSeen(t) >=
+            //                       (Modes.ModeSettings.MenuSettingQ.Item("Settings.SpellCast.VisibleDelay")
+            //                           .GetValue<StringList>()
+            //                           .SelectedIndex + 1)*250;
+            //    
         }
 
         public static void CastQ(Obj_AI_Base t)
         {
-            //if (t.HaveImmortalBuff())
-            //{
-            //    return;
-            //}
-
-            if (Q.CanCast(t))
-            {
-                Q.CastOnUnit(t);
-            }
+            Q.CastOnUnit(t, true);
         }
 
         public static void CastQ2(Obj_AI_Base t)
         {
-            //if (t.HaveImmortalBuff())
-            //{
-            //    return;
-            //}
-
-            if (CommonHelper.SpellRStatus == CommonHelper.SpellRName.R2xQ && Q2.CanCast(t))
+            if (CommonHelper.SpellRStatus == CommonHelper.SpellRName.R2xQ)
             {
-                Q2.CastOnUnit(t);
+                Q2.CastOnUnit(t, true);
             }
         }
         public static void CastW(Vector3 t)
         {
             if (W.IsReady() && !W.StillJumped())
             {
-                W.Cast(t);
+                W.Cast(t, true);
             }
         }
 
@@ -116,7 +121,7 @@ namespace Leblanc.Champion
         {
             if (W2.IsReady() && !W2.StillJumped())
             {
-                W2.Cast(t);
+                W2.Cast(t, true);
             }
         }
 
@@ -124,26 +129,13 @@ namespace Leblanc.Champion
         {
             if (W.CanCast(t) && !W.StillJumped())
             {
-                W.Cast(t.Position);
+                W.Cast(t.Position, true);
             }
 
-            if (returnBack && W.StillJumped() && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-            {
-                W.Cast();
-            }
-        }
-
-        public static void CastW2(Obj_AI_Base t)
-        {
-            //if (t.HaveImmortalBuff())
+            //if (returnBack && W.StillJumped())
             //{
-            //    return;
+            //  W.Cast();
             //}
-
-            if (CommonHelper.SpellRStatus == CommonHelper.SpellRName.R2xW && W2.CanCast(t) && !W2.StillJumped())
-            {
-                W2.Cast(t.Position);
-            }
         }
 
         public static void CastE(Obj_AI_Base t)
@@ -154,7 +146,7 @@ namespace Leblanc.Champion
                 E.UpdateSourcePosition(ObjectManager.Player.ServerPosition, t.ServerPosition);
                 if (E.GetPrediction(t).Hitchance >= hitChances[Modes.ModeSettings.EHitchance])
                 {
-                    E.Cast(t);
+                    E.Cast(t, true);
                 }
             }
         }
@@ -167,7 +159,7 @@ namespace Leblanc.Champion
                 E.UpdateSourcePosition(ObjectManager.Player.ServerPosition, t.ServerPosition);
                 if (E.GetPrediction(t).Hitchance >= hitChances[Modes.ModeSettings.EHitchance])
                 {
-                    E2.Cast(t);
+                    E2.Cast(t, true);
                 }
 
                 //E2.UpdateSourcePosition(ObjectManager.Player.ServerPosition, t.ServerPosition);

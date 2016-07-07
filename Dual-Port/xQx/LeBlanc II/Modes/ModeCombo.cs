@@ -21,14 +21,12 @@ namespace Leblanc.Modes
     {
         Mode2xQ,
         Mode2xW,
-        ModeAuto
     }
 
     enum ComboMode
     {
         Mode2xQ = 0,
         Mode2xW = 1,
-        ModeAuto = 2
     }
 
 
@@ -89,9 +87,6 @@ namespace Leblanc.Modes
                     case 1:
                         ActiveComboMode = ActiveComboMode.Mode2xW;
                         return ComboMode.Mode2xW;
-                    case 2:
-                        ActiveComboMode = ActiveComboMode.ModeAuto;
-                        return ComboMode.ModeAuto;
                 }
 
                 return ComboMode.Mode2xQ;
@@ -103,7 +98,7 @@ namespace Leblanc.Modes
 
             MenuLocal = Modes.ModeConfig.MenuConfig.AddSubMenu("Combo", "Combo");
             {
-                MenuLocal.Add("Combo.Mode", new ComboBox("Combo Mode:", 1, "Q:R", "W:R", "Auto"));
+                MenuLocal.Add("Combo.Mode", new ComboBox("Combo Mode:", 1, "Q:R", "W:R"));
                 MenuLocal.Add("Combo.UseW", new ComboBox("W:", 1, "Off", "On"));
                 MenuLocal.Add("Combo.UseW.Far", new ComboBox("W: Jump for killable distant enemy", 1, "Off", "On"));
                 MenuLocal.Add("Combo.UseE", new ComboBox("E:", 1, "Off", "On"));
@@ -118,7 +113,7 @@ namespace Leblanc.Modes
 
         private static int GetWHits(Obj_AI_Base target, List<Obj_AI_Base> targets = null)
         {
-            if (targets != null && (ComboMode == ComboMode.Mode2xW || ComboMode == ComboMode.ModeAuto))
+            if (targets != null && ComboMode == ComboMode.Mode2xW)
             {
                 targets = targets.Where(t => t.LSIsValidTarget((W.Range + W.Width))).ToList();
                 var pred = W.GetPrediction(target);
@@ -255,7 +250,7 @@ namespace Leblanc.Modes
 
             string[] vComboString = new[]
             {
-                "Q:R", "W:R", "Auto"
+                "Q > R", "W > R"
             };
 
             System.Drawing.Color[] vComboColor = new[]
@@ -269,7 +264,7 @@ namespace Leblanc.Modes
             xComboString = xComboString + vComboString[MenuLocal["Combo.Mode"].Cast<ComboBox>().CurrentValue];
             xComboColor = vComboColor[MenuLocal["Combo.Mode"].Cast<ComboBox>().CurrentValue];
 
-            Common.CommonGeometry.DrawBox(new Vector2(Drawing.Width * 0.45f, Drawing.Height * 0.80f), 125, 18, xComboColor, 1, System.Drawing.Color.Black);
+            Common.CommonGeometry.DrawBox(new Vector2(Drawing.Width * 0.45f, Drawing.Height * 0.80f), 115, 18, xComboColor, 1, System.Drawing.Color.Black);
             Common.CommonGeometry.DrawText(CommonGeometry.Text, xComboString, Drawing.Width * 0.455f, Drawing.Height * 0.803f, SharpDX.Color.Wheat);
 
             return;
@@ -330,7 +325,7 @@ namespace Leblanc.Modes
                     if (IgniteSlot != SpellSlot.Unknown &&
                         ObjectManager.Player.Spellbook.CanUseSpell(IgniteSlot) == SpellState.Ready)
                     {
-                        if (Target.LSIsValidTarget(650) && !Target.HaveImmortalBuff() &&
+                        if (Target.LSIsValidTarget(650) && !Target.HasImmortalBuff() &&
                             ObjectManager.Player.GetSummonerSpellDamage(Target, LeagueSharp.Common.Damage.SummonerSpell.Ignite) + 150 >=
                             Target.Health && (!Q.IsReady() || W.StillJumped()))
                         {
@@ -352,13 +347,6 @@ namespace Leblanc.Modes
                         {
                             ActiveComboMode = ActiveComboMode.Mode2xW;
                             ExecuteMode2xW();
-                            break;
-                        }
-
-                    case ComboMode.ModeAuto:
-                        {
-                            ActiveComboMode = ActiveComboMode.ModeAuto;
-                            ExecuteModeAuto();
                             break;
                         }
                 }
@@ -409,7 +397,7 @@ namespace Leblanc.Modes
                     Champion.PlayerSpells.CastQ(Target);
                 }
 
-                if (ActiveComboMode == ActiveComboMode.Mode2xW || ActiveComboMode == ActiveComboMode.ModeAuto)
+                if (ActiveComboMode == ActiveComboMode.Mode2xW)
                 {
                     if (MenuLocal["Combo.UseE"].Cast<ComboBox>().CurrentValue != 0)
                     {
@@ -485,9 +473,7 @@ namespace Leblanc.Modes
             }
 
             Champion.PlayerSpells.CastQ(Target);
-            Champion.PlayerSpells.Q2.CastOnUnit(Target);
-
-            //Champion.PlayerSpells.CastQ2(Target);
+            Champion.PlayerSpells.CastQ2(Target);
         }
 
         private static void ExecuteCompleteCombo()
@@ -516,7 +502,7 @@ namespace Leblanc.Modes
             }
 
             Champion.PlayerSpells.CastW(Target);
-            Champion.PlayerSpells.W2.Cast(Target);
+            Champion.PlayerSpells.CastW2(Target.Position);
             //Champion.PlayerSpells.CastW2(Target);
         }
 

@@ -21,7 +21,11 @@ namespace Leblanc.Modes
         private static LeagueSharp.Common.Spell W => PlayerSpells.W;
         private static LeagueSharp.Common.Spell E => PlayerSpells.E;
         private static AIHeroClient Target => TargetSelector.GetTarget(Q.Range * 2, DamageType.Magical);
-      
+
+        private static bool AutoReturnW => MenuLocal["Harass.UseW.Return"].Cast<CheckBox>().CurrentValue;
+
+        private static int ToggleActive => MenuLocal["Toggle.Active"].Cast<ComboBox>().CurrentValue;
+
         public static void Init()
         {
 
@@ -29,11 +33,12 @@ namespace Leblanc.Modes
             {
                 MenuLocal.Add("Harass.UseQ", new CheckBox("Q:"));
                 MenuLocal.Add("Harass.UseW", new ComboBox("W:", 2, "Off", "On", "On: After Q"));
-                MenuLocal.Add("Harass.UseW.Return", new ComboBox("W: Auto Return:", 2, "Off", "On: Everytime", "On: Don't Go Back if Enemy Have Chain"));
+                MenuLocal.Add("Harass.UseW.Return", new ComboBox("W: Auto Return"));
                 MenuLocal.Add("Harass.UseE", new CheckBox("E:", false));
 
                 MenuLocal.AddGroupLabel("Toggle Harass");
                 {
+                    MenuLocal.Add("Toggle.Active", new ComboBox("Active:", 2, "Just with Laneclear Mode", "Just with Lasthit Mode", "Both"));
                     MenuLocal.Add("Toggle.UseQ", new CheckBox("Q:", false));//.SetValue(false).SetFontStyle(FontStyle.Regular, Q.MenuColor()));
                     MenuLocal.Add("Toggle.UseW", new CheckBox("W:", false));//.SetValue(false).SetFontStyle(FontStyle.Regular, W.MenuColor()));
                     MenuLocal.Add("Toggle.UseE", new CheckBox("E:", false));//.SetValue(false).SetFontStyle(FontStyle.Regular, E.MenuColor()));
@@ -67,28 +72,35 @@ namespace Leblanc.Modes
         }
         private static void ExecuteHarass()
         {
-            if (W.StillJumped())
-            {
-                W.Cast();
-            }
-
             if (MenuLocal["Harass.UseQ"].Cast<CheckBox>().CurrentValue && Q.CanCast(Target))
             {
                 PlayerSpells.CastQ(Target);
             }
 
             var harassUseW = MenuLocal["Harass.UseW"].Cast<ComboBox>().CurrentValue;
-            
+
             if (harassUseW != 0 && W.CanCast(Target))
             {
-                if (harassUseW == 1)
+                switch (harassUseW)
                 {
-                    CastW();
+                    case 1:
+                        {
+                            PlayerSpells.CastW(Target);
+                            break;
+                        }
+                    case 2:
+                        {
+                            if (Target.HasMarkedWithQ())
+                                PlayerSpells.CastW(Target);
+                            break;
+                        }
                 }
-                else if (harassUseW == 2 && Target.HasMarkedWithQ())
-                {
-                    CastW();
-                }
+
+            }
+
+            if (W.StillJumped() && AutoReturnW)
+            {
+                W.Cast();
             }
 
             if (MenuLocal["Harass.UseE"].Cast<CheckBox>().CurrentValue && E.CanCast(Target))
@@ -99,14 +111,24 @@ namespace Leblanc.Modes
 
         private static void ExecuteToggle()
         {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            if (ToggleActive == 0 && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 return;
             }
 
-            if (W.StillJumped())
+            if (ToggleActive == 1 && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
-                W.Cast();
+                return;
+            }
+
+            if (ToggleActive == 2 && !(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))
+            {
+                return;
+            }
+
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+            {
+                return;
             }
 
             if (MenuLocal["Toggle.UseQ"].Cast<CheckBox>().CurrentValue && Q.CanCast(Target))
@@ -116,7 +138,12 @@ namespace Leblanc.Modes
 
             if (MenuLocal["Toggle.UseW"].Cast<CheckBox>().CurrentValue && W.CanCast(Target))
             {
-                PlayerSpells.CastW(Target, true);
+                PlayerSpells.CastW(Target);
+            }
+
+            if (W.StillJumped() && AutoReturnW)
+            {
+                W.Cast();
             }
 
             if (MenuLocal["Toggle.UseE"].Cast<CheckBox>().CurrentValue && E.CanCast(Target))
