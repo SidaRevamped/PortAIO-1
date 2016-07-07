@@ -86,13 +86,9 @@ namespace OneKeyToWin_AIO_Sebby
             if (t != null)
             {
                 var realDistance = GetRealDistance(t) - 50;
-                if (Program.Combo &&
-                    (realDistance < GetRealPowPowRange(t) ||
-                     (Player.Mana < RMANA + 20 && Player.GetAutoAttackDamage(t) * 3 < t.Health)))
+                if (Program.Combo && (!HeroManager.Enemies.Any(a => a.LSIsValidTarget(Player.BoundingRadius + 525f)) && HeroManager.Enemies.Any(t2 => t2.LSIsValidTarget(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) ? Player.BoundingRadius + 525f + (50f + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level) : 1350f)) || (Player.Mana < RMANA + 20 && Player.GetAutoAttackDamage(t) * 3 < t.Health)))
                     Q.Cast();
-                else if (Program.Farm && getCheckBoxItem(qMenu, "Qharras") &&
-                         (realDistance > bonusRange() || realDistance < GetRealPowPowRange(t) ||
-                          Player.Mana < RMANA + EMANA + WMANA + WMANA))
+                else if (Program.Farm && getCheckBoxItem(qMenu, "Qharras") && (realDistance > bonusRange() || realDistance < GetRealPowPowRange(t) || Player.Mana < RMANA + EMANA + WMANA + WMANA))
                     Q.Cast();
             }
 
@@ -226,10 +222,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Orbwalking.CanAttack() && getCheckBoxItem(farmMenu, "farmQout") &&
                 Player.Mana > RMANA + WMANA + EMANA + 10)
             {
-                foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(
-                    minion =>
-                        !Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) &&
-                        bonusRange() < GetRealDistance(minion)))
+                foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(minion => !Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
                 {
                     var hpPred = HealthPrediction.GetHealthPrediction(minion, 400);
                     if (hpPred < Player.GetAutoAttackDamage(minion) * 1.1 && hpPred > 5)
@@ -247,25 +240,19 @@ namespace OneKeyToWin_AIO_Sebby
                 if (!FishBoneActive && (!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) > 2) && Orbwalker.LastTarget == null)
                 {
                     var distance = GetRealDistance(t);
-                    if (Program.Combo &&
-                        (Player.Mana > RMANA + WMANA + 10 || Player.GetAutoAttackDamage(t) * 3 > t.Health))
+                    if (Program.Combo && (Player.Mana > RMANA + WMANA + 10 || Player.GetAutoAttackDamage(t) * 3 > t.Health))
                         Q.Cast();
-                    else if (Program.Farm && !Orbwalker.IsAutoAttacking && Orbwalking.CanAttack() &&
-                             getCheckBoxItem(qMenu, "Qharras") && !ObjectManager.Player.UnderTurret(true) &&
-                             Player.Mana > RMANA + WMANA + EMANA + 20 &&
-                             distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
+                    else if (Program.Farm && !Orbwalker.IsAutoAttacking && Orbwalking.CanAttack() && getCheckBoxItem(qMenu, "Qharras") && !ObjectManager.Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + 20 && distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
                         Q.Cast();
                 }
             }
-            else if (!FishBoneActive && Program.Combo && Player.Mana > RMANA + WMANA + 20 &&
-                     Player.CountEnemiesInRange(2000) > 0)
+            else if (!FishBoneActive && Program.Combo && Player.Mana > RMANA + WMANA + 20 && Player.CountEnemiesInRange(2000) > 0)
                 Q.Cast();
             else if (FishBoneActive && Program.Combo && Player.Mana < RMANA + WMANA + 20)
                 Q.Cast();
             else if (FishBoneActive && Program.Combo && Player.CountEnemiesInRange(2000) == 0)
                 Q.Cast();
-            else if (FishBoneActive &&
-                     (Program.Farm || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))
+            else if (FishBoneActive && (Program.Farm || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))
             {
                 Q.Cast();
             }
@@ -426,10 +413,8 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private static float bonusRange()
-        {
-            return 670f + Player.BoundingRadius + 25 * Player.Spellbook.GetSpell(SpellSlot.Q).Level;
-        }
+        private static float bonusRange() { return 670f + Player.BoundingRadius + 25 * Player.Spellbook.GetSpell(SpellSlot.Q).Level; }
+
 
         private static float GetRealPowPowRange(GameObject target)
         {
@@ -438,8 +423,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static float GetRealDistance(Obj_AI_Base target)
         {
-            return Player.ServerPosition.LSDistance(Prediction.GetPrediction(target, 0.05f).CastPosition) +
-                   Player.BoundingRadius + target.BoundingRadius;
+            return Player.ServerPosition.LSDistance(Prediction.GetPrediction(target, 0.05f).CastPosition) + Player.BoundingRadius + target.BoundingRadius;
         }
 
         public static bool ShouldUseE(string SpellName)
