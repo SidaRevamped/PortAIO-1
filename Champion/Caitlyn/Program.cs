@@ -109,7 +109,7 @@ namespace OneKeyToWin_AIO_Sebby
             eMenu = Config.AddSubMenu("E Config");
             eMenu.Add("autoE", new CheckBox("Auto E", true));
             eMenu.Add("Ehitchance", new CheckBox("Auto E dash and immobile target", true));
-            eMenu.Add("harrasEQ", new CheckBox("Harass E + Q", true));
+            eMenu.Add("harrasEQ", new CheckBox("TRY E + Q", true));
             eMenu.Add("EQks", new CheckBox("Ks E + Q + AA", true));
             eMenu.Add("useE", new KeyBind("Dash E HotKeySmartcast", false, KeyBind.BindTypes.HoldActive, 'T'));
             eMenu.AddSeparator();
