@@ -120,8 +120,8 @@ namespace ezEvade
                 keyMenu = menu.AddSubMenu("Key Settings", "KeySettings");
                 ObjectCache.menuCache.AddMenuToCache(keyMenu);
                 keyMenu.Add("DodgeDangerousKeyEnabled", new CheckBox("Enable Dodge Only Dangerous Keys", false));
-                keyMenu.Add("DodgeDangerousKey", new KeyBind("Dodge Only Dangerous Key", false, KeyBind.BindTypes.HoldActive, 32));
-                keyMenu.Add("DodgeDangerousKey2", new KeyBind("Dodge Only Dangerous Key 2", false, KeyBind.BindTypes.HoldActive, 'V'));
+                keyMenu.Add("DodgeDangerousKey", new KeyBind("Dodge Only Dangerous Key (On Hold)", false, KeyBind.BindTypes.HoldActive, 32));
+                keyMenu.Add("DodgeDangerousKey2", new KeyBind("Dodge Only Dangerous Key 2 (Toggle)", false, KeyBind.BindTypes.PressToggle, 'V'));
                 keyMenu.AddSeparator();
                 keyMenu.Add("DodgeOnlyOnComboKeyEnabled", new CheckBox("Enable Dodge Only On Combo Key", false));
                 keyMenu.Add("DodgeComboKey", new KeyBind("Dodge Only Combo Key", false, KeyBind.BindTypes.HoldActive, 32));
