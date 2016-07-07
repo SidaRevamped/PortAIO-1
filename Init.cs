@@ -638,7 +638,7 @@ namespace PortAIO
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;
                             case 1:
-                                KoreanMalzahar.Program.Game_OnGameLoad();
+                                SurvivorMalzahar.Program.Game_OnGameLoad();
                                 break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();

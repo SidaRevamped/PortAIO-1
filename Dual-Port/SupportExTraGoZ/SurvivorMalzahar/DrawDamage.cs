@@ -9,7 +9,7 @@ using SharpDX;
 using Color = System.Drawing.Color;
 using EloBuddy;
 
-namespace KoreanMalzahar
+namespace SurvivorMalzahar
 {
     class DrawDamage
     {

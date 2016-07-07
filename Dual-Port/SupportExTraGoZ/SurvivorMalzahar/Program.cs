@@ -13,7 +13,7 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK;
 
-namespace KoreanMalzahar
+namespace SurvivorMalzahar
 {
     class Program
     {
@@ -34,14 +34,14 @@ namespace KoreanMalzahar
 
             igniteSlot = Player.GetSpellSlot("summonerdot");
             Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 900f);
-            W = new LeagueSharp.Common.Spell(SpellSlot.W, 750f);
+            W = new LeagueSharp.Common.Spell(SpellSlot.W, 650f);
             E = new LeagueSharp.Common.Spell(SpellSlot.E, 650f);
             R = new LeagueSharp.Common.Spell(SpellSlot.R, 700f);
 
             Q.SetSkillshot(0.75f, 80, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.5f, 80, 20, false, SkillshotType.SkillshotCircle);
 
-            Menu = MainMenu.AddMenu("KoreanMalzahar", "KoreanMalzahar");
+            Menu = MainMenu.AddMenu("SurvivorMalzahar", "SurvivorMalzahar");
 
             #region Combo/Harass/LaneClear/OneShot
             //Combo Menu
@@ -62,10 +62,12 @@ namespace KoreanMalzahar
             lc = Menu.AddSubMenu("Laneclear", "Laneclear");
             lc.Add("laneclearE", new CheckBox("Use E to LaneClear"));
             lc.Add("laneclearQ", new CheckBox("Use Q to LaneClear"));
+            lc.Add("laneclearW", new CheckBox("Use W to LaneClear"));
             lc.Add("LaneClearMinions", new Slider("LaneClear Minimum Minions for Q", 2, 0, 10));
             lc.Add("LaneClearEMinMinions", new Slider("LaneClear Minimum Minions for E", 2, 0, 10));
             lc.Add("laneclearEMinimumMana", new Slider("Minimum E Mana%", 30));
             lc.Add("laneclearQMinimumMana", new Slider("Minimum Q Mana%", 30));
+            lc.Add("laneclearWMinimumMana", new Slider("Minimum W Mana%", 30));
 
             // Drawing Menu
             DrawingMenu = Menu.AddSubMenu("Drawings", "Drawings");
@@ -100,7 +102,7 @@ namespace KoreanMalzahar
         {
             if (DrawingMenu["drawQ"].Cast<CheckBox>().CurrentValue)
             {
-                Render.Circle.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.DarkRed, 3);               
+                Render.Circle.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.DarkRed, 3);
             }
             if (DrawingMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {
@@ -280,7 +282,7 @@ namespace KoreanMalzahar
             var m = TargetSelector.GetTarget(E.Range, DamageType.Magical);
             var pred = Q.GetPrediction(m);
             if (m != null && harass["autoharass"].Cast<CheckBox>().CurrentValue)
-                    E.CastOnUnit(m);
+                E.CastOnUnit(m);
             if (m != null && harass["autoharassuseQ"].Cast<CheckBox>().CurrentValue)
                 if (pred.Hitchance >= HitChance.High)
                 {
@@ -327,7 +329,7 @@ namespace KoreanMalzahar
                         Q.Cast(pred.CastPosition);
                     }
                 }
-                if (useW && W.IsReady() && Player.Mana > W.ManaCost) W.Cast(m);
+                if (useW && W.IsReady() && Player.Mana > W.ManaCost && W.IsInRange(m)) W.Cast(m);
             }
             if (combo["useIgniteInCombo"].Cast<CheckBox>().CurrentValue)
             {
@@ -364,25 +366,26 @@ namespace KoreanMalzahar
                 return;
             }
             var pred = Q.GetPrediction(m);
-                if (Q.IsReady())
+            if (Q.IsReady() && Q.IsInRange(m))
+            {
+                if (pred.Hitchance >= HitChance.High)
                 {
-                    if (pred.Hitchance >= HitChance.High)
-                    {
-                        Q.Cast(pred.CastPosition);
-                    }
+                    Q.Cast(pred.CastPosition);
                 }
-                if (E.IsReady()) E.CastOnUnit(m);
-                if (W.IsReady()) W.CastOnUnit(m);
-                Player.Spellbook.CastSpell(igniteSlot, m);
-                if (R.IsReady() && !E.IsReady() && !W.IsReady()) R.CastOnUnit(m);
+            }
+            if (E.IsReady() && E.IsInRange(m)) E.CastOnUnit(m);
+            if (W.IsReady()) W.Cast(m);
+            Player.Spellbook.CastSpell(igniteSlot, m);
+            if (R.IsReady() && !E.IsReady() && !W.IsReady() && R.IsInRange(m)) R.CastOnUnit(m);
         }
         //Lane
         private static void Lane()
         {
-            if (Player.ManaPercent < lc["laneclearEMinimumMana"].Cast<Slider>().CurrentValue || Player.ManaPercent < lc["laneclearQMinimumMana"].Cast<Slider>().CurrentValue)
+            if (Player.ManaPercent < lc["laneclearEMinimumMana"].Cast<Slider>().CurrentValue || Player.ManaPercent < lc["laneclearQMinimumMana"].Cast<Slider>().CurrentValue || Player.ManaPercent < lc["laneclearWMinimumMana"].Cast<Slider>().CurrentValue)
                 return;
 
             var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range);
+            var allMinionsW = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 450f);
             if (allMinions.Count > lc["LaneClearEMinMinions"].Cast<Slider>().CurrentValue)
             {
                 if (lc["laneclearE"].Cast<CheckBox>().CurrentValue && E.IsReady())
@@ -393,6 +396,16 @@ namespace KoreanMalzahar
                         {
                             E.CastOnUnit(minion);
                         }
+                    }
+                }
+            }
+            if (lc["laneclearW"].Cast<CheckBox>().CurrentValue && W.IsReady())
+            {
+                foreach (var minion in allMinionsW)
+                {
+                    if (minion.IsValidTarget())
+                    {
+                        W.Cast(minion);
                     }
                 }
             }

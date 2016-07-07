@@ -585,7 +585,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[84]))
                 {
-                    Miscc.Add("malzahar", new ComboBox("Use addon for Malzahar : ", 0, "OKTW", "Korean Malzahar"));
+                    Miscc.Add("malzahar", new ComboBox("Use addon for Malzahar : ", 0, "OKTW", "SurvivorMalzahar"));
                 }
             }
             else
