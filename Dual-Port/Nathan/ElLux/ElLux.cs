@@ -35,7 +35,7 @@
                                                              {
                                                                  { Spells.Q, new LeagueSharp.Common.Spell(SpellSlot.Q, 1175f) },
                                                                  { Spells.W, new LeagueSharp.Common.Spell(SpellSlot.W, 1075f) },
-                                                                 { Spells.E, new LeagueSharp.Common.Spell(SpellSlot.E, 1075f) },
+                                                                 { Spells.E, new LeagueSharp.Common.Spell(SpellSlot.E, 1075f - 100f) },
                                                                  { Spells.R, new LeagueSharp.Common.Spell(SpellSlot.R, 3340f) }
                                                              };
 
