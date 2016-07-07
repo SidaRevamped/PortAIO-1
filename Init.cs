@@ -541,6 +541,9 @@ namespace PortAIO
                             case 1:
                                 ExorAIO.AIO.OnLoad();
                                 break;
+                            case 2:
+                                Firestorm_AIO.Program.Main();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;

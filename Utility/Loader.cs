@@ -443,7 +443,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[49]))
                 {
-                    Miscc.Add("anivia", new ComboBox("Use addon for Anivia : ", 0, "OKTW", "ExorAIO"));
+                    Miscc.Add("anivia", new ComboBox("Use addon for Anivia : ", 0, "OKTW", "ExorAIO", "Firestorm AIO"));
                 }
                 if (Player.ChampionName.Equals(Champion[50]))
                 {

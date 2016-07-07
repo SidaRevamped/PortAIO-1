@@ -50,22 +50,22 @@ namespace Firestorm_AIO.Helpers
 
         public static int CountAllyMinions(this Obj_AI_Base target, int range)
         {
-            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(target, range) && m.IsValid);
         }
 
         public static int CountAllyMinions(this Obj_AI_Base target, float range)
         {
-            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(target, range) && m.IsValid);
         }
 
         public static int CountAllyMinions(this Vector2 position, float range)
         {
-            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(position, range) && m.IsValid);
         }
 
         public static int CountAllyMinions(this Vector3 position, float range)
         {
-            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+            return GameObjects.AllyMinions.Count(m => m.LSIsInRange(position.ToVector2(), range) && m.IsValid);
         }
 
         #endregion AllyMinions
@@ -154,5 +154,22 @@ namespace Firestorm_AIO.Helpers
         }
 
         #endregion Vector
+
+        #region Damage
+
+        public static bool CanKillTarget(this Obj_AI_Base target, Spell spell, int customDelay = 0)
+        {
+            var predictedHealth = Health.GetPrediction(target,
+                customDelay == 0 ? (int)(spell.Delay * 1000f) : customDelay);
+            return predictedHealth < spell.GetDamage(target) && predictedHealth >= Me.GetAutoAttackDamage(target);
+        }
+
+        public static bool CanKillTarget(this Obj_AI_Base target, float damage, int delay)
+        {
+            var predictedHealth = Health.GetPrediction(target, (int)(delay * 1000f));
+            return predictedHealth < damage && predictedHealth >= Me.GetAutoAttackDamage(target);
+        }
+
+        #endregion Damage
     }
 }

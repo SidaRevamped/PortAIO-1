@@ -58,16 +58,16 @@ namespace Firestorm_AIO.Bases
         private bool DrawReady;
 
         private bool DrawQ;
-        private System.Drawing.Color QColor = System.Drawing.Color.Black;
+        public System.Drawing.Color QColor = System.Drawing.Color.Black;
 
         private bool DrawW;
-        private System.Drawing.Color WColor = System.Drawing.Color.Blue;
+        public System.Drawing.Color WColor = System.Drawing.Color.Blue;
 
         private bool DrawE;
-        private System.Drawing.Color EColor = System.Drawing.Color.DarkKhaki;
+        public System.Drawing.Color EColor = System.Drawing.Color.DarkKhaki;
 
         private bool DrawR;
-        private System.Drawing.Color RColor = System.Drawing.Color.ForestGreen;
+        public System.Drawing.Color RColor = System.Drawing.Color.ForestGreen;
 
         public void DrawSpell(LeagueSharp.SDK.Spell spell)
         {

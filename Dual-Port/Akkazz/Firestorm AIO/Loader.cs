@@ -8,6 +8,7 @@ using Firestorm_AIO.Champions.Rumble;
 using Firestorm_AIO.Champions.Yasuo;
 using LeagueSharp;
 using EloBuddy;
+using Firestorm_AIO.Champions.Anivia;
 
 namespace Firestorm_AIO
 {
@@ -28,6 +29,7 @@ namespace Firestorm_AIO
                     break;
                 //TODO
                 case "Anivia":
+                    new Anivia().Load();
                     break;
                 case "Gnar":
                     

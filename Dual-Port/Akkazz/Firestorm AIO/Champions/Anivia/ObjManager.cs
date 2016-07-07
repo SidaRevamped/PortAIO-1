@@ -1,16 +1,15 @@
 ﻿using System;
 using Firestorm_AIO.Bases;
 using LeagueSharp;
-using SharpDX;
 using EloBuddy;
 
 namespace Firestorm_AIO.Champions.Anivia
 {
-    public class QManager
+    public class ObjManager
     {
-        public static MyObjectBase QObject;
+        public static GameObject QObject;
+        public static GameObject RObject;
 
-        //TODO Test this shit het the proper name
         public static void Load()
         {
             GameObject.OnCreate += GameObject_OnCreate;
@@ -19,44 +18,25 @@ namespace Firestorm_AIO.Champions.Anivia
 
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
         {
-            if (sender.Name == "cryo_FlashFrost_Player_mis.troy" && sender.IsAlly)
+            if (sender.Name == "cryo_FlashFrost_Player_mis.troy")
             {
-                QObject = new MyObjectBase(sender.Position);
+                QObject = sender;
+            }
+
+            if (sender.Name.Contains("cryo_storm"))
+            {
+                RObject = sender;
             }
         }
 
         private static void GameObject_OnDelete(GameObject sender, EventArgs args)
         {
-            if (sender.Name == "cryo_FlashFrost_Player_mis.troy" && sender.IsAlly)
+            if (sender.Name == "cryo_FlashFrost_Player_mis.troy")
             {
                 QObject = null;
             }
-        }
-    }
 
-    public class RManager
-    {
-        public static MyObjectBase RObject;
-
-        public static void Load()
-        {
-            GameObject.OnCreate += GameObject_OnCreate;
-            GameObject.OnDelete += GameObject_OnDelete;
-        }
-
-        //TODO Test and get proper name
-        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
-        {
-            if (sender.Name == "cryo_storm" && sender.IsAlly)
-            {
-                RObject = new MyObjectBase(sender.Position);
-            }
-        }
-
-
-        private static void GameObject_OnDelete(GameObject sender, EventArgs args)
-        {
-            if (sender.Name.Contains("cryo_storm") && sender.IsAlly)
+            if (sender.Name.Contains("cryo_storm"))
             {
                 RObject = null;
             }

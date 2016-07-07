@@ -264,6 +264,7 @@
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Rumble\Rumble.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Yasuo\DashManager.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Yasuo\Yasuo.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\AntiGapcloser.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\Extensions.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\Helpers.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\SmartCaster.cs" />
