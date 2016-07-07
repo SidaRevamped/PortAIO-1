@@ -94,6 +94,30 @@ namespace Firestorm_AIO.Helpers
 
         #endregion EnemyMinions
 
+        #region AnyEnemy
+
+        public static int CountAnyEnemy(this Obj_AI_Base target, int range)
+        {
+            return GameObjects.Enemy.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+        }
+
+        public static int CountAnyEnemy(this Obj_AI_Base target, float range)
+        {
+            return GameObjects.Enemy.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+        }
+
+        public static int CountAnyEnemy(this Vector2 position, float range)
+        {
+            return GameObjects.Enemy.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+        }
+
+        public static int CountAnyEnemy(this Vector3 position, float range)
+        {
+            return GameObjects.Enemy.Count(m => m.LSIsInRange(Me, range) && m.IsValid);
+        }
+
+        #endregion AnyEnemy
+
         #endregion Counts
 
         #region Vector

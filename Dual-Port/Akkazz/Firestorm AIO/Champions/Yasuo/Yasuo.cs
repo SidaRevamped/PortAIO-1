@@ -30,6 +30,18 @@ namespace Firestorm_AIO.Champions.Yasuo
             Q3.SetSkillshot(0.3f, 90f, 1200f, false, SkillshotType.SkillshotLine);
 
             DashManager.Load();
+
+            Events.OnGapCloser += Events_OnGapCloser;
+        }
+
+        private void Events_OnGapCloser(object sender, Events.GapCloserEventArgs e)
+        {
+            if (e.Sender.IsAlly) return;
+
+            if (e.IsDirectedToPlayer && HasQ3() && MiscMenu["qGap"].Cast<CheckBox>().CurrentValue)
+            {
+                Q3.CastIfHitchanceMinimum(e.Sender, HitChance.Medium);
+            }
         }
 
         #region Functions
@@ -98,7 +110,7 @@ namespace Firestorm_AIO.Champions.Yasuo
                         m.LSIsValidTarget(E.Range)).OrderBy(m => m.Distance(Target))
                     .ThenByDescending(m => m.Distance(Me))
                     .ThenBy(m => m.Distance(Game.CursorPos))
-                    .FirstOrDefault();
+                    .FirstOrDefault(m => m.GetPosAfterE().Distance(Target.Position) < Me.Distance(Target));
         }
 
         private static Obj_AI_Base GetBestEscapeE()
@@ -154,6 +166,8 @@ namespace Firestorm_AIO.Champions.Yasuo
 
             Q.CreateBool(JungleClearMenu);
             E.CreateBool(JungleClearMenu);
+
+            MiscMenu.Add("qGap", new CheckBox("Use Q3 on gapclosers", true));
         }
 
         #region Modes
@@ -165,6 +179,21 @@ namespace Firestorm_AIO.Champions.Yasuo
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 CastE(GetBestEscapeE());
+            }
+
+            if (Target == null) return;
+            if (GetBoolValue(R, ComboMenu))
+            {
+                if (Target.HealthPercent > Me.HealthPercent - 10 || Me.HealthPercent < 10 || !Target.IsKnockedUp()) return;
+
+                var count = GameObjects.EnemyHeroes.Count(h => h.IsValidTarget(R.Range) && h.IsKnockedUp() && h.Health > R.GetDamage(h));
+
+                var time = GetLowestKnockupTime();
+
+                if (count >= ComboMenu["rCount"].Cast<Slider>().CurrentValue && time < 100 + Game.Ping && time > 0)
+                {
+                    R.Cast();
+                }
             }
         }
 
@@ -192,13 +221,13 @@ namespace Firestorm_AIO.Champions.Yasuo
             {
                 if (Target.HealthPercent > Me.HealthPercent - 10 || Me.HealthPercent < 10 || !Target.IsKnockedUp()) return;
 
-                var count = GameObjects.EnemyHeroes.Count(h => h.LSIsValidTarget(R.Range) && h.IsKnockedUp());
+                var count = GameObjects.EnemyHeroes.Count(h => h.IsValidTarget(R.Range) && h.IsKnockedUp() && h.Health > R.GetDamage(h));
 
                 var time = GetLowestKnockupTime();
 
-                if (count >= ComboMenu["rCount"].Cast<Slider>().CurrentValue && time < 50 + Game.Ping && time > 0)
+                if (count >= ComboMenu["rCount"].Cast<Slider>().CurrentValue && time < 100 + Game.Ping && time > 0)
                 {
-                    R.CastOnUnit(Target);
+                    R.Cast();
                 }
             }
         }
@@ -223,7 +252,7 @@ namespace Firestorm_AIO.Champions.Yasuo
                                 m =>
                                     m.LSIsValidTarget(GetQRange()) &&
                                     Health.GetPrediction(m,
-                                        (int) Q.Delay + (E.IsReady() ? 150 : 0) + Game.Ping) <
+                                        (int)Q.Delay + (E.IsReady() && m.IsSafeToE() ? 150 : 0) + Game.Ping) <
                                     Q.GetDamage(m) + (E.IsReady() && !HasEBuff(m) ? E.GetDamage(m) : 0f));
 
                     if (!HasQ3() && minionQ != null && GetBoolValue(Q, LaneClearMenu)) CastQ(minionQ);
@@ -232,8 +261,7 @@ namespace Firestorm_AIO.Champions.Yasuo
                         GameObjects.EnemyMinions.OrderBy(m => m.Health)
                             .FirstOrDefault(
                                 m =>
-                                    m.LSIsValidTarget(E.Range) &&
-
+                                    m.LSIsValidTarget(E.Range) && m.IsSafeToE() &&
                                     Health.GetPrediction(m, 30 + Game.Ping) < E.GetDamage(m));
 
                     if (minionE != null && GetBoolValue(E, LaneClearMenu)) CastE(minionE);

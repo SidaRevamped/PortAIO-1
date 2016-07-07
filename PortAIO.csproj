@@ -257,7 +257,6 @@
     <Compile Include="Champion\Zilean\IncomingDamageManager.cs" />
     <Compile Include="Champion\Zilean\Zilean.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Bases\ChampionBase.cs" />
-    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Bases\MyObjectBase.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Anivia\Anivia.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Anivia\ObjManager.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Illaoi\Illaoi.cs" />

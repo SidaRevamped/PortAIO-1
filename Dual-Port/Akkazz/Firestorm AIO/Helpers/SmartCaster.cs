@@ -2,6 +2,7 @@
 using LeagueSharp;
 using LeagueSharp.SDK;
 using LeagueSharp.SDK.Enumerations;
+
 using static Firestorm_AIO.Helpers.Helpers;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -10,25 +11,13 @@ namespace Firestorm_AIO.Helpers
 {
     public static class SmartCaster
     {
-        #region GetTarget
-
-        public static Obj_AI_Minion GetBestLastHitMinion(this LeagueSharp.SDK.Spell spell)
+        public static void SmartCast(this LeagueSharp.SDK.Spell spell, Obj_AI_Base target = null, HitChance hitchance = HitChance.Medium,
+            int minimunHits = 0)
         {
-            return
-                GameObjects.EnemyMinions.Where(m => m.LSIsValidTarget(spell.Range))
-                    .OrderBy(m => m.Health)
-                    .FirstOrDefault(m => Health.GetPrediction(m, (int)spell.Delay * 1000) < spell.GetDamage(m));
-        }
+            if (target == null || !spell.CanCast(target)) return;
 
-        #endregion GetTarget
-
-        public static void SmartCast(this LeagueSharp.SDK.Spell spell, Obj_AI_Base target = null, HitChance hitchance = HitChance.Medium, int minimunHits = 0)
-        {
-            var hero = target as AIHeroClient;
-            if (hero != null && (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)))
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
-                if (!spell.CanCast(target)) return;
-
                 if (spell.IsSkillshot)
                 {
                     if (spell.Collision)
@@ -36,83 +25,89 @@ namespace Firestorm_AIO.Helpers
                         if (Me.CountEnemyHeroesInRange(spell.Range) <= (minimunHits == 0 ? 2 : minimunHits))
                         {
                             spell.CastOnBestTarget(0f, true);
+                            return;
                         }
 
                         if (Me.CountEnemyHeroesInRange(spell.Range) >= (minimunHits == 0 ? 2 : minimunHits))
                         {
                             spell.CastOnBestTarget(0f, true, 1);
+                            return;
                         }
                     }
                     else
                     {
                         spell.CastIfHitchanceMinimum(target, hitchance);
+                        return;
                     }
                 }
                 else
                 {
                     spell.CastOnUnit(target);
+                    return;
                 }
             }
 
-            var minion = target as Obj_AI_Minion;
-            if (minion != null)
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
-                if (spell.IsSkillshot)
+                if (spell.Collision)
                 {
-                    if (spell.Collision)
-                    {
-                        spell.CastIfHitchanceMinimum(target, HitChance.Low);
-                    }
-                    else
-                    {
-                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
-                        {
-                            var minions =
-                                GameObjects.EnemyMinions.Where(m => m.LSIsValidTarget())
-                                    .OrderBy(m => m.Distance(target))
-                                    .ThenBy(m => m.Health)
-                                    .ToList();
-
-                            if (minions != null)
-                            {
-                                switch (spell.Type)
-                                {
-                                    case SkillshotType.SkillshotLine:
-                                        var posLine = spell.GetLineFarmLocation(minions);
-                                        if (posLine.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
-                                        {
-                                            spell.Cast(posLine.Position);
-                                        }
-                                        break;
-                                    case SkillshotType.SkillshotCircle:
-                                        var posCircle = spell.GetCircularFarmLocation(minions);
-                                        if (posCircle.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
-                                        {
-                                            spell.Cast(posCircle.Position);
-                                        }
-                                        break;
-                                    case SkillshotType.SkillshotCone:
-                                        var posCone = spell.GetLineFarmLocation(minions, spell.Width);
-                                        if (posCone.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
-                                        {
-                                            spell.Cast(posCone.Position);
-                                        }
-                                        break;
-                                }
-                            }
-                            spell.Cast(target.Position);
-                        }
-
-                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-                        {
-                            spell.CastIfHitchanceMinimum(target, HitChance.Low);
-                        }
-                    }
+                    spell.CastIfHitchanceMinimum(target, HitChance.Low);
+                    return;
                 }
                 else
                 {
-                    spell.CastOnUnit(target);
+                    var minions =
+                        GameObjects.EnemyMinions.Where(m => m.LSIsValidTarget())
+                            .OrderBy(m => m.Distance(target))
+                            .ThenBy(m => m.Health)
+                            .ToList();
+
+                    if (minions != null)
+                    {
+                        switch (spell.Type)
+                        {
+                            case SkillshotType.SkillshotLine:
+                                var posLine = spell.GetLineFarmLocation(minions);
+                                if (posLine.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
+                                {
+                                    spell.Cast(posLine.Position);
+                                    return;
+                                }
+                                break;
+                            case SkillshotType.SkillshotCircle:
+                                var posCircle = spell.GetCircularFarmLocation(minions);
+                                if (posCircle.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
+                                {
+                                    spell.Cast(posCircle.Position);
+                                    return;
+                                }
+                                break;
+                            case SkillshotType.SkillshotCone:
+                                var posCone = spell.GetLineFarmLocation(minions, spell.Width);
+                                if (posCone.MinionsHit >= (minimunHits == 0 ? 1 : minimunHits))
+                                {
+                                    spell.Cast(posCone.Position);
+                                    return;
+                                }
+                                break;
+                        }
+                    }
+                    spell.CastIfHitchanceMinimum(target, HitChance.Medium);
                 }
+            }
+            else
+            {
+                spell.CastOnUnit(target);
+            }
+
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                if (spell.IsSkillshot)
+                {
+                    spell.CastIfHitchanceMinimum(target, HitChance.Low);
+                    return;
+                }
+                spell.CastOnUnit(target);
             }
         }
     }
