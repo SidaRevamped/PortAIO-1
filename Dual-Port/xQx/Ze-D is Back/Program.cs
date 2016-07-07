@@ -282,42 +282,45 @@ namespace Zed
 
         private static void Combo(AIHeroClient target)
         {
-            var overkill = _player.LSGetSpellDamage(target, SpellSlot.Q) + _player.LSGetSpellDamage(target, SpellSlot.E) + _player.LSGetAutoAttackDamage(target, true) * 2;
-            var doubleu = _player.Spellbook.GetSpell(SpellSlot.W);
-
-
-            if (getCheckBoxItem(comboMenu, "UseUlt") && UltStage == UltCastStage.First && (overkill < target.Health || (!_w.IsReady() && doubleu.Cooldown > 2f && _player.LSGetSpellDamage(target, SpellSlot.Q) < target.Health && target.LSDistance(_player.Position) > 400)))
+            if (target != null && target.IsVisible && target.IsHPBarRendered)
             {
-                if ((target.LSDistance(_player.Position) > 700 && target.MoveSpeed > _player.MoveSpeed) || target.LSDistance(_player.Position) > 800)
-                {
-                    CastW(target);
-                    _w.Cast();
+                var overkill = _player.LSGetSpellDamage(target, SpellSlot.Q) + _player.LSGetSpellDamage(target, SpellSlot.E) + _player.LSGetAutoAttackDamage(target, true) * 2;
+                var doubleu = _player.Spellbook.GetSpell(SpellSlot.W);
 
-                }
-                _r.Cast(target);
-            }
 
-            else
-            {
-                if (target != null && getCheckBoxItem(comboMenu, "UseIgnitecombo") && _igniteSlot != SpellSlot.Unknown &&
-                        _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+                if (getCheckBoxItem(comboMenu, "UseUlt") && UltStage == UltCastStage.First && (overkill < target.Health || (!_w.IsReady() && doubleu.Cooldown > 2f && _player.LSGetSpellDamage(target, SpellSlot.Q) < target.Health && target.LSDistance(_player.Position) > 400)))
                 {
-                    if (ComboDamage(target) > target.Health || target.HasBuff("zedulttargetmark"))
+                    if ((target.LSDistance(_player.Position) > 700 && target.MoveSpeed > _player.MoveSpeed) || target.LSDistance(_player.Position) > 800)
                     {
-                        _player.Spellbook.CastSpell(_igniteSlot, target);
+                        CastW(target);
+                        _w.Cast();
+
                     }
+                    _r.Cast(target);
                 }
-                if (target != null && ShadowStage == ShadowCastStage.First && getCheckBoxItem(comboMenu, "UseWC") &&
-                        target.LSDistance(_player.Position) > 400 && target.LSDistance(_player.Position) < 1300)
+
+                else
                 {
-                    CastW(target);
+                    if (target != null && getCheckBoxItem(comboMenu, "UseIgnitecombo") && _igniteSlot != SpellSlot.Unknown &&
+                            _player.Spellbook.CanUseSpell(_igniteSlot) == SpellState.Ready)
+                    {
+                        if (ComboDamage(target) > target.Health || target.HasBuff("zedulttargetmark"))
+                        {
+                            _player.Spellbook.CastSpell(_igniteSlot, target);
+                        }
+                    }
+                    if (target != null && ShadowStage == ShadowCastStage.First && getCheckBoxItem(comboMenu, "UseWC") &&
+                            target.LSDistance(_player.Position) > 400 && target.LSDistance(_player.Position) < 1300)
+                    {
+                        CastW(target);
+                    }
+                    if (target != null && ShadowStage == ShadowCastStage.Second && getCheckBoxItem(comboMenu, "UseWC") && target.LSDistance(WShadow.ServerPosition) < target.LSDistance(_player.Position))
+                    {
+                        _w.Cast();
+                    }
+                    CastE();
+                    CastQ(target);
                 }
-                if (target != null && ShadowStage == ShadowCastStage.Second && getCheckBoxItem(comboMenu, "UseWC") && target.LSDistance(WShadow.ServerPosition) < target.LSDistance(_player.Position))
-                {
-                    _w.Cast();
-                }
-                CastE();
-                CastQ(target);
             }
         }
 
