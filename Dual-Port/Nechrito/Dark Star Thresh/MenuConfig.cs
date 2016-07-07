@@ -26,8 +26,6 @@ namespace Dark_Star_Thresh
             Misc = Config.AddSubMenu("Misc", "Misc");
             Misc.Add("Interrupt", new CheckBox("Interrupter"));
             Misc.Add("Gapcloser", new CheckBox("Gapcloser"));
-            Misc.Add("UseSkin", new CheckBox("Use Skinchanger", false));
-            Misc.Add("Skin", new ComboBox("Skin", 0, "Default", "Deep Terror Thresh", "Championship Thresh", "Blood Moon Thresh", "SSW Thresh", "Dark Star Thresh"));
             Misc.Add("Flee", new KeyBind("Flee", false, KeyBind.BindTypes.HoldActive, 'A'));
 
             Draw = Config.AddSubMenu("Draw", "Draw");
@@ -57,8 +55,6 @@ namespace Dark_Star_Thresh
 
         public static bool Interrupt => Misc["Interrupt"].Cast<CheckBox>().CurrentValue;
         public static bool Gapcloser => Misc["Gapcloser"].Cast<CheckBox>().CurrentValue;
-
-        public static bool UseSkin => Misc["UseSkin"].Cast<CheckBox>().CurrentValue;
 
         public static bool DrawDmg => Draw["DrawDmg"].Cast<CheckBox>().CurrentValue;
         public static bool DrawPred => Draw["DrawPred"].Cast<CheckBox>().CurrentValue;

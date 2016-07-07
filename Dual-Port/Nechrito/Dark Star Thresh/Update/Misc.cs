@@ -9,16 +9,6 @@ namespace Dark_Star_Thresh.Update
 {
     class Misc : Core.Core
     {
-        public static void Skinchanger(EventArgs args)
-        {
-            if (!MenuConfig.UseSkin)
-            {
-                Player.SetSkin(Player.CharData.BaseSkinName, Player.SkinId);
-                return;
-            }
-            Player.SetSkin(Player.CharData.BaseSkinName, MenuConfig.Misc["Skin"].Cast<ComboBox>().CurrentValue);
-        }
-
         public static void OnInterruptableTarget(AIHeroClient sender, Interrupter2.InterruptableTargetEventArgs args)
         {
             if (!MenuConfig.Interrupt || sender.IsInvulnerable) return;

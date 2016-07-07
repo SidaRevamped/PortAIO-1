@@ -631,7 +631,20 @@ namespace PortAIO
                                 break;
                         }
                         break;
-                    case "malzahar": // OKTW - Sebby - All Seeby champs go down here
+                    case "malzahar":
+                        switch (Loader.malzahar)
+                        {
+                            case 0:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                            case 1:
+                                KoreanMalzahar.Program.Game_OnGameLoad();
+                                break;
+                            default:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                        }
+                        break;
                     case "orianna":
                     case "velkoz":
                     case "swain":

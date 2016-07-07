@@ -138,6 +138,7 @@ namespace PortAIO.Utility
         public static int predictionerCB { get { return Miscc["predictionerCB"].Cast<ComboBox>().CurrentValue; } }
         public static int urgot { get { return Miscc["urgot"].Cast<ComboBox>().CurrentValue; } }
         public static int varus { get { return Miscc["varus"].Cast<ComboBox>().CurrentValue; } }
+        public static int malzahar { get { return Miscc["malzahar"].Cast<ComboBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -233,6 +234,7 @@ namespace PortAIO.Utility
             "Hecarim", //81
             "Urgot", // 82
             "Varus", //83
+            "Malzahar", //84
         });
 
         public static void Menu()
@@ -580,6 +582,10 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[83]))
                 {
                     Miscc.Add("varus", new ComboBox("Use addon for Varus : ", 0, "ElVarus", "Marksman II"));
+                }
+                if (Player.ChampionName.Equals(Champion[84]))
+                {
+                    Miscc.Add("malzahar", new ComboBox("Use addon for Malzahar : ", 0, "OKTW", "Korean Malzahar"));
                 }
             }
             else

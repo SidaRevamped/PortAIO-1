@@ -14,7 +14,6 @@ namespace Dark_Star_Thresh
             Spells.Load();
             MenuConfig.LoadMenu();
 
-            Game.OnUpdate += Misc.Skinchanger;
             Game.OnUpdate += Mode.GetActiveMode;
 
             Drawing.OnDraw += DrawRange.OnDraw;
