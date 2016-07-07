@@ -556,6 +556,12 @@
     <Compile Include="Dual-Port\TheDoctor\yol0Thresh\Interrupter.cs" />
     <Compile Include="Dual-Port\TheDoctor\yol0Thresh\Program.cs" />
     <Compile Include="Dual-Port\xQx\Marksman II\Champions\Quinn.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Teemo.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Tristana.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Twitch.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Urgot.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Varus.cs" />
+    <Compile Include="Dual-Port\xQx\Marksman II\Champions\Vayne.cs" />
     <Compile Include="Dual-Port\xQx\Marksman II\Common\CommonFontExtention.cs" />
     <Compile Include="Dual-Port\xQx\Marksman II\Common\CommonObjectDetector.cs" />
     <Compile Include="Dual-Port\xQx\Marksman II\DangerousTargets.cs" />

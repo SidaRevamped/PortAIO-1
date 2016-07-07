@@ -3,11 +3,13 @@ using System;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using Marksman.Orb;
 using Marksman.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
-using Orbwalking = Marksman.Orb.Orbwalking;
+using EloBuddy;
+using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Menu;
+using EloBuddy.SDK;
 
 #endregion
 
@@ -18,13 +20,13 @@ namespace Marksman.Champions
         public static float rqTumbleBuffEndOfTime = 0;
         public static bool VayneUltiIsActive { get; set; }
 
-        public static Spell Q, E, R;
+        public static LeagueSharp.Common.Spell Q, E, R;
 
         public Vayne()
         {
-            Q = new Spell(SpellSlot.Q, 300f);
-            E = new Spell(SpellSlot.E, 650f);
-            R = new Spell(SpellSlot.R);
+            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 300f);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 650f);
+            R = new LeagueSharp.Common.Spell(SpellSlot.R);
 
             E.SetTargetted(0.25f, 2200f);
 
@@ -39,9 +41,9 @@ namespace Marksman.Champions
 
         }
 
-        public override void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
+        public override void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
         {
-            rqTumbleBuffEndOfTime = GetValue<bool>("Misc.R.DontAttack") && sender.IsMe &&
+            rqTumbleBuffEndOfTime = Program.misc["Misc.R.DontAttack"].Cast<CheckBox>().CurrentValue && sender.IsMe &&
                                     args.Buff.Name.ToLower() == "vaynetumblefade"
                 ? args.Buff.EndTime
                 : 0;
@@ -49,13 +51,13 @@ namespace Marksman.Champions
 
         public void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (GetValue<bool>("UseEGapcloser") && E.IsReady() && gapcloser.Sender.LSIsValidTarget(E.Range))
+            if (Program.misc["UseEGapcloser"].Cast<CheckBox>().CurrentValue && E.IsReady() && gapcloser.Sender.LSIsValidTarget(E.Range))
                 E.CastOnUnit(gapcloser.Sender);
         }
 
-        private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero unit, Interrupter2.InterruptableTargetEventArgs args)
+        private void Interrupter2_OnInterruptableTarget(AIHeroClient unit, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (GetValue<bool>("UseEInterrupt") && unit.LSIsValidTarget(550f))
+            if (Program.misc["UseEInterrupt"].Cast<CheckBox>().CurrentValue && unit.LSIsValidTarget(550f))
                 E.Cast(unit);
         }
 
@@ -63,9 +65,9 @@ namespace Marksman.Champions
         {
             for (var i = 1; i < 8; i++)
             {
-                var targetBehind = t.Position + Vector3.Normalize(t.ServerPosition - ObjectManager.Player.Position)*i*50;
+                var targetBehind = t.Position + Vector3.Normalize(t.ServerPosition - ObjectManager.Player.Position) * i * 50;
 
-                if (targetBehind.IsWall() && t.LSIsValidTarget(E.Range))
+                if (targetBehind.LSIsWall() && t.LSIsValidTarget(E.Range))
                 {
                     E.CastOnUnit(t);
                     return true;
@@ -76,7 +78,7 @@ namespace Marksman.Champions
 
         public override void Game_OnGameUpdate(EventArgs args)
         {
-            Orbwalker.SetAttack(Game.Time > rqTumbleBuffEndOfTime);
+            Orbwalker.DisableAttacking = !(Game.Time > rqTumbleBuffEndOfTime);
 
             if (JungleClearActive)
             {
@@ -85,66 +87,64 @@ namespace Marksman.Champions
 
             if ((ComboActive || HarassActive))
             {
-                if (GetValue<bool>("FocusW"))
+                if (Program.combo["FocusW"].Cast<CheckBox>().CurrentValue)
                 {
                     var silverBuffMarkedEnemy = VayneData.GetSilverBuffMarkedEnemy;
                     if (silverBuffMarkedEnemy != null)
                     {
-                        TargetSelector.SetTarget(silverBuffMarkedEnemy);
+                        Orbwalker.ForcedTarget = (silverBuffMarkedEnemy);
                     }
                     else
                     {
                         var attackRange = Orbwalking.GetRealAutoAttackRange(ObjectManager.Player);
-                        TargetSelector.SetTarget(
-                            TargetSelector.GetTarget(attackRange, TargetSelector.DamageType.Physical));
+                        Orbwalker.ForcedTarget = (TargetSelector.GetTarget(attackRange, DamageType.Physical));
                     }
                 }
 
-                var useQ = GetValue<StringList>("Combo.UseQ").SelectedIndex;
-                var t = TargetSelector.GetTarget(Q.Range + Orbwalking.GetRealAutoAttackRange(null),
-                    TargetSelector.DamageType.Physical);
+                var useQ = Program.combo["Combo.UseQ"].Cast<ComboBox>().CurrentValue;
+                var t = TargetSelector.GetTarget(Q.Range + Orbwalking.GetRealAutoAttackRange(null), DamageType.Physical);
                 if (Q.IsReady() && t.LSIsValidTarget() && useQ != 0)
                 {
                     switch (useQ)
                     {
                         case 1:
-                        {
-                            Q.Cast(Game.CursorPos);
-                            break;
-                        }
+                            {
+                                Q.Cast(Game.CursorPos);
+                                break;
+                            }
 
                         case 2:
-                        {
-                            var silverEnemy = VayneData.GetSilverBuffMarkedEnemy;
-                            if (silverEnemy != null && t.ChampionName == silverEnemy.ChampionName &&
-                                VayneData.GetSilverBuffMarkedCount == 2)
                             {
-                                Q.Cast(Game.CursorPos);
-                                Orbwalker.ForceTarget(t);
+                                var silverEnemy = VayneData.GetSilverBuffMarkedEnemy;
+                                if (silverEnemy != null && t.ChampionName == silverEnemy.ChampionName &&
+                                    VayneData.GetSilverBuffMarkedCount == 2)
+                                {
+                                    Q.Cast(Game.CursorPos);
+                                    Orbwalker.ForcedTarget = (t);
+                                }
+                                break;
                             }
-                            break;
-                        }
 
                         case 3:
-                        {
-                            if (t.LSDistance(ObjectManager.Player.Position) > Orbwalking.GetRealAutoAttackRange(null) && Q.IsPositionSafe(t.Position.LSTo2D()))
                             {
-                                Q.Cast(t.Position);
+                                if (t.LSDistance(ObjectManager.Player.Position) > Orbwalking.GetRealAutoAttackRange(null) && Q.IsPositionSafe(t.Position.LSTo2D()))
+                                {
+                                    Q.Cast(t.Position);
+                                }
+                                else if (Q.IsPositionSafe(Game.CursorPos.LSTo2D()))
+                                {
+                                    Q.Cast(Game.CursorPos);
+                                }
+                                Orbwalker.ForcedTarget = (t);
+                                break;
                             }
-                            else if (Q.IsPositionSafe(Game.CursorPos.LSTo2D()))
-                            {
-                                Q.Cast(Game.CursorPos);
-                            }
-                            Orbwalker.ForceTarget(t);
-                            break;
-                        }
                     }
                 }
 
-                var useE = GetValue<StringList>("UseEC").SelectedIndex;
+                var useE = Program.combo["UseEC"].Cast<ComboBox>().CurrentValue;
                 if (E.IsReady() && useE != 0)
                 {
-                    t = TargetSelector.GetTarget(E.Range + Q.Range, TargetSelector.DamageType.Physical);
+                    t = TargetSelector.GetTarget(E.Range + Q.Range, DamageType.Physical);
                     if (useE == 1)
                     {
                         if (t.LSIsValidTarget())
@@ -161,7 +161,7 @@ namespace Marksman.Champions
                     }
                     /*
                     foreach (var hero in
-                        from hero in ObjectManager.Get<Obj_AI_Hero>().Where(hero => hero.LSIsValidTarget(550f))
+                        from hero in ObjectManager.Get<AIHeroClient>().Where(hero => hero.LSIsValidTarget(550f))
                         let prediction = E.GetPrediction(hero)
                         where
                             NavMesh.GetCollisionFlags(
@@ -186,14 +186,14 @@ namespace Marksman.Champions
 
             if (LaneClearActive)
             {
-                var useQ = GetValue<bool>("UseQL");
+                var useQ = Program.laneclear["UseQL"].Cast<CheckBox>().CurrentValue;
 
                 if (Q.IsReady() && useQ)
                 {
                     var vMinions = MinionManager.GetMinions(ObjectManager.Player.Position, Q.Range);
                     foreach (var minions in
                         vMinions.Where(
-                            minions => minions.Health < ObjectManager.Player.GetSpellDamage(minions, SpellSlot.Q)))
+                            minions => minions.Health < ObjectManager.Player.LSGetSpellDamage(minions, SpellSlot.Q)))
                         Q.Cast(minions);
                 }
             }
@@ -207,215 +207,124 @@ namespace Marksman.Champions
 
             if (jungleMobs != null)
             {
-                switch (GetValue<StringList>("UseQJ").SelectedIndex)
+                switch (Program.jungleClear["UseQJ"].Cast<ComboBox>().CurrentValue)
                 {
                     case 1:
-                    {
-                        if (!jungleMobs.SkinName.ToLower().Contains("baron") ||
-                            !jungleMobs.SkinName.ToLower().Contains("dragon"))
                         {
-                            if (jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65))
-                                Q.Cast(
-                                    jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65)
-                                        ? Game.CursorPos
-                                        : jungleMobs.Position);
-                        }
-                        break;
-                    }
-                    case 2:
-                    {
-                        if (!jungleMobs.SkinName.ToLower().Contains("baron") ||
-                            !jungleMobs.SkinName.ToLower().Contains("dragon"))
-                        {
-                            jungleMobs =
-                                Marksman.Utils.Utils.GetMobs(
-                                    Q.Range + Orbwalking.GetRealAutoAttackRange(null) + 65,
-                                    Marksman.Utils.Utils.MobTypes.BigBoys);
-                            if (jungleMobs != null)
+                            if (!jungleMobs.BaseSkinName.ToLower().Contains("baron") ||
+                                !jungleMobs.BaseSkinName.ToLower().Contains("dragon"))
                             {
-                                Q.Cast(
-                                    jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65)
-                                        ? Game.CursorPos
-                                        : jungleMobs.Position);
+                                if (jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65))
+                                    Q.Cast(
+                                        jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65)
+                                            ? Game.CursorPos
+                                            : jungleMobs.Position);
                             }
+                            break;
                         }
-                        break;
-                    }
+                    case 2:
+                        {
+                            if (!jungleMobs.BaseSkinName.ToLower().Contains("baron") ||
+                                !jungleMobs.BaseSkinName.ToLower().Contains("dragon"))
+                            {
+                                jungleMobs =
+                                    Marksman.Utils.Utils.GetMobs(
+                                        Q.Range + Orbwalking.GetRealAutoAttackRange(null) + 65,
+                                        Marksman.Utils.Utils.MobTypes.BigBoys);
+                                if (jungleMobs != null)
+                                {
+                                    Q.Cast(
+                                        jungleMobs.LSIsValidTarget(Orbwalking.GetRealAutoAttackRange(null) + 65)
+                                            ? Game.CursorPos
+                                            : jungleMobs.Position);
+                                }
+                            }
+                            break;
+                        }
                 }
 
-                switch (GetValue<StringList>("UseEJ").SelectedIndex)
+                switch (Program.jungleClear["UseEJ"].Cast<ComboBox>().CurrentValue)
                 {
                     case 1:
-                    {
-                        if (jungleMobs.LSIsValidTarget(E.Range))
-                            E.CastOnUnit(jungleMobs);
-                        break;
-                    }
-                    case 2:
-                    {
-                        jungleMobs = Marksman.Utils.Utils.GetMobs(E.Range, Marksman.Utils.Utils.MobTypes.BigBoys);
-                        if (jungleMobs != null)
                         {
-                            CastE(jungleMobs);
-
-                            if (ObjectManager.Player.LSDistance(jungleMobs) < ObjectManager.Player.AttackRange/2)
-                            {
+                            if (jungleMobs.LSIsValidTarget(E.Range))
                                 E.CastOnUnit(jungleMobs);
-                            }
-
+                            break;
                         }
-                        break;
-                    }
+                    case 2:
+                        {
+                            jungleMobs = Marksman.Utils.Utils.GetMobs(E.Range, Marksman.Utils.Utils.MobTypes.BigBoys);
+                            if (jungleMobs != null)
+                            {
+                                CastE(jungleMobs);
+
+                                if (ObjectManager.Player.LSDistance(jungleMobs) < ObjectManager.Player.AttackRange / 2)
+                                {
+                                    E.CastOnUnit(jungleMobs);
+                                }
+
+                            }
+                            break;
+                        }
                 }
             }
         }
 
-        public override void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        public override void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args)
         {
         }
 
         public override bool ComboMenu(Menu config)
         {
-            config.AddItem(
-                new MenuItem("Combo.UseQ" + Id, "Use Q").SetValue(
-                    new StringList(
-                        new[]
-                        {"Off", "Tumble to Mouse Cursor", "Just Complete 3rd Silver Buff Mark", "Marksman Settings"}, 1)));
-            config.AddItem(
-                new MenuItem("UseEC" + Id, "Use E").SetValue(new StringList(
-                    new[] {"Off", "On", "Just Selected Target"}, 1)));
-            config.AddItem(new MenuItem("FocusW" + Id, "Force Focus Marked Enemy").SetValue(true));
+            config.Add("Combo.UseQ", new ComboBox("Use Q", 1, "Off", "Tumble to Mouse Cursor", "Just Complete 3rd Silver Buff Mark", "Marksman Settings"));
+            config.Add("UseEC", new ComboBox("Use E", 1, "Off", "On", "Just Selected Target"));
+            config.Add("FocusW", new CheckBox("Force Focus Marked Enemy"));
             return true;
         }
 
         public override bool HarassMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQH" + Id, "Use Q").SetValue(true));
-            config.AddItem(new MenuItem("UseEH" + Id, "Use E").SetValue(true));
+            config.Add("UseQH", new CheckBox("Use Q"));
+            config.Add("UseEH", new CheckBox("Use E"));
             return true;
         }
 
         public override bool MiscMenu(Menu config)
         {
-            var menuMiscR = new Menu("R", "Misc.R");
-            {
-                menuMiscR.AddItem(
-                    new MenuItem("Misc.R.DontAttack" + Id, "Don't Attack If I'm visible with ulti").SetValue(true));
-                config.AddSubMenu(menuMiscR);
-            }
+            config.Add("Misc.R.DontAttack", new CheckBox("Don't Attack If I'm visible with ulti"));
             // TODO: Add back-off option if Vayne's in dangerous
-            config.AddItem(
-                new MenuItem("UseET" + Id, "Use E (Toggle)").SetValue(new KeyBind("T".ToCharArray()[0],
-                    KeyBindType.Toggle)));
-            config.AddItem(new MenuItem("UseEInterrupt" + Id, "Use E To Interrupt").SetValue(true));
-            config.AddItem(new MenuItem("UseEGapcloser" + Id, "Use E To Gapcloser").SetValue(true));
-            config.AddItem(new MenuItem("PushDistance" + Id, "E Push Distance").SetValue(new Slider(425, 475, 300)));
-            config.AddItem(new MenuItem("CompleteSilverBuff" + Id, "Complete Silver Buff With Q").SetValue(true));
+            config.Add("UseET", new KeyBind("Use E (Toggle)", false, KeyBind.BindTypes.PressToggle, 'T'));
+            config.Add("UseEInterrupt", new CheckBox("Use E To Interrupt"));
+            config.Add("UseEGapcloser", new CheckBox("Use E To Gapcloser"));
+            config.Add("PushDistance", new Slider("E Push Distance", 425, 475, 300));
+            config.Add("CompleteSilverBuff", new CheckBox("Complete Silver Buff With Q"));
             return true;
         }
 
         public override bool LaneClearMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQL" + Id, "Use Q").SetValue(true));
+            config.Add("UseQL", new CheckBox("Use Q"));
             return true;
         }
 
         public override bool JungleClearMenu(Menu config)
         {
-            config.AddItem(
-                new MenuItem("UseQJ" + Id, "Use Q").SetValue(new StringList(new[] {"Off", "On", "Just big Monsters"}, 2)));
-            config.AddItem(
-                new MenuItem("UseEJ" + Id, "Use E").SetValue(new StringList(new[] {"Off", "On", "Just big Monsters"}, 2)));
+            config.Add("UseQJ", new ComboBox("Use Q", 2, "Off", "On", "Just big Monsters"));
+            config.Add("UseEJ", new ComboBox("Use E", 2, "Off", "On", "Just big Monsters"));
             return true;
         }
 
 
         public override bool DrawingMenu(Menu config)
         {
-          config.AddItem(
-                new MenuItem("DrawQ" + Id, "Q range").SetValue(new StringList(new[] {"Off", "Q Range", "Q + AA Range"},
-                    2)));
-            config.AddItem(
-                new MenuItem("DrawE" + Id, "E range").SetValue(
-                    new StringList(new[] {"Off", "E Range", "E Stun Status", "Both"}, 3)));
-
+            config.Add("DrawQ", new ComboBox("Q range", 2, "Off", "Q Range", "Q + AA Range"));
+            config.Add("DrawE", new ComboBox("E range", 3, "Off", "E Range", "E Stun Status", "Both"));
             return true;
         }
 
         public override void Drawing_OnDraw(EventArgs args)
         {
             return;
-            var drawE = GetValue<StringList>("DrawE").SelectedIndex;
-            if (E.IsReady() && drawE != 0)
-            {
-                if (drawE == 1 || drawE == 3)
-                {
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range, Color.BurlyWood, 1);
-                }
-
-                if (drawE == 2 || drawE == 3)
-                {
-                    var t = TargetSelector.GetTarget(E.Range + Q.Range, TargetSelector.DamageType.Physical);
-                    if (t.LSIsValidTarget())
-                    {
-                        var color = System.Drawing.Color.Red;
-                        for (var i = 1; i < 8; i++)
-                        {
-                            var targetBehind = t.Position +
-                                               Vector3.Normalize(t.ServerPosition - ObjectManager.Player.Position)*i*50;
-
-                            if (!targetBehind.IsWall())
-                            {
-                                color = System.Drawing.Color.Aqua;
-                            }
-                            else
-                            {
-                                color = System.Drawing.Color.Red;
-                            }
-                        }
-
-                        var tt = t.Position + Vector3.Normalize(t.ServerPosition - ObjectManager.Player.Position)*8*50;
-
-                        var startpos = t.Position;
-                        var endpos = tt;
-                        var endpos1 = tt +
-                                      (startpos - endpos).LSTo2D().Normalized().Rotated(45*(float) Math.PI/180).To3D()*
-                                      t.BoundingRadius;
-                        var endpos2 = tt +
-                                      (startpos - endpos).LSTo2D().Normalized().Rotated(-45*(float) Math.PI/180).To3D()*
-                                      t.BoundingRadius;
-
-                        var width = 2;
-
-                        var x = new Geometry.Polygon.Line(startpos, endpos);
-                        {
-                            x.Draw(color, width);
-                        }
-
-                        var y = new Geometry.Polygon.Line(endpos, endpos1);
-                        {
-                            y.Draw(color, width);
-                        }
-
-                        var z = new Geometry.Polygon.Line(endpos, endpos2);
-                        {
-                            z.Draw(color, width);
-                        }
-                    }
-                }
-            }
-
-            var drawQ = GetValue<StringList>("DrawQ").SelectedIndex;
-            switch (drawQ)
-            {
-                case 1:
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.Aqua);
-                    break;
-                case 2:
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position,
-                        Q.Range + Orbwalking.GetRealAutoAttackRange(null) + 65, System.Drawing.Color.Aqua);
-                    break;
-            }
         }
 
         public class VayneData
@@ -434,12 +343,12 @@ namespace Marksman.Champions
                 }
             }
 
-            public static Obj_AI_Hero GetSilverBuffMarkedEnemy
+            public static AIHeroClient GetSilverBuffMarkedEnemy
             {
                 get
                 {
                     return
-                        ObjectManager.Get<Obj_AI_Hero>()
+                        ObjectManager.Get<AIHeroClient>()
                             .Where(
                                 enemy =>
                                     !enemy.IsDead &&

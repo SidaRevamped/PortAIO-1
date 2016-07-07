@@ -6,12 +6,14 @@ using System.Linq;
 using System.Security.Cryptography;
 using LeagueSharp;
 using LeagueSharp.Common;
-using Marksman.Orb;
 using Marksman.Utils;
 using SharpDX;
 using Color = System.Drawing.Color;
 using SharpDX.Direct3D9;
-using Orbwalking = Marksman.Orb.Orbwalking;
+using EloBuddy;
+using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Menu;
+using EloBuddy.SDK;
 
 #endregion
 
@@ -26,27 +28,26 @@ namespace Marksman.Champions
             public double ExpireTime { get; set; }
             public int BuffCount { get; set; }
         }
-        public static Spell W;
-        public static Spell E;
-        private static string twitchEBuffName = "TwitchDeadlyVenom";
+        public static LeagueSharp.Common.Spell W;
+        public static LeagueSharp.Common.Spell E;
         public Twitch()
         {
-            W = new Spell(SpellSlot.W, 950);
+            W = new LeagueSharp.Common.Spell(SpellSlot.W, 950);
             W.SetSkillshot(0.25f, 120f, 1400f, false, SkillshotType.SkillshotCircle);
-            E = new Spell(SpellSlot.E, 1200);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 1200);
 
             //Utility.HpBarDamageIndicator.DamageToUnit = GetComboDamage;
             //Utility.HpBarDamageIndicator.Enabled = true;
             Utils.Utils.PrintMessage("Twitch loaded.");
         }
 
-        public override void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        public override void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args)
         {
-            var t = target as Obj_AI_Hero;
-            if (t == null || (!ComboActive && !HarassActive) || !unit.IsMe)
+            var t = target as AIHeroClient;
+            if (t == null || (!ComboActive && !HarassActive))
                 return;
 
-            var useW = GetValue<bool>("UseW" + (ComboActive ? "C" : "H"));
+            var useW = ComboActive ? Program.combo["UseWC"].Cast<CheckBox>().CurrentValue : Program.harass["UseWH"].Cast<CheckBox>().CurrentValue;
 
             if (useW && W.IsReady())
                 W.Cast(t, false, true);
@@ -65,12 +66,12 @@ namespace Marksman.Champions
 
         public override void Game_OnGameUpdate(EventArgs args)
         {
-            if (Orbwalking.CanMove(100) && (ComboActive || HarassActive))
+            if (Orbwalker.CanMove && (ComboActive || HarassActive))
             {
-                var useW = GetValue<bool>("UseW" + (ComboActive ? "C" : "H"));
-                var useE = GetValue<bool>("UseE" + (ComboActive ? "C" : "H"));
+                var useW = ComboActive ? Program.combo["UseWC"].Cast<CheckBox>().CurrentValue : Program.harass["UseWH"].Cast<CheckBox>().CurrentValue;
+                var useE = ComboActive ? Program.combo["UseEC"].Cast<CheckBox>().CurrentValue : Program.harass["UseEH"].Cast<CheckBox>().CurrentValue;
 
-                var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                 if (!t.LSIsValidTarget() || t.HasKindredUltiBuff())
                 {
                     return;
@@ -87,21 +88,21 @@ namespace Marksman.Champions
                     E.Cast();
                 }
 
-                if (ObjectManager.Get<Obj_AI_Hero>().Find(e1 => e1.LSIsValidTarget(E.Range) && E.IsKillable(e1)) != null)
+                if (ObjectManager.Get<AIHeroClient>().Find(e1 => e1.LSIsValidTarget(E.Range) && E.IsKillable(e1)) != null)
                 {
                     E.Cast();
                 }
             }
 
-            if (GetValue<bool>("UseEM") && E.IsReady())
+            if (Program.misc["UseEM"].Cast<CheckBox>().CurrentValue && E.IsReady())
             {
                 foreach (
                     var hero in
-                        ObjectManager.Get<Obj_AI_Hero>()
+                        ObjectManager.Get<AIHeroClient>()
                             .Where(
                                 hero =>
                                     hero.LSIsValidTarget(E.Range) &&
-                                    (ObjectManager.Player.GetSpellDamage(hero, SpellSlot.E) - 10 > hero.Health)))
+                                    (ObjectManager.Player.LSGetSpellDamage(hero, SpellSlot.E) - 10 > hero.Health)))
                 {
                     E.Cast();
                 }
@@ -146,7 +147,7 @@ namespace Marksman.Champions
 
         public override void ExecuteJungleClear()
         {
-            var jungleWValue = Program.Config.Item("UseW.Jungle").GetValue<StringList>().SelectedIndex;
+            var jungleWValue = Program.jungleClear["UseW.Jungle"].Cast<ComboBox>().CurrentValue;
             if (W.IsReady() && jungleWValue != 0)
             {
                 var jungleMobs = Utils.Utils.GetMobs(W.Range, 
@@ -159,9 +160,9 @@ namespace Marksman.Champions
                 }
             }
 
-            if (E.IsReady() && Program.Config.Item("UseE.Jungle").GetValue<StringList>().SelectedIndex != 0)
+            if (E.IsReady() && Program.jungleClear["UseE.Jungle"].Cast<ComboBox>().CurrentValue != 0)
             {
-                var jungleMobs = Utils.Utils.GetMobs(E.Range, Program.Config.Item("UseE.Jungle").GetValue<StringList>().SelectedIndex == 1
+                var jungleMobs = Utils.Utils.GetMobs(E.Range, Program.jungleClear["UseE.Jungle"].Cast<ComboBox>().CurrentValue == 1
                         ? Utils.Utils.MobTypes.All
                         : Utils.Utils.MobTypes.BigBoys);
 
@@ -173,61 +174,57 @@ namespace Marksman.Champions
         }
 
 
-        private static float GetComboDamage(Obj_AI_Hero t)
+        private static float GetComboDamage(AIHeroClient t)
         {
             var fComboDamage = 0f;
 
             if (E.IsReady())
-                fComboDamage += (float) ObjectManager.Player.GetSpellDamage(t, SpellSlot.E);
+                fComboDamage += (float) ObjectManager.Player.LSGetSpellDamage(t, SpellSlot.E);
 
             if (ObjectManager.Player.GetSpellSlot("summonerdot") != SpellSlot.Unknown &&
                 ObjectManager.Player.Spellbook.CanUseSpell(ObjectManager.Player.GetSpellSlot("summonerdot")) ==
                 SpellState.Ready && ObjectManager.Player.LSDistance(t) < 550)
-                fComboDamage += (float) ObjectManager.Player.GetSummonerSpellDamage(t, Damage.SummonerSpell.Ignite);
+                fComboDamage += (float) ObjectManager.Player.GetSummonerSpellDamage(t, LeagueSharp.Common.Damage.SummonerSpell.Ignite);
 
             if (Items.CanUseItem(3144) && ObjectManager.Player.LSDistance(t) < 550)
-                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, Damage.DamageItems.Bilgewater);
+                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Bilgewater);
 
             if (Items.CanUseItem(3153) && ObjectManager.Player.LSDistance(t) < 550)
-                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, Damage.DamageItems.Botrk);
+                fComboDamage += (float) ObjectManager.Player.GetItemDamage(t, LeagueSharp.Common.Damage.DamageItems.Botrk);
 
             return fComboDamage;
         }
 
         public override bool ComboMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseWC" + Id, "Use W").SetValue(true));
-            config.AddItem(new MenuItem("UseEC" + Id, "Use E max Stacks").SetValue(true));
+            config.Add("UseWC", new CheckBox("Use W"));
+            config.Add("UseEC", new CheckBox("Use E max Stacks"));
             return true;
         }
 
         public override bool HarassMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseWH" + Id, "Use W").SetValue(false));
-            config.AddItem(new MenuItem("UseEH" + Id, "Use E at max Stacks").SetValue(false));
+            config.Add("UseWH", new CheckBox("Use W", false));
+            config.Add("UseEH", new CheckBox("Use E at max Stacks", false));
             return true;
         }
 
         public override bool DrawingMenu(Menu config)
         {
-            config.AddItem(
-                new MenuItem("DrawW" + Id, "W range").SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
-
-            var dmgAfterComboItem = new MenuItem("DamageAfterCombo", "Damage After Combo").SetValue(true);
-            config.AddItem(dmgAfterComboItem);
+            config.Add("DrawW", new CheckBox("W range"));//.SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
 
             return true;
         }
 
         public override bool MiscMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseEM" + Id, "Use E KS").SetValue(true));
+            config.Add("UseEM", new CheckBox("Use E KS"));
             return true;
         }
 
         public override bool LaneClearMenu(Menu config)
         {
-            config.AddItem(new MenuItem("PrepareMinionsE.Lane", "Prepare Minions for E").SetValue(new StringList(new []{ "Off", "Everytime", "Just Under Ally Turret" }, 2)));
+            config.Add("PrepareMinionsE.Lane", new ComboBox("Prepare Minions for E", 2, "Off", "Everytime", "Just Under Ally Turret"));
 
             string[] strW = new string[6];
             strW[0] = "Off";
@@ -237,7 +234,7 @@ namespace Marksman.Champions
                 strW[i] = "If Could Infect Minion Count>= " + i;
             }
 
-            config.AddItem(new MenuItem("UseW.Lane", "Use W:").SetValue(new StringList(strW, 0)));
+            config.Add("UseW.Lane", new ComboBox("Use W:", 0, strW));
 
 
             string[] strE = new string[6];
@@ -248,7 +245,7 @@ namespace Marksman.Champions
                 strE[i] = "Minion Count >= " + i;
             }
 
-            config.AddItem(new MenuItem("UseE.Lane", "Use E:").SetValue(new StringList(strE, 0)));
+            config.Add("UseE.Lane", new ComboBox("Use E:", strE, 0));
             return true;
         }
         public override bool JungleClearMenu(Menu config)
@@ -263,10 +260,10 @@ namespace Marksman.Champions
                 strW[i] = "If Could Infect Mobs Count>= " + i;
             }
             
-            config.AddItem(new MenuItem("UseW.Jungle", "Use W:").SetValue(new StringList(strW, 3)));
+            config.Add("UseW.Jungle", new ComboBox("Use W:", 3, strW));
 
-            //config.AddItem(new MenuItem("UseW.Jungle", "Use W").SetValue(new StringList(new[] { "Off", "On", "Just big Monsters" }, 2)));
-            config.AddItem(new MenuItem("UseE.Jungle", "Use E").SetValue(new StringList(new[] { "Off", "On", "Just big Monsters" }, 2)));
+            //config.Add("UseW.Jungle", "Use W").SetValue(new StringList(new[] { "Off", "On", "Just big Monsters" }, 2)));
+            config.Add("UseE.Jungle", new ComboBox("Use E", 2, "Off", "On", "Just big Monsters"));
 
             return true;
         }

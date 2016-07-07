@@ -110,7 +110,6 @@ namespace Marksman
                 case "quinn":
                     ChampionClass = new Quinn();
                     break;
-                    /*
                 case "teemo":
                     ChampionClass = new Teemo();
                     break;
@@ -129,7 +128,6 @@ namespace Marksman
                 case "varus":
                     ChampionClass = new Varus();
                     break;
-                    */
             }
             Config.DisplayName = "Marksman Lite";
 

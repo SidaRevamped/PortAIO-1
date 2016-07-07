@@ -136,6 +136,8 @@ namespace PortAIO.Utility
         public static int hecarim { get { return Miscc["hecarim"].Cast<ComboBox>().CurrentValue; } }
         public static bool predictioner { get { return Miscc["predictioner"].Cast<CheckBox>().CurrentValue; } }
         public static int predictionerCB { get { return Miscc["predictionerCB"].Cast<ComboBox>().CurrentValue; } }
+        public static int urgot { get { return Miscc["urgot"].Cast<ComboBox>().CurrentValue; } }
+        public static int varus { get { return Miscc["varus"].Cast<ComboBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -229,6 +231,8 @@ namespace PortAIO.Utility
             "Warwick", //79
             "Illaoi", //80
             "Hecarim", //81
+            "Urgot", // 82
+            "Varus", //83
         });
 
         public static void Menu()
@@ -267,7 +271,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[6]))
                 {
-                    Miscc.Add("twitch", new ComboBox("Use addon for Twitch : ", 0, "OKTW", "Infected Twitch", "iTwitch", "ExorAIO"));
+                    Miscc.Add("twitch", new ComboBox("Use addon for Twitch : ", 0, "OKTW", "Infected Twitch", "iTwitch", "ExorAIO", "Marksman II"));
                 }
                 if (Player.ChampionName.Equals(Champion[7]))
                 {
@@ -283,7 +287,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[10]))
                 {
-                    Miscc.Add("vayne", new ComboBox("Use addon for Vayne : ", 0, "Vayne 2.0", "VayneHunterReborn", "hi im gosu", "hVayne SDK", "ExorAIO", "Challenger Series"));
+                    Miscc.Add("vayne", new ComboBox("Use addon for Vayne : ", 0, "Vayne 2.0", "VayneHunterReborn", "hi im gosu", "hVayne SDK", "ExorAIO", "Challenger Series", "Marksman II"));
                 }
                 if (Player.ChampionName.Equals(Champion[11]))
                 {
@@ -471,7 +475,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[57]))
                 {
-                    Miscc.Add("teemo", new ComboBox("Use addon for Teemo : ", 0, "Sharpshooter", "Swiftly Teemo"));
+                    Miscc.Add("teemo", new ComboBox("Use addon for Teemo : ", 0, "Sharpshooter", "Swiftly Teemo", "Marksman II"));
                 }
                 if (Player.ChampionName.Equals(Champion[58]))
                 {
@@ -535,7 +539,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[73]))
                 {
-                    Miscc.Add("tristana", new ComboBox("Use addon for Tristana : ", 0, "ElTristana", "ExorAIO"));
+                    Miscc.Add("tristana", new ComboBox("Use addon for Tristana : ", 0, "ElTristana", "ExorAIO", "Marksman II"));
                 }
                 if (Player.ChampionName.Equals(Champion[74]))
                 {
@@ -568,6 +572,14 @@ namespace PortAIO.Utility
                 if (Player.ChampionName.Equals(Champion[81]))
                 {
                     Miscc.Add("hecarim", new ComboBox("Use addon for Hecarim : ", 0, "Justy Hecarim", "UnderratedAIO"));
+                }
+                if (Player.ChampionName.Equals(Champion[82]))
+                {
+                    Miscc.Add("urgot", new ComboBox("Use addon for Urgot : ", 0, "OKTW", "Marksman II"));
+                }
+                if (Player.ChampionName.Equals(Champion[83]))
+                {
+                    Miscc.Add("varus", new ComboBox("Use addon for Varus : ", 0, "ElVarus", "Marksman II"));
                 }
             }
             else

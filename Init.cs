@@ -404,6 +404,9 @@ namespace PortAIO
                             case 3:
                                 ExorAIO.AIO.OnLoad();
                                 break;
+                            case 4:
+                                Marksman.Program.Game_OnGameLoad();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;
@@ -611,11 +614,24 @@ namespace PortAIO
                                 break;
                         }
                         break;
+                    case "urgot":
+                        switch (Loader.urgot)
+                        {
+                            case 0:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                            case 1:
+                                Marksman.Program.Game_OnGameLoad();
+                                break;
+                            default:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
+                        }
+                        break;
                     case "malzahar": // OKTW - Sebby - All Seeby champs go down here
                     case "orianna":
                     case "velkoz":
                     case "swain":
-                    case "urgot":
                         SebbyLib.Program.GameOnOnGameLoad();
                         break;
                     case "azir": // HeavenStrike
@@ -1343,6 +1359,9 @@ namespace PortAIO
                             case 5:
                                 Challenger_Series.Program.Main();
                                 break;
+                            case 6:
+                                Marksman.Program.Game_OnGameLoad();
+                                break;
                             default:
                                 Vayne1.Program.OnLoad();
                                 break;
@@ -1376,6 +1395,9 @@ namespace PortAIO
                                 break;
                             case 1:
                                 ExorAIO.AIO.OnLoad();
+                                break;
+                            case 2:
+                                Marksman.Program.Game_OnGameLoad();
                                 break;
                             default:
                                 ElTristana.Tristana.OnLoad();
@@ -1602,7 +1624,18 @@ namespace PortAIO
                         }
                         break;
                     case "varus": // ElVarus
-                        Elvarus.Varus.Game_OnGameLoad();
+                        switch (Loader.varus)
+                        {
+                            case 0:
+                                Elvarus.Varus.Game_OnGameLoad();
+                                break;
+                            case 1:
+                                Marksman.Program.Game_OnGameLoad();
+                                break;
+                            default:
+                                Elvarus.Varus.Game_OnGameLoad();
+                                break;
+                        }
                         break;
                     case "veigar": // FreshBooster
                         switch (Loader.veigar)
@@ -1692,6 +1725,9 @@ namespace PortAIO
                                 break;
                             case 1:
                                 Swiftly_Teemo.Program.Load();
+                                break;
+                            case 2:
+                                Marksman.Program.Game_OnGameLoad();
                                 break;
                             default:
                                 new SharpShooter.Plugins.Teemo();
