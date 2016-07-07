@@ -16,6 +16,7 @@ namespace Dark_Star_Thresh
             combo = Config.AddSubMenu("Combo", "Combo");
             combo.Add("ComboFlash", new KeyBind("Flash Combo", false, KeyBind.BindTypes.HoldActive, 'T'));
             combo.Add("ComboR", new Slider("Min Enemies For R", 3, 0, 5));
+            combo.Add("ComboQ", new Slider("Max Q Range", 110, 0, 110));
             combo.Add("ComboTaxi", new CheckBox("Taxi Mode (Beta!)"));
 
             Harass = Config.AddSubMenu("Harass", "Harass");
@@ -45,6 +46,8 @@ namespace Dark_Star_Thresh
 
         // Slider
         public static int ComboR => combo["ComboR"].Cast<Slider>().CurrentValue;
+        public static int ComboQ => combo["ComboQ"].Cast<Slider>().CurrentValue;
+
 
         // Bool
         public static bool ComboTaxi => combo["ComboTaxi"].Cast<CheckBox>().CurrentValue;
