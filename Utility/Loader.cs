@@ -351,7 +351,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[27]))
                 {
-                    Miscc.Add("quinn", new ComboBox("Use addon for Quinn : ", 0, "GFuel Quinn", "OKTW", "ExorAIO"));
+                    Miscc.Add("quinn", new ComboBox("Use addon for Quinn : ", 0, "GFuel Quinn", "OKTW", "ExorAIO", "Marksman II"));
                 }
                 if (Player.ChampionName.Equals(Champion[28]))
                 {

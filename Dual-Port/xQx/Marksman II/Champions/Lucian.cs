@@ -221,9 +221,10 @@ namespace Marksman.Champions
             //return al1;
         }
 
-        public static void DrawingOnEndScene(EventArgs args)
+        public override void DrawingOnEndScene(EventArgs args)
         {
             return;
+            /*
             if (Program.misc["Passive"].Cast<CheckBox>().CurrentValue && xAttackLeft > 0)
             {
                 return;
@@ -338,7 +339,7 @@ namespace Marksman.Champions
 
 
             }
-
+            */
         }
 
         public override void Drawing_OnDraw(EventArgs args)

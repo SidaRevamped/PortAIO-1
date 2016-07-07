@@ -4,32 +4,34 @@ using System;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using Marksman.Orb;
 using SharpDX;
 using Color = System.Drawing.Color;
-using Orbwalking = Marksman.Orb.Orbwalking;
+using EloBuddy;
+using EloBuddy.SDK.Menu.Values;
 
 #endregion
 
 namespace Marksman.Champions
 {
+    using EloBuddy.SDK;
+    using EloBuddy.SDK.Menu;
     using System.Diagnostics.Eventing.Reader;
 
     internal class Quinn : Champion
     {
         public static float ValorMinDamage;
         public static float ValorMaxDamage;
-        public Spell E;
-        public Spell Q;
-        public Spell R;
+        public LeagueSharp.Common.Spell E;
+        public LeagueSharp.Common.Spell Q;
+        public LeagueSharp.Common.Spell R;
 
         public Quinn()
         {
             Utils.Utils.PrintMessage("Quinn loaded.");
 
-            Q = new Spell(SpellSlot.Q, 1010);
-            E = new Spell(SpellSlot.E, 800);
-            R = new Spell(SpellSlot.R, 550);
+            Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 1010);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 800);
+            R = new LeagueSharp.Common.Spell(SpellSlot.R, 550);
 
             Q.SetSkillshot(0.25f, 160f, 1150, true, SkillshotType.SkillshotLine);
             E.SetTargetted(0.25f, 2000f);
@@ -37,18 +39,9 @@ namespace Marksman.Champions
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
 
-        public override void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
-        {
-        }
-
-        public override void Obj_AI_Base_OnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
-        {
-            
-        }
-
         public void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (Program.Config.Item("Misc.AntiGapCloser").GetValue<bool>())
+            if (!Program.misc["Misc.AntiGapCloser"].Cast<CheckBox>().CurrentValue)
             {
                 return;
             }
@@ -57,30 +50,30 @@ namespace Marksman.Champions
                 E.CastOnUnit(gapcloser.Sender);
         }
 
-        public override void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        public override void Orbwalking_AfterAttack(AttackableUnit target, EventArgs args)
         {
-            var t = target as Obj_AI_Hero;
-            if (t == null || (!ComboActive && !HarassActive) || unit.IsMe) return;
+            var t = target as AIHeroClient;
+            if (t == null || (!ComboActive && !HarassActive)) return;
 
-            if (Q.IsReady() && GetValue<bool>("UseQ" + (ComboActive ? "C" : "H")))
+            if (Q.IsReady() && ComboActive ? Program.combo["UseQC"].Cast<CheckBox>().CurrentValue : Program.harass["UseQH"].Cast<CheckBox>().CurrentValue)
                 Q.Cast(t, false, true);
         }
 
         public override void Drawing_OnDraw(EventArgs args)
         {
-            Spell[] spellList = { Q, E};
+            LeagueSharp.Common.Spell[] spellList = { Q, E};
             foreach (var spell in spellList)
             {
-                var menuItem = GetValue<Circle>("Draw" + spell.Slot);
-                if (menuItem.Active && spell.Level > 0)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, spell.Range, menuItem.Color);
+                var menuItem = Program.marksmanDrawings["Draw" + spell.Slot].Cast<CheckBox>().CurrentValue;
+                if (menuItem && spell.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, spell.Range, Color.FromArgb(100, 255, 0, 255));
 
-                if (menuItem.Active && spell.Level > 0 && IsValorMode)
-                    Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range, menuItem.Color);
+                if (menuItem && spell.Level > 0 && IsValorMode)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range, Color.FromArgb(100, 255, 0, 255));
             }
         }
 
-        public static bool IsPositionSafe(Obj_AI_Hero target, Spell spell)
+        public static bool IsPositionSafe(AIHeroClient target, LeagueSharp.Common.Spell spell)
             // use underTurret and .Extend for this please
         {
             var predPos = spell.GetPrediction(target).UnitPosition.LSTo2D();
@@ -107,7 +100,7 @@ namespace Marksman.Champions
             return true;
         }
 
-        public static bool isHePantheon(Obj_AI_Hero target)
+        public static bool isHePantheon(AIHeroClient target)
         {
             /* Quinn's Spell E can do nothing when Pantheon's passive is active. */
             return target.Buffs.All(buff => buff.Name == "pantheonpassivebuff");
@@ -142,30 +135,30 @@ namespace Marksman.Champions
             {
                 if (enemy.LSDistance(ObjectManager.Player.Position) > Orbwalking.GetRealAutoAttackRange(null) + 65)
                 {
-                    ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, enemy);
+                    EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, enemy);
                 }
-                Orbwalker.ForceTarget(enemy);
+                Orbwalker.ForcedTarget = enemy;
             }
 
-            if (Q.IsReady() && GetValue<KeyBind>("UseQTH").Active)
+            if (Q.IsReady() && Program.harass["UseQTH"].Cast<KeyBind>().CurrentValue)
             {
                 if (ObjectManager.Player.HasBuff("Recall"))
                     return;
-                var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
                 if (t != null)
                     Q.Cast(t, false, true);
             }
 
             if (ComboActive || HarassActive)
             {
-                var useQ = GetValue<bool>("UseQ" + (ComboActive ? "C" : "H"));
-                var useE = GetValue<bool>("UseE" + (ComboActive ? "C" : "H"));
+                var useQ = ComboActive ? Program.combo["UseQC"].Cast<CheckBox>().CurrentValue : Program.harass["UseQH"].Cast<CheckBox>().CurrentValue;
+                var useE = ComboActive ? Program.combo["UseEC"].Cast<CheckBox>().CurrentValue : Program.harass["UseEH"].Cast<CheckBox>().CurrentValue;
 
-                if (Orbwalking.CanMove(100))
+                if (Orbwalker.CanMove)
                 {
                     if (E.IsReady() && useE)
                     {
-                        var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+                        var t = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                         if (t.LSIsValidTarget() && !t.IsZombie && !isHePantheon(t) && !t.HasBuff("QuinnW_Cosmetic"))
                         {
                             E.CastOnUnit(t);
@@ -174,14 +167,14 @@ namespace Marksman.Champions
 
                     if (Q.IsReady() && useQ)
                     {
-                        var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+                        var t = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
                         if (t.LSIsValidTarget() && !t.IsZombie)
                             Q.Cast(t);
                     }
 
                     if (IsValorMode && !E.IsReady())
                     {
-                        var vTarget = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
+                        var vTarget = TargetSelector.GetTarget(R.Range, DamageType.Physical);
                         if (vTarget != null)
                         {
                             calculateValorDamage();
@@ -200,7 +193,7 @@ namespace Marksman.Champions
                 var jQ = Marksman.Utils.Utils.GetMobs(Orbwalking.GetRealAutoAttackRange(null) + 65, Marksman.Utils.Utils.MobTypes.All);
                 if (jQ != null)
                 {
-                    switch (GetValue<StringList>("UseQJ").SelectedIndex)
+                    switch (Program.jungleClear["UseQJ"].Cast<ComboBox>().CurrentValue)
                     {
                         case 1:
                             {
@@ -227,7 +220,7 @@ namespace Marksman.Champions
 
                 if (jungleMobs != null)
                 {
-                    switch (GetValue<StringList>("UseEJ").SelectedIndex)
+                    switch (Program.jungleClear["UseEJ"].Cast<ComboBox>().CurrentValue)
                     {
                         case 1:
                             {
@@ -249,45 +242,41 @@ namespace Marksman.Champions
         }
         public override bool ComboMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQC" + Id, "Use Q").SetValue(true));
-            config.AddItem(new MenuItem("UseEC" + Id, "Use E").SetValue(true));
+            config.Add("UseQC", new CheckBox("Use Q"));
+            config.Add("UseEC", new CheckBox("Use E"));
             return true;
         }
 
         public override bool HarassMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQH" + Id, "Use Q").SetValue(true));
-            config.AddItem(new MenuItem("UseEH" + Id, "Use E").SetValue(true));
-            config.AddItem(new MenuItem("UseQTH" + Id, "Use Q (Toggle)").SetValue(new KeyBind("H".ToCharArray()[0], KeyBindType.Toggle)));
+            config.Add("UseQH", new CheckBox("Use Q"));
+            config.Add("UseEH", new CheckBox("Use E"));
+            config.Add("UseQTH", new KeyBind("Use Q (Toggle)", false, KeyBind.BindTypes.PressToggle, 'H'));
             return true;
         }
 
         public override bool DrawingMenu(Menu config)
         {
-            config.AddItem(
-                new MenuItem("DrawQ" + Id, "Q range").SetValue(new Circle(true,
-                    Color.FromArgb(100, 255, 0, 255))));
-            config.AddItem(
-                new MenuItem("DrawE" + Id, "E range").SetValue(new Circle(false,
-                    Color.FromArgb(100, 255, 255, 255))));
+            config.Add("DrawQ", new CheckBox("Q range", false));//.SetValue(new Circle(true, Color.FromArgb(100, 255, 0, 255))));
+            config.Add("DrawE", new CheckBox("E range", false));//.SetValue(new Circle(false, Color.FromArgb(100, 255, 255, 255))));
             return true;
         }
 
         public override bool LaneClearMenu(Menu config)
         {
-            config.AddItem(new MenuItem("Lane.Non", ObjectManager.Player.ChampionName + " Doesn't Support Lane Clear"));
+            config.AddLabel(ObjectManager.Player.ChampionName + " Doesn't Support Lane Clear");
             return true;
         }
         public override bool JungleClearMenu(Menu config)
         {
-            config.AddItem(new MenuItem("UseQJ" + Id, "Use Q").SetValue(new StringList(new[] { "Off", "On", "Just for big Monsters" }, 1)));
-            config.AddItem(new MenuItem("UseEJ" + Id, "Use E").SetValue(new StringList(new[] { "Off", "On", "Just for big Monsters" }, 1)));
+            config.Add("UseQJ", new ComboBox("Use Q", 1, "Off", "On", "Just for big Monsters"));//.SetValue(new StringList(new[] { "Off", "On", "Just for big Monsters" }, 1)));
+            config.Add("UseEJ", new ComboBox("Use E", 1, "Off", "On", "Just for big Monsters"));//.SetValue(new StringList(new[] { "Off", "On", "Just for big Monsters" }, 1)));
             return true;
         }
 
         public override bool MiscMenu(Menu config)
         {
-            config.AddItem(new MenuItem("Misc.AntiGapCloser" + Id, "E Anti Gap Closer").SetValue(true));
+            config.Add("Misc.AntiGapCloser", new CheckBox("E Anti Gap Closer"));
             return true;
         }
     }

@@ -104,14 +104,13 @@ namespace Marksman
                 case "sivir":
                     ChampionClass = new Sivir();
                     break;
-
                 case "missfortune":
                     ChampionClass = new MissFortune();
                     break;
-                 /*
                 case "quinn":
                     ChampionClass = new Quinn();
                     break;
+                    /*
                 case "teemo":
                     ChampionClass = new Teemo();
                     break;

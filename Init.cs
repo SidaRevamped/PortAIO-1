@@ -1360,6 +1360,9 @@ namespace PortAIO
                             case 2:
                                 ExorAIO.AIO.OnLoad();
                                 break;
+                            case 3:
+                                Marksman.Program.Game_OnGameLoad();
+                                break;
                             default:
                                 GFUELQuinn.Quinn.OnGameLoad();
                                 break;
