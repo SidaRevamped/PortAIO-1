@@ -105,7 +105,8 @@
             }
 
             hybridMenu = config.AddSubMenu("Hybrid", "Hybrid");
-            hybridMenu.Add("Mode", new ComboBox("Mode", 0, "W-E-Q", "E-Q", "Q"));
+            hybridMenu.Add("Mode", new ComboBox("Mode", 1, "W-E-Q", "E-Q", "Q"));
+            hybridMenu.Add("WEQ", new KeyBind("Only W If Hit E-Q", false, KeyBind.BindTypes.PressToggle, 'X'));
             hybridMenu.AddGroupLabel("Auto Q Settings (Champ)");
             hybridMenu.Add("AutoQ", new KeyBind("KeyBind", false, KeyBind.BindTypes.PressToggle, 'T'));
             hybridMenu.Add("AutoQMpA", new Slider("If Mp >=", 100, 0, 200));
@@ -535,7 +536,8 @@
             {
                 Swap(target);
                 var useR = getKeyBindItem(comboMenu, "R")
-                           && getCheckBoxItem(comboMenu, "RCast" + target.NetworkId);
+                           && getCheckBoxItem(comboMenu, "RCast" + target.NetworkId)
+                           && target.Health + target.AttackShield > Q.GetDamage(target);
                 if (RState == 0 && useR && R.IsInRange(target) && CanR && R.CastOnUnit(target))
                 {
                     return;
@@ -683,10 +685,24 @@
             {
                 return;
             }
+            var canCast = true;
             var mode = getBoxItem(hybridMenu, "Mode");
             if (mode == 0 && WState == 0)
             {
-                CastW(target, CanW(target));
+                if (hybridMenu["WEQ"].Cast<KeyBind>().CurrentValue)
+                {
+                    canCast = E.IsReady() && Q.IsReady(100)
+                              && Player.Mana >= E.Instance.SData.Mana + (Q.Instance.SData.Mana - 10) + W.Instance.SData.Mana
+                              && target.DistanceToPlayer() < W.Range + E.Range - 20;
+                }
+                if (canCast)
+                {
+                    CastW(target, hybridMenu["WEQ"].Cast<KeyBind>().CurrentValue ? SpellSlot.E : CanW(target));
+                    return;
+                }
+            }
+            if (!canCast)
+            {
                 return;
             }
             if (mode < 2)

@@ -151,6 +151,7 @@
 
             miscMenu = config.AddSubMenu("Misc", "Misc");
             miscMenu.Add("StackQ", new KeyBind("Auto Stack Q", false, KeyBind.BindTypes.PressToggle, 'Z'));
+            miscMenu.Add("EQ3Flash", new KeyBind("Use E-Q3-Flash", false, KeyBind.BindTypes.HoldActive, 'X'));
 
             Evade.Evading += Evading;
             Evade.TryEvading += TryEvading;
@@ -333,6 +334,41 @@
             else
             {
                 CastQ3();
+            }
+        }
+
+        private static void BeyBlade()
+        {
+            if (!Common.CanFlash)
+            {
+                return;
+            }
+            if (Q.IsReady() && haveQ3 && IsDashing && CanCastQCir)
+            {
+                var hits =
+                    GameObjects.EnemyHeroes.Count(
+                        i => i.LSIsValidTarget() && Q3.GetPredPosition(i).Distance(posDash) < Q3.Range + FlashRange);
+                if (hits > 0 && Q3.Cast(posDash))
+                {
+                    //DelayAction.Add();
+                }
+            }
+            if (!E.IsReady() || IsDashing)
+            {
+                return;
+            }
+            var obj =
+                Common.ListEnemies(true)
+                    .Where(i => i.LSIsValidTarget(E.Range) && !HaveE(i))
+                    .MaxOrDefault(
+                        i =>
+                        GameObjects.EnemyHeroes.Count(
+                            a =>
+                            !a.Compare(i) && a.LSIsValidTarget()
+                            && Q3.GetPredPosition(a).Distance(GetPosAfterDash(i)) < Q3.Range + FlashRange - 50));
+            if (obj != null && E.CastOnUnit(obj))
+            {
+                lastE = Variables.TickCount;
             }
         }
 
@@ -1036,6 +1072,11 @@
             {
                 Orbwalker.OrbwalkTo(Game.CursorPos);
                 Flee();
+            }
+            else if (miscMenu["EQ3Flash"].Cast<KeyBind>().CurrentValue)
+            {
+                Orbwalker.MoveTo(Game.CursorPos);
+                //BeyBlade();
             }
 
             if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))

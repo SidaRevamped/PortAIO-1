@@ -662,7 +662,7 @@
                 {
                     bestTarget = targetKick;
                     bestHit = targetHits.Count;
-                    posAfter = targetHits[0].Item2;
+                    posAfter = targetHits.First().Item2;
                 }
             }
             return new Tuple<AIHeroClient, int, Vector3>(bestTarget, bestHit >= minHit ? 1 : 0, posAfter);
