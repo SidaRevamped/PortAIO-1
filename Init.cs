@@ -1436,6 +1436,9 @@ namespace PortAIO
                             case 4:
                                 yol0Thresh.Program.OnLoad();
                                 break;
+                            case 5:
+                                Dark_Star_Thresh.Program.OnLoad();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;

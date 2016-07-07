@@ -514,6 +514,17 @@
     <Compile Include="Dual-Port\Hoola\HpBarIndicator.cs" />
     <Compile Include="Dual-Port\Hoola\Program.cs" />
     <Compile Include="Dual-Port\imsosharp\ChallengerSeries\Plugins\Vayne.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Core\Core.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Core\Dmg.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Core\Spells.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Drawings\DrawDmg.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Drawings\DrawRange.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Drawings\HpBarIndicator.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Load.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\MenuConfig.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Program.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Update\Misc.cs" />
+    <Compile Include="Dual-Port\Nechrito\Dark Star Thresh\Update\Mode.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Core.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Dmg.cs" />
     <Compile Include="Dual-Port\Nechrito\Preserved Kassadin\Cores\Killsteal.cs" />
