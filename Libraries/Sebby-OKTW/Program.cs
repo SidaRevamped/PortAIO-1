@@ -264,6 +264,9 @@ namespace SebbyLib
                     case "TwistedFate":
                         OneKeyToWin_AIO_Sebby.Champions.TwistedFate.LoadOKTW();
                         break;
+                    case "Varus":
+                        new OneKeyToWin_AIO_Sebby.Champions.Varus().LoadOKTW();
+                        break;
                 }
             }
 

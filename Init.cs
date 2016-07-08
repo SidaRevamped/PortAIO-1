@@ -1657,6 +1657,9 @@ namespace PortAIO
                             case 1:
                                 Marksman.Program.Game_OnGameLoad();
                                 break;
+                            case 2:
+                                SebbyLib.Program.GameOnOnGameLoad();
+                                break;
                             default:
                                 Elvarus.Varus.Game_OnGameLoad();
                                 break;

@@ -581,7 +581,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[83]))
                 {
-                    Miscc.Add("varus", new ComboBox("Use addon for Varus : ", 0, "ElVarus", "Marksman II"));
+                    Miscc.Add("varus", new ComboBox("Use addon for Varus : ", 0, "ElVarus", "Marksman II", "OKTW"));
                 }
                 if (Player.ChampionName.Equals(Champion[84]))
                 {
