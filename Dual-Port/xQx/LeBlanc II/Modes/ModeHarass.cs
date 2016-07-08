@@ -33,7 +33,7 @@ namespace Leblanc.Modes
             {
                 MenuLocal.Add("Harass.UseQ", new CheckBox("Q:"));
                 MenuLocal.Add("Harass.UseW", new ComboBox("W:", 2, "Off", "On", "On: After Q"));
-                MenuLocal.Add("Harass.UseW.Return", new ComboBox("W: Auto Return"));
+                MenuLocal.Add("Harass.UseW.Return", new CheckBox("W: Auto Return"));
                 MenuLocal.Add("Harass.UseE", new CheckBox("E:", false));
 
                 MenuLocal.AddGroupLabel("Toggle Harass");
