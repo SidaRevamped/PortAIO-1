@@ -127,8 +127,9 @@
 
                 Random = new Random(Environment.TickCount);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 Console.WriteLine($"Failed to load exhaust");
             }
         }

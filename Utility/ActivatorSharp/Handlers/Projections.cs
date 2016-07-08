@@ -24,6 +24,7 @@ namespace Activators.Handlers
         {
             MissileClient.OnCreate += MissileClient_OnSpellMissileCreate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnUnitSpellCast;
+            AIHeroClient.OnPlayAnimation += AIHeroClient_OnPlayAnimation;
         }
 
         private static void MissileClient_OnSpellMissileCreate(GameObject sender, EventArgs args)
@@ -35,7 +36,7 @@ namespace Activators.Handlers
                 return;
             }
 
-            var missile = (MissileClient) sender;
+            var missile = (MissileClient)sender;
             if (missile.SpellCaster is AIHeroClient && missile.SpellCaster?.Team != Player.Team)
             {
                 var startPos = missile.StartPosition.LSTo2D();
@@ -66,7 +67,7 @@ namespace Activators.Handlers
                     var projdist = hero.Player.ServerPosition.LSTo2D().LSDistance(proj.SegmentPoint);
 
                     // get the evade time 
-                    var evadetime = (int) (1000 * 
+                    var evadetime = (int)(1000 *
                        (data.Width - projdist + hero.Player.BoundingRadius) / hero.Player.MoveSpeed);
 
                     // check if hero on segment
@@ -100,16 +101,16 @@ namespace Activators.Handlers
                                     x =>
                                         Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
 
-                            LeagueSharp.Common.Utility.DelayAction.Add((int) endtime * 2 + (200 - Game.Ping), () =>
-                            {
-                                hero.Attacker = null;
-                                hero.IncomeDamage -= 1;
-                                hero.HitTypes.RemoveAll(
-                                    x =>
-                                        !x.Equals(HitType.Spell) &&
-                                        Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
-                                hero.HitTypes.Remove(HitType.Spell);
-                            });
+                            LeagueSharp.Common.Utility.DelayAction.Add((int)endtime * 2 + (200 - Game.Ping), () =>
+                           {
+                               hero.Attacker = null;
+                               hero.IncomeDamage -= 1;
+                               hero.HitTypes.RemoveAll(
+                                   x =>
+                                       !x.Equals(HitType.Spell) &&
+                                       Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
+                               hero.HitTypes.Remove(HitType.Spell);
+                           });
                         });
                     }
                 }
@@ -125,10 +126,10 @@ namespace Activators.Handlers
 
             #region Hero
 
-            if (sender.IsEnemy && sender.Type == GameObjectType.AIHeroClient)
+            if (sender.IsEnemy && sender is AIHeroClient)
             {
-                var attacker = sender as AIHeroClient;
-                if (attacker != null && attacker.IsValid<AIHeroClient>())
+                var attacker = (AIHeroClient)sender;
+                if (attacker.IsValid<AIHeroClient>())
                 {
                     LastCastedTimeStamp = Utils.GameTimeTickCount;
 
@@ -148,14 +149,14 @@ namespace Activators.Handlers
                                 var dist = 1000 * sender.LSDistance(args.Target.Position) / args.SData.MissileSpeed;
                                 var end = adelay + dist + Game.Ping;
 
-                                dmg += (int) Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true), 0);
+                                dmg += (int)Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true), 0);
 
                                 if (attacker.HasBuff("sheen"))
-                                    dmg += (int) Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true) +
+                                    dmg += (int)Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true) +
                                                           attacker.GetCustomDamage("sheen", hero.Player), 0);
 
                                 if (attacker.HasBuff("lichbane"))
-                                    dmg += (int) Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true) +
+                                    dmg += (int)Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true) +
                                                           attacker.GetCustomDamage("lichbane", hero.Player), 0);
 
                                 if (attacker.HasBuff("itemstatikshankcharge") &&
@@ -163,23 +164,23 @@ namespace Activators.Handlers
                                     dmg += new[] { 62, 120, 200 }[attacker.Level / 6];
 
                                 if (args.SData.Name.ToLower().Contains("crit"))
-                                    dmg += (int) Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true), 0);
+                                    dmg += (int)Math.Max(attacker.LSGetAutoAttackDamage(hero.Player, true), 0);
 
                                 dmg = dmg / 100 * Activator.zmenu["weightdmg"].Cast<Slider>().CurrentValue;
 
-                                LeagueSharp.Common.Utility.DelayAction.Add((int) end / 2, () =>
-                                {
-                                    hero.Attacker = attacker;
-                                    hero.HitTypes.Add(HitType.AutoAttack);
-                                    hero.IncomeDamage += dmg;
+                                LeagueSharp.Common.Utility.DelayAction.Add((int)end / 2, () =>
+                               {
+                                   hero.Attacker = attacker;
+                                   hero.HitTypes.Add(HitType.AutoAttack);
+                                   hero.IncomeDamage += dmg;
 
-                                    LeagueSharp.Common.Utility.DelayAction.Add(Math.Max((int) end + (150 - Game.Ping), 250), () =>
-                                    {
-                                        hero.Attacker = null;
-                                        hero.IncomeDamage -= dmg;
-                                        hero.HitTypes.Remove(HitType.AutoAttack);
-                                    });
-                                });
+                                   LeagueSharp.Common.Utility.DelayAction.Add(Math.Max((int)end + (150 - Game.Ping), 250), () =>
+                                   {
+                                       hero.Attacker = null;
+                                       hero.IncomeDamage -= dmg;
+                                       hero.HitTypes.Remove(HitType.AutoAttack);
+                                   });
+                               });
                             }
                         }
 
@@ -209,59 +210,48 @@ namespace Activators.Handlers
                             if (hero.Player.LSDistance(correctpos) > data.Range + 125)
                                 continue;
 
-                            if (data.SDataName == "kalistaexpungewrapper" &&
-                                !hero.Player.HasBuff("kalistaexpungemarker"))
+                            if (data.SDataName == "kalistaexpungewrapper" && !hero.Player.HasBuff("kalistaexpungemarker"))
                                 continue;
 
-                            var evadetime = 1000 * (data.Range - hero.Player.LSDistance(correctpos) +
-                                                    hero.Player.BoundingRadius) / hero.Player.MoveSpeed;
-
-                            // ignore if can evade
-                            if (hero.Player.NetworkId == Player.NetworkId)
-                            {
-                                if (hero.Player.CanMove && evadetime < data.Delay)
-                                {
-                                    // check next player
-                                    continue;
-                                }
-                            }
+                            //var evadetime = 1000 * (data.Range - hero.Player.LSDistance(correctpos) +
+                            //hero.Player.BoundingRadius) / hero.Player.MoveSpeed;
 
                             if (!Activator.zmenu[data.SDataName + "predict"].Cast<CheckBox>().CurrentValue)
                                 continue;
 
-                            var dmg = (int) Math.Max(attacker.LSGetSpellDamage(hero.Player, data.SDataName), 0);
+                            var dmg = (int)Math.Max(attacker.LSGetSpellDamage(hero.Player, data.SDataName), 0);
                             if (dmg == 0)
                             {
-                                dmg = (int) (hero.Player.Health / hero.Player.MaxHealth * 5);
+                                dmg = (int)(hero.Player.Health / hero.Player.MaxHealth * 5);
                                 // Console.WriteLine("Activator# - There is no Damage Lib for: " + data.SDataName);
                             }
 
                             dmg = dmg / 100 * Activator.zmenu["weightdmg"].Cast<Slider>().CurrentValue;
 
                             // delay the spell a bit before missile endtime
-                            LeagueSharp.Common.Utility.DelayAction.Add((int) (data.Delay / 2), () =>
-                            {
-                                hero.Attacker = attacker;
-                                hero.IncomeDamage += dmg;
-                                hero.HitTypes.Add(HitType.Spell);
-                                hero.HitTypes.AddRange(
-                                    MenuTypes.Where(
-                                        x =>
-                                            Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
+                            LeagueSharp.Common.Utility.DelayAction.Add((int)(data.Delay / 2), () =>
+                           {
+                               hero.Attacker = attacker;
+                               hero.IncomeDamage += dmg;
+                               hero.HitTypes.Add(HitType.Spell);
+                               hero.HitTypes.AddRange(
+                                   MenuTypes.Where(
+                                       x =>
+                                           Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
 
                                 // lazy safe reset
-                                LeagueSharp.Common.Utility.DelayAction.Add((int) data.Delay * 2 + (200 - Game.Ping), () =>
-                                {
-                                    hero.Attacker = null;
-                                    hero.IncomeDamage -= dmg;
-                                    hero.HitTypes.Remove(HitType.Spell);
-                                    hero.HitTypes.RemoveAll(
-                                        x =>
-                                            !x.Equals(HitType.Spell) &&
-                                            Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
-                                    hero.HitTypes.Remove(HitType.Spell);
-                                });
-                            });
+                                LeagueSharp.Common.Utility.DelayAction.Add((int)data.Delay * 2 + (200 - Game.Ping), () =>
+                               {
+                                   hero.Attacker = null;
+                                   hero.IncomeDamage -= dmg;
+                                   hero.HitTypes.Remove(HitType.Spell);
+                                   hero.HitTypes.RemoveAll(
+                                       x =>
+                                           !x.Equals(HitType.Spell) &&
+                                           Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
+                                   hero.HitTypes.Remove(HitType.Spell);
+                               });
+                           });
                         }
 
                         #endregion
@@ -293,8 +283,8 @@ namespace Activators.Handlers
                             if ((data.SDataName == "azirq" || data.SDataName == "azire") && fromobj == null)
                                 continue;
 
-                            var distance = (int) (1000 * (startpos.LSDistance(hero.Player.ServerPosition) / data.Speed));
-                            var endtime = data.Delay - 100 + Game.Ping / 2f +  distance - (Utils.GameTimeTickCount - LastCastedTimeStamp);
+                            var distance = (int)(1000 * (startpos.LSDistance(hero.Player.ServerPosition) / data.Speed));
+                            var endtime = data.Delay - 100 + Game.Ping / 2f + distance - (Utils.GameTimeTickCount - LastCastedTimeStamp);
 
                             var iscone = data.SpellType.ToString().Contains("Cone");
                             var direction = (args.End.LSTo2D() - startpos.LSTo2D()).LSNormalized();
@@ -313,11 +303,11 @@ namespace Activators.Handlers
 
                             if (isline)
                                 evadetime =
-                                    (int) (1000 * (data.Width - projdist + hero.Player.BoundingRadius) / hero.Player.MoveSpeed);
+                                    (int)(1000 * (data.Width - projdist + hero.Player.BoundingRadius) / hero.Player.MoveSpeed);
 
                             if (!isline || iscone)
-                                 evadetime =
-                                     (int) (1000 * (data.Width - hero.Player.LSDistance(startpos) + hero.Player.BoundingRadius) / hero.Player.MoveSpeed);
+                                evadetime =
+                                    (int)(1000 * (data.Width - hero.Player.LSDistance(startpos) + hero.Player.BoundingRadius) / hero.Player.MoveSpeed);
 
                             if ((!isline || iscone) && hero.Player.LSDistance(endpos) <= data.Width + hero.Player.BoundingRadius + 35 ||
                                 isline && data.Width + hero.Player.BoundingRadius + 35 > projdist)
@@ -335,36 +325,36 @@ namespace Activators.Handlers
                                 if (!Activator.zmenu[data.SDataName + "predict"].Cast<CheckBox>().CurrentValue)
                                     continue;
 
-                                var dmg = (int) Math.Max(attacker.LSGetSpellDamage(hero.Player, data.SDataName), 0);
+                                var dmg = (int)Math.Max(attacker.LSGetSpellDamage(hero.Player, data.SDataName), 0);
                                 if (dmg == 0)
                                 {
-                                    dmg = (int) (hero.Player.Health / hero.Player.MaxHealth * 5);
+                                    dmg = (int)(hero.Player.Health / hero.Player.MaxHealth * 5);
                                     Console.WriteLine("Activator# - There is no Damage Lib for: " + data.SDataName);
                                 }
 
                                 dmg = dmg / 100 * Activator.zmenu["weightdmg"].Cast<Slider>().CurrentValue;
 
-                                LeagueSharp.Common.Utility.DelayAction.Add((int) (endtime / 2), () =>
-                                {
-                                    hero.Attacker = attacker;
-                                    hero.IncomeDamage += dmg;
-                                    hero.HitTypes.Add(HitType.Spell);
-                                    hero.HitTypes.AddRange(
-                                        MenuTypes.Where(
-                                            x =>
-                                                Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
+                                LeagueSharp.Common.Utility.DelayAction.Add((int)(endtime / 2), () =>
+                               {
+                                   hero.Attacker = attacker;
+                                   hero.IncomeDamage += dmg;
+                                   hero.HitTypes.Add(HitType.Spell);
+                                   hero.HitTypes.AddRange(
+                                       MenuTypes.Where(
+                                           x =>
+                                               Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
 
-                                    LeagueSharp.Common.Utility.DelayAction.Add((int) endtime * 3 + (200 - Game.Ping), () =>
-                                    {
-                                        hero.Attacker = null;
-                                        hero.IncomeDamage -= dmg;
-                                        hero.HitTypes.RemoveAll(
-                                            x =>
-                                                !x.Equals(HitType.Spell) &&
-                                                Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
-                                        hero.HitTypes.Remove(HitType.Spell);
-                                    });
-                                });
+                                   LeagueSharp.Common.Utility.DelayAction.Add((int)endtime * 3 + (200 - Game.Ping), () =>
+                                   {
+                                       hero.Attacker = null;
+                                       hero.IncomeDamage -= dmg;
+                                       hero.HitTypes.RemoveAll(
+                                           x =>
+                                               !x.Equals(HitType.Spell) &&
+                                               Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
+                                       hero.HitTypes.Remove(HitType.Spell);
+                                   });
+                               });
                             }
                         }
 
@@ -387,7 +377,7 @@ namespace Activators.Handlers
                                 continue;
 
                             var distance =
-                                (int) (1000 * (attacker.LSDistance(hero.Player.ServerPosition) / data.Speed));
+                                (int)(1000 * (attacker.LSDistance(hero.Player.ServerPosition) / data.Speed));
 
                             var endtime = data.Delay - 100 + Game.Ping / 2 + distance -
                                           (Utils.GameTimeTickCount - LastCastedTimeStamp);
@@ -395,37 +385,37 @@ namespace Activators.Handlers
                             if (!Activator.zmenu[data.SDataName + "predict"].Cast<CheckBox>().CurrentValue)
                                 continue;
 
-                            var dmg = (int) Math.Max(attacker.LSGetSpellDamage(hero.Player, args.SData.Name), 0);
+                            var dmg = (int)Math.Max(attacker.LSGetSpellDamage(hero.Player, args.SData.Name), 0);
                             if (dmg == 0)
                             {
-                                dmg = (int) (hero.Player.Health / hero.Player.MaxHealth * 5);
+                                dmg = (int)(hero.Player.Health / hero.Player.MaxHealth * 5);
                                 // Console.WriteLine("Activator# - There is no Damage Lib for: " + data.SDataName);
                             }
 
                             dmg = dmg / 100 * Activator.zmenu["weightdmg"].Cast<Slider>().CurrentValue;
 
-                            LeagueSharp.Common.Utility.DelayAction.Add((int) (endtime / 2), () =>
-                            {
-                                hero.Attacker = attacker;
-                                hero.IncomeDamage += dmg;
-                                hero.HitTypes.Add(HitType.Spell);
-                                hero.HitTypes.AddRange(
-                                    MenuTypes.Where(
-                                        x =>
-                                            Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
+                            LeagueSharp.Common.Utility.DelayAction.Add((int)(endtime / 2), () =>
+                           {
+                               hero.Attacker = attacker;
+                               hero.IncomeDamage += dmg;
+                               hero.HitTypes.Add(HitType.Spell);
+                               hero.HitTypes.AddRange(
+                                   MenuTypes.Where(
+                                       x =>
+                                           Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue));
 
                                 // lazy reset
-                                LeagueSharp.Common.Utility.DelayAction.Add((int) endtime * 2 + (200 - Game.Ping), () =>
-                                {
-                                    hero.Attacker = null;
-                                    hero.IncomeDamage -= dmg;
-                                    hero.HitTypes.RemoveAll(
-                                        x =>
-                                            !x.Equals(HitType.Spell) &&
-                                            Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
-                                    hero.HitTypes.Remove(HitType.Spell);
-                                });
-                            });
+                                LeagueSharp.Common.Utility.DelayAction.Add((int)endtime * 2 + (200 - Game.Ping), () =>
+                               {
+                                   hero.Attacker = null;
+                                   hero.IncomeDamage -= dmg;
+                                   hero.HitTypes.RemoveAll(
+                                       x =>
+                                           !x.Equals(HitType.Spell) &&
+                                           Activator.zmenu[data.SDataName + x.ToString().ToLower()].Cast<CheckBox>().CurrentValue);
+                                   hero.HitTypes.Remove(HitType.Spell);
+                               });
+                           });
                         }
 
                         #endregion
@@ -446,7 +436,7 @@ namespace Activators.Handlers
                     {
                         if (args.Target.NetworkId == hero.Player.NetworkId && !hero.Immunity)
                         {
-                            var dmg = (int) Math.Max(turret.CalcDamage(hero.Player, DamageType.Physical,
+                            var dmg = (int)Math.Max(turret.CalcDamage(hero.Player, DamageType.Physical,
                                 turret.BaseAttackDamage + turret.FlatPhysicalDamageMod), 0);
 
                             if (turret.LSDistance(hero.Player.ServerPosition) <= 900)
@@ -491,7 +481,7 @@ namespace Activators.Handlers
                                 {
                                     hero.HitTypes.Add(HitType.MinionAttack);
                                     hero.MinionDamage =
-                                        (int) Math.Max(minion.CalcDamage(hero.Player, DamageType.Physical,
+                                        (int)Math.Max(minion.CalcDamage(hero.Player, DamageType.Physical,
                                             minion.BaseAttackDamage + minion.FlatPhysicalDamageMod), 0);
 
                                     LeagueSharp.Common.Utility.DelayAction.Add(250, () =>
@@ -535,7 +525,7 @@ namespace Activators.Handlers
                                 continue;
                             }
 
-                            var dmg = (int) Math.Abs(attacker.LSGetAutoAttackDamage(hero.Player, true) * 1.2 + 150);
+                            var dmg = (int)Math.Abs(attacker.LSGetAutoAttackDamage(hero.Player, true) * 1.2 + 150);
                             if (args.SData.Name.ToLower().Contains("crit"))
                             {
                                 dmg = dmg * 2;
@@ -576,10 +566,10 @@ namespace Activators.Handlers
 
                             if (args.Target.NetworkId != hero.Player.NetworkId)
                                 continue;
-  
+
                             if (args.SData.Name.ToLower() == "bilgewatercutlass")
                             {
-                                var dmg = (float) attacker.GetItemDamage(hero.Player, Damage.DamageItems.Bilgewater);
+                                var dmg = (float)attacker.GetItemDamage(hero.Player, Damage.DamageItems.Bilgewater);
 
                                 hero.Attacker = attacker;
                                 hero.HitTypes.Add(HitType.AutoAttack);
@@ -595,7 +585,7 @@ namespace Activators.Handlers
 
                             if (args.SData.Name.ToLower() == "itemswordoffeastandfamine")
                             {
-                                var dmg = (float) attacker.GetItemDamage(hero.Player, Damage.DamageItems.Botrk);
+                                var dmg = (float)attacker.GetItemDamage(hero.Player, Damage.DamageItems.Botrk);
 
                                 hero.Attacker = attacker;
                                 hero.HitTypes.Add(HitType.AutoAttack);
@@ -611,7 +601,7 @@ namespace Activators.Handlers
 
                             if (args.SData.Name.ToLower() == "hextechgunblade")
                             {
-                                var dmg = (float) attacker.GetItemDamage(hero.Player, Damage.DamageItems.Hexgun);
+                                var dmg = (float)attacker.GetItemDamage(hero.Player, Damage.DamageItems.Hexgun);
 
                                 hero.Attacker = attacker;
                                 hero.HitTypes.Add(HitType.AutoAttack);
@@ -687,9 +677,67 @@ namespace Activators.Handlers
                     }
                 }
             }
+        }
+        #endregion
+
+        private static void AIHeroClient_OnPlayAnimation(Obj_AI_Base sender, GameObjectPlayAnimationEventArgs args)
+        {
+            if (!(sender is AIHeroClient))
+                return;
+
+            var aiHero = (AIHeroClient)sender;
+
+            #region Jax
+
+            if (aiHero.ChampionName == "Jax" && aiHero.IsEnemy)
+            {
+                if (args.Animation == "Spell3")
+                {
+                    LeagueSharp.Common.Utility.DelayAction.Add(Game.Ping + 100, () =>
+                    {
+                        if (aiHero.HasBuff("JaxCounterStrike"))
+                        {
+                            var buff = aiHero.GetBuff("JaxCounterStrike");
+                            var time = (int)((buff.EndTime - buff.StartTime) * 1000);
+
+                            LeagueSharp.Common.Utility.DelayAction.Add(time / 2, () =>
+                            {
+                                foreach (var hero in Activator.Allies())
+                                {
+                                    var dmg = (float)Math.Max(aiHero.LSGetSpellDamage(hero.Player, SpellSlot.E), 0);
+
+                                    if (aiHero.LSDistance(hero.Player) <= 250)
+                                    {
+                                        LeagueSharp.Common.Utility.DelayAction.Add(150, () =>
+                                        {
+                                            hero.Attacker = null;
+                                            hero.HitTypes.Remove(HitType.Spell);
+                                            hero.HitTypes.RemoveAll(
+                                                x =>
+                                                    !x.Equals(HitType.Spell) &&
+                                                    true);
+                                            hero.HitTypes.Remove(HitType.Spell);
+                                            if (hero.IncomeDamage > 0)
+                                                hero.IncomeDamage -= dmg;
+                                        });
+
+                                        hero.Attacker = aiHero;
+                                        hero.IncomeDamage += dmg;
+                                        hero.HitTypes.Add(HitType.Spell);
+                                        hero.HitTypes.AddRange(
+                                            MenuTypes.Where(
+                                                x =>
+                                                    true));
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
 
             #endregion
-     
+
         }
     }
 }
