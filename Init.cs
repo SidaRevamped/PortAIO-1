@@ -28,12 +28,11 @@ namespace PortAIO
 
         private static void Game_OnUpdate(EventArgs args)
         {
-            if (Loader.useOrb)
+            if (Loader.useOrb || (Loader.riven == 3 && ObjectManager.Player.ChampionName == "Riven"))
             {
                 Orbwalker.DisableAttacking = true;
                 Orbwalker.DisableMovement = true;
             }
-
             if (Orbwalker.ForcedTarget != null)
             {
                 if (!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.IsDead || ObjectManager.Player.LSIsRecalling())
@@ -77,8 +76,15 @@ namespace PortAIO
 
             if (Loader.useOrb)
             {
-                LSTargetSelector.Initialize();
-                new Orbwalking.Orbwalker();
+                if (ObjectManager.Player.ChampionName == "Riven" && Loader.riven == 3)
+                {
+                    LSTargetSelector.Initialize();
+                }
+                else
+                {
+                    LSTargetSelector.Initialize();
+                    new Orbwalking.Orbwalker();
+                }
             }
 
             if (!Loader.champOnly)
@@ -1487,6 +1493,9 @@ namespace PortAIO
                                 break;
                             case 2:
                                 KurisuRiven.Program.Game_OnGameLoad();
+                                break;
+                            case 3:
+                                HoolaRiven.Program.OnGameLoad();
                                 break;
                             default:
                                 NechritoRiven.Program.Init();
