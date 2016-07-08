@@ -139,6 +139,7 @@ namespace PortAIO.Utility
         public static int urgot { get { return Miscc["urgot"].Cast<ComboBox>().CurrentValue; } }
         public static int varus { get { return Miscc["varus"].Cast<ComboBox>().CurrentValue; } }
         public static int malzahar { get { return Miscc["malzahar"].Cast<ComboBox>().CurrentValue; } }
+        public static bool useOrb { get { return Miscc["useOrb"].Cast<CheckBox>().CurrentValue; } }
 
         public static Menu Miscc;
 
@@ -603,6 +604,8 @@ namespace PortAIO.Utility
             Miscc.AddLabel("Please F5 after making any changes below >>");
             Miscc.Add("champ", new CheckBox("Champ only mode? (No utils will load)", false));
             Miscc.Add("util", new CheckBox("Util only mode? (No champs will load)", false));
+            Miscc.AddSeparator();
+            Miscc.Add("useOrb", new CheckBox("Enable L# ORB/TS [BETA]?", false));
             Miscc.AddSeparator();
             Miscc.Add("activator", new CheckBox("Enable Activator?"));
             Miscc.Add("tracker", new CheckBox("Enable Tracker?"));

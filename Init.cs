@@ -28,6 +28,12 @@ namespace PortAIO
 
         private static void Game_OnUpdate(EventArgs args)
         {
+            if (Loader.useOrb)
+            {
+                Orbwalker.DisableAttacking = true;
+                Orbwalker.DisableMovement = true;
+            }
+
             if (Orbwalker.ForcedTarget != null)
             {
                 if (!Orbwalker.ForcedTarget.IsVisible || Orbwalker.ForcedTarget.IsDead || !Orbwalker.ForcedTarget.VisibleOnScreen || ObjectManager.Player.IsDead || ObjectManager.Player.LSIsRecalling())
@@ -53,13 +59,11 @@ namespace PortAIO
 
         private static void Initialize(EventArgs args)
         {
-            Game.OnUpdate += Game_OnUpdate;
-
             LeagueSharp.SDK.Bootstrap.Init();
 
             Notifications.Show(new SimpleNotification("PortAIO", "Welcome to PortAIO, this is a complete AIO made for every single champion. If you experience bugs or have suggestions or just have something to report please go to the github and view the instructions to post a new issue. Enjoy using PortAIO and GLHF!"), 8000);
-
             Loader.Menu();
+            Game.OnUpdate += Game_OnUpdate;
 
             /*
             if (false)
@@ -70,6 +74,12 @@ namespace PortAIO
                 LeagueSharp.Common.Utility.DelayAction.Add(5000, () => Intro.Remove());
             }
             */
+
+            if (Loader.useOrb)
+            {
+                LSTargetSelector.Initialize();
+                new Orbwalking.Orbwalker();
+            }
 
             if (!Loader.champOnly)
             {
