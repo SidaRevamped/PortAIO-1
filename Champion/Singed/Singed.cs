@@ -264,7 +264,7 @@
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                TurnOffQ();
+                //TurnOffQ();
                 Combo();
             }
 
