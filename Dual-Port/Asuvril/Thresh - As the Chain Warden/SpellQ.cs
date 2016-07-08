@@ -15,7 +15,7 @@ using SkillshotType = SebbyLib.Prediction.SkillshotType;
 using SPrediction;
 using SebbyLib.Prediction;
 
-namespace Thresh {
+namespace ThreshWarden {
 
 	public enum QState
     {
@@ -29,7 +29,7 @@ namespace Thresh {
 		public static bool CastQ1(AIHeroClient target)
         {
 
-            var Q = Thresh.Q;
+            var Q = ThreshWarden.Q;
             if (Q.IsReady())
             {
                 CastSpell(Q, target);
@@ -40,7 +40,7 @@ namespace Thresh {
         public static void CastSpell(LeagueSharp.Common.Spell QWER, AIHeroClient target)
         {
          //   Chat.Print("CastSpell");
-             if (getBoxItem(Thresh.PredictConfig, "PredictionMode") == 2)
+             if (getBoxItem(ThreshWarden.PredictConfig, "PredictionMode") == 2)
              {
           //       Chat.Print("SDK");
                  SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
@@ -62,7 +62,7 @@ namespace Thresh {
                      Speed = QWER.Speed,
                      Delay = QWER.Delay,
                      Range = QWER.Range,
-                     From = Thresh.Player.ServerPosition,
+                     From = ThreshWarden.Player.ServerPosition,
                      Radius = QWER.Width,
                      Unit = target,
                      Type = CoreType2
@@ -71,10 +71,10 @@ namespace Thresh {
 
                  //var poutput2 = QWER.GetPrediction(target);
 
-                 if (QWER.Speed != float.MaxValue && SebbyLib.OktwCommon.CollisionYasuo(Thresh.Player.ServerPosition, poutput2.CastPosition))
+                 if (QWER.Speed != float.MaxValue && SebbyLib.OktwCommon.CollisionYasuo(ThreshWarden.Player.ServerPosition, poutput2.CastPosition))
                      return;
 
-                 if (getBoxItem(Thresh.PredictConfig, "HitChance") == 0)
+                 if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 0)
                  {
                      if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.VeryHigh)
                          QWER.Cast(poutput2.CastPosition);
@@ -84,20 +84,20 @@ namespace Thresh {
                      }
 
                  }
-                 else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 1)
+                 else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 1)
                  {
                      if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
                          QWER.Cast(poutput2.CastPosition);
 
                  }
-                 else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 2)
+                 else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 2)
                  {
                      if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.Medium)
                          QWER.Cast(poutput2.CastPosition);
                  }
              }
              else
-           if(Thresh.getBoxItem(Thresh.PredictConfig, "PredictionMode") == 1)
+           if(ThreshWarden.getBoxItem(ThreshWarden.PredictConfig, "PredictionMode") == 1)
             {
           //      Chat.Print("OKTW");
                 SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
@@ -119,7 +119,7 @@ namespace Thresh {
                     Speed = QWER.Speed,
                     Delay = QWER.Delay,
                     Range = QWER.Range,
-                    From = Thresh.Player.ServerPosition,
+                    From = ThreshWarden.Player.ServerPosition,
                     Radius = QWER.Width,
                     Unit = target,
                     Type = CoreType2
@@ -128,10 +128,10 @@ namespace Thresh {
 
                 //var poutput2 = QWER.GetPrediction(target);
 
-                if (QWER.Speed != float.MaxValue && SebbyLib.OktwCommon.CollisionYasuo(Thresh.Player.ServerPosition, poutput2.CastPosition))
+                if (QWER.Speed != float.MaxValue && SebbyLib.OktwCommon.CollisionYasuo(ThreshWarden.Player.ServerPosition, poutput2.CastPosition))
                     return;
 
-                if (getBoxItem(Thresh.PredictConfig, "HitChance") == 0)
+                if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 0)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
@@ -141,56 +141,56 @@ namespace Thresh {
                     }
 
                 }
-                else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 1)
+                else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 1)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                         QWER.Cast(poutput2.CastPosition);
 
                 }
-                else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 2)
+                else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 2)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
                         QWER.Cast(poutput2.CastPosition);
                 }            
             }
             else 
-            if (Thresh.getBoxItem(Thresh.PredictConfig, "PredictionMode") == 0)
+            if (ThreshWarden.getBoxItem(ThreshWarden.PredictConfig, "PredictionMode") == 0)
             {
           //      Chat.Print("Common");
-                if (getBoxItem(Thresh.PredictConfig, "HitChance") == 0)
+                if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 0)
                 {
                     QWER.CastIfHitchanceEquals(target, LeagueSharp.Common.HitChance.VeryHigh);
                     return;
                 }
-                else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 1)
+                else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 1)
                 {
                     QWER.CastIfHitchanceEquals(target, LeagueSharp.Common.HitChance.High);
                     return;
                 }
-                else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 2)
+                else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 2)
                 {
                     QWER.CastIfHitchanceEquals(target, LeagueSharp.Common.HitChance.Medium);
                     return;
                 }
             }
             
-            else if (getBoxItem(Thresh.PredictConfig, "PredictionMode") == 3)
+            else if (getBoxItem(ThreshWarden.PredictConfig, "PredictionMode") == 3)
             {
           //  Chat.Print("Prediction");
                 if (target is AIHeroClient && target.IsValid)
                 {
               //      var t = target as AIHeroClient;
-                    if (getBoxItem(Thresh.PredictConfig, "HitChance") == 0)
+                    if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 0)
                     {
                         QWER.SPredictionCast(target, LeagueSharp.Common.HitChance.VeryHigh);
                         return;
                     }
-                    else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 1)
+                    else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 1)
                     {
                         QWER.SPredictionCast(target, LeagueSharp.Common.HitChance.High);
                         return;
                     }
-                    else if (getBoxItem(Thresh.PredictConfig, "HitChance") == 2)
+                    else if (getBoxItem(ThreshWarden.PredictConfig, "HitChance") == 2)
                     {
                         QWER.SPredictionCast(target, LeagueSharp.Common.HitChance.Medium);
                         return;
@@ -205,11 +205,11 @@ namespace Thresh {
 
         public static bool CastQ2()
         {
-            if (!Thresh.getCheckBoxItem(Thresh.SpellConfig, "dontQ2"))
+            if (!ThreshWarden.getCheckBoxItem(ThreshWarden.SpellConfig, "dontQ2"))
             {
-                if (Thresh.QTarget is AIHeroClient && Thresh.QTarget.GetPassiveTime("ThreshQ") < 0.3)
+                if (ThreshWarden.QTarget is AIHeroClient && ThreshWarden.QTarget.GetPassiveTime("ThreshQ") < 0.3)
                 {
-                    return Thresh.Q.Cast();
+                    return ThreshWarden.Q.Cast();
                 }
             }
              
@@ -235,13 +235,13 @@ namespace Thresh {
             return m[item].Cast<ComboBox>().CurrentValue;
         }
         public static QState GetState() {
-			if (!Thresh.Q.IsReady())
+			if (!ThreshWarden.Q.IsReady())
 			{
 				return QState.Cooldown;
 			}
 			else
 			{
-				if (Thresh.Q.Instance.Name == "ThreshQ")
+				if (ThreshWarden.Q.Instance.Name == "ThreshQ")
 				{
 					return QState.ThreshQ;
 				}

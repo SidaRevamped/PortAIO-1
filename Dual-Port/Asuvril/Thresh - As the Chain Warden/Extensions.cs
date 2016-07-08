@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Color = System.Drawing.Color;
 
-namespace Thresh
+namespace ThreshWarden
 {
 	public static class Extensions
     {
@@ -67,7 +67,7 @@ namespace Thresh
 
 		public static bool CastToReverse(this LeagueSharp.Common.Spell spell, Obj_AI_Base target) {
 			var eCastPosition = spell.GetPrediction(target).CastPosition;
-			var position = Thresh.Player.ServerPosition + Thresh.Player.ServerPosition - eCastPosition;
+			var position = ThreshWarden.Player.ServerPosition + ThreshWarden.Player.ServerPosition - eCastPosition;
 			return spell.Cast(position);
 		}
 

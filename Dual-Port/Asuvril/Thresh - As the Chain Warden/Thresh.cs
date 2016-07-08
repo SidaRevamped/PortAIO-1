@@ -13,8 +13,8 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK;
 
-namespace Thresh {
-	class Thresh {
+namespace ThreshWarden {
+	class ThreshWarden {
 
 		public static AIHeroClient Player = ObjectManager.Player;
 		public static LeagueSharp.Common.Spell Q, W, E, R;
