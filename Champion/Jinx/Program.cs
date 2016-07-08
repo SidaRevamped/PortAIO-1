@@ -189,7 +189,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (getKeyBindItem(rMenu, "useR"))
                 {
                     var t = TargetSelector.GetTarget(R.Range, DamageType.Physical);
-                    if (t.LSIsValidTarget())
+                    if (t.LSIsValidTarget() && t.IsVisible && t.IsHPBarRendered)
                         R.Cast(t, true, true);
                 }
                 if (getCheckBoxItem(rMenu, "Rjungle"))
@@ -262,7 +262,7 @@ namespace OneKeyToWin_AIO_Sebby
         private static void LogicW()
         {
             var t = TargetSelector.GetTarget(W.Range, DamageType.Physical);
-            if (t.LSIsValidTarget())
+            if (t.LSIsValidTarget() && t.IsVisible && t.IsHPBarRendered)
             {
                 foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && enemy.LSDistance(Player) > bonusRange())) // KS check
                 {
@@ -366,7 +366,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 foreach (
                     var target in
-                        Program.Enemies.Where(target => target.LSIsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
+                        Program.Enemies.Where(target => target.LSIsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.IsHPBarRendered && target.IsVisible))
                 {
                     var predictedHealth = target.Health - OktwCommon.GetIncomingDamage(target);
                     var Rdmg = R.GetDamage(target, 1);
@@ -390,6 +390,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void castR(AIHeroClient target)
         {
+            if (!target.IsVisible || !target.IsHPBarRendered)
+            {
+                return;
+            }
             var inx = getSliderItem(rMenu, "hitchanceR");
             if (inx == 0)
             {

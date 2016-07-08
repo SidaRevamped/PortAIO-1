@@ -462,6 +462,10 @@ namespace SebbyLib
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
+            if (!target.IsVisible || !target.IsHPBarRendered)
+            {
+                return;
+            }
             if (getSliderItem("PredictionMODE") == 0)
             {
                 if (getSliderItem("HitChance") == 0)
