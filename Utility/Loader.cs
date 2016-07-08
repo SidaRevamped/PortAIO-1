@@ -277,7 +277,7 @@ namespace PortAIO.Utility
                 }
                 if (Player.ChampionName.Equals(Champion[7]))
                 {
-                    Miscc.Add("nidalee", new ComboBox("Use addon for Nidalee : ", 0, "Kurisu", "Nechrito"));
+                    Miscc.Add("nidalee", new ComboBox("Use addon for Nidalee : ", 0, "Kurisu", "Nechrito", "D_Nidalee"));
                 }
                 if (Player.ChampionName.Equals(Champion[8]))
                 {

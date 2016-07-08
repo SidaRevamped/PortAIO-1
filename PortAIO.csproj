@@ -272,6 +272,7 @@
     <Compile Include="Dual-Port\ChewyMoon\MoonDraven\MoonDraven.cs" />
     <Compile Include="Dual-Port\Danz\Thresh - The Chain Warden\Program.cs" />
     <Compile Include="Dual-Port\Danz\Zac - The Secret Flubber\Program.cs" />
+    <Compile Include="Dual-Port\Diabath\D-Nidalee\Program.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Akali.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Properties\Modes\Automatic.cs" />
     <Compile Include="Dual-Port\Exory\ExorAkali\Properties\Modes\PvM\Clear.cs" />

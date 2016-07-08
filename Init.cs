@@ -1552,6 +1552,9 @@ namespace PortAIO
                             case 1:
                                 Nechrito_Nidalee.Program.OnLoad();
                                 break;
+                            case 2:
+                                D_Nidalee.Program.Game_OnGameLoad();
+                                break;
                             default:
                                 KurisuNidalee.KurisuNidalee.Game_OnGameLoad();
                                 break;
