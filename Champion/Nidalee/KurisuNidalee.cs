@@ -79,7 +79,7 @@ namespace KurisuNidalee
             foreach (var hero in HeroManager.Allies)
             {
                 eHMenu.Add("xx" + hero.NetworkId, new CheckBox("Heal on " + hero.ChampionName));
-                eHMenu.Add("zz" + hero.NetworkId, new Slider(hero.ChampionName + " below Pct% ", 88, 1, 99));
+                eHMenu.Add("zz" + hero.NetworkId, new Slider("Heal " + hero.ChampionName + " if below HP% ", 88, 1, 99));
             }
             eHMenu.Add("ndheord", new ComboBox("Ally Priority:", 1, "Low HP", "Most AD/AP", "Max HP"));
 
@@ -427,17 +427,14 @@ namespace KurisuNidalee
 
                     foreach (
                         var hero in
-                            Allies().Where(
+                            EntityManager.Heroes.Allies.Where(
                                 h => getCheckBoxItem(eHMenu, "xx" + h.NetworkId) &&
-                                     h.LSIsValidTarget(KL.Spells["Primalsurge"].Range) &&
-                                     h.Health/h.MaxHealth*100 <
-                                     getSliderItem(eHMenu, "zz" + h.NetworkId)))
+                                     KL.Spells["Primalsurge"].IsInRange(h) &&
+                                     h.HealthPercent < getSliderItem(eHMenu, "zz" + h.NetworkId)))
                     {
-                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None) ||
-                            hero.Health/hero.MaxHealth*100 <= 20 || !KL.CatForm())
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None) || hero.HealthPercent <= 20 || !KL.CatForm())
                         {
-                            if (Player.Mana/Player.MaxMana*100 < getSliderItem(eHMenu, "ndhemana") &&
-                                !(hero.Health/hero.MaxHealth*100 <= 20))
+                            if (Player.ManaPercent < getSliderItem(eHMenu, "ndhemana") && !(hero.HealthPercent <= 20))
                                 return;
 
                             if (KL.CatForm() == false)
