@@ -47,23 +47,35 @@ namespace Azir_Free_elo_Machine
             }
             else
             {
-                 Render.Circle.DrawCircle(Clickposition, 100, System.Drawing.Color.GreenYellow);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                Render.Circle.DrawCircle(Clickposition, 100, System.Drawing.Color.GreenYellow);
             }
 
         }
         Vector3 Clickposition;
         private void Game_OnWndProc(WndEventArgs args)
         {
+
+
+
+
             if (args.Msg != (uint)WindowsMessages.WM_KEYDOWN)
             {
                 return;
             }
-            var pressed = Menu._jumpMenu["insecposkey"].Cast<KeyBind>().CurrentValue;
-            if (pressed)
-                if (Clickposition == new Vector3(0, 0, 0))
-                    Clickposition = Game.CursorPos;
-                else
-                    Clickposition = new Vector3(0, 0, 0);
+            switch (args.WParam)
+            {
+                case 'G':
+                    if (Clickposition == new Vector3(0, 0, 0))
+                        Clickposition = Game.CursorPos;
+                    else
+                        Clickposition = new Vector3(0, 0, 0);
+
+                    break;
+
+
+            }
+
+
 
 
         }
