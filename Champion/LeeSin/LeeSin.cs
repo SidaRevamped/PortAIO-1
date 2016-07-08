@@ -103,6 +103,7 @@
 
             bkMenu = config.AddSubMenu("Bubba Kush", "BubbaKush");
             bkMenu.Add("R", new KeyBind("Keybind (R-Flash)", false, KeyBind.BindTypes.HoldActive, 'X'));
+            bkMenu.Add("RMode", new ComboBox("Mode", 0, new[] { "Flash", "WardJump", "Both" }));
             bkMenu.Add("RKill", new CheckBox("Priority To Kill Enemy"));
             bkMenu.Add("RCountA", new Slider("Or Hit Enemy >=", 1, 1, 4));
 
@@ -278,11 +279,12 @@
             }
             else if (Variables.TickCount - lastBubbaKush > 1500)
             {
-                var multiW = WardManager.CanWardJump
-                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"), getSliderItem(bkMenu, "RCountA"), 2)
+                var mode = bkMenu["RMode"].Cast<ComboBox>().CurrentValue;
+                var multiW = WardManager.CanWardJump && mode != 0
+                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"),getSliderItem(bkMenu, "RCountA"), 2)
                                  : new Tuple<AIHeroClient, int, Vector3>(null, 0, new Vector3());
-                var multiF = Common.CanFlash && !posBubbaKush.IsValid()
-                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"), getSliderItem(bkMenu, "RCountA"), 1)
+                var multiF = Common.CanFlash && !posBubbaKush.IsValid() && mode != 1
+                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"),getSliderItem(bkMenu, "RCountA"), 1)
                                  : new Tuple<AIHeroClient, int, Vector3>(null, 0, new Vector3());
                 if (multiW.Item1 != null && multiW.Item2 != 0)
                 {

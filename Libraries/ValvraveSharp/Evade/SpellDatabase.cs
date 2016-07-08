@@ -3749,7 +3749,7 @@ namespace Valvrave_Sharp.Evade
                     SpellName = "VladimirHemoplague",
                     Slot = SpellSlot.R,
                     Type = SkillShotType.SkillshotCircle,
-                    Delay = 389,
+                    Delay = 250,
                     Range = 700,
                     Radius = 375,
                     MissileSpeed = int.MaxValue,

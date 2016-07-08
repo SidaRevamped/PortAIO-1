@@ -66,7 +66,7 @@
             Q2 = new LeagueSharp.SDK.Spell(Q.Slot, 1100).SetSkillshot(Q2Delay, 90, 1200, true, Q.Type);
             Q3 = new LeagueSharp.SDK.Spell(Q.Slot, 250).SetTargetted(0.025f, float.MaxValue);
             W = new LeagueSharp.SDK.Spell(SpellSlot.W, 400).SetTargetted(0.25f, float.MaxValue);
-            E = new LeagueSharp.SDK.Spell(SpellSlot.E, 475).SetTargetted(0, 1100);
+            E = new LeagueSharp.SDK.Spell(SpellSlot.E, 475).SetTargetted(0, 1400);
             E2 = new LeagueSharp.SDK.Spell(E.Slot, E.Range).SetTargetted(Q3.Delay, E.Speed);
             R = new LeagueSharp.SDK.Spell(SpellSlot.R, 1200);
             Q.DamageType = Q2.DamageType = R.DamageType = DamageType.Physical;
@@ -175,7 +175,7 @@
                     }
                     Q.Delay = GetQDelay(false);
                     Q2.Delay = GetQDelay(true);
-                    E.Speed = E2.Speed = 1100 + (Player.MoveSpeed - 345);
+                    E.Speed = E2.Speed = 1400 + (Player.MoveSpeed - 345);
                 };
             Orbwalker.OnPostAttack += (sender, args) =>
                 {

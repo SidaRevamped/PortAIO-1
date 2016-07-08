@@ -691,9 +691,14 @@
             {
                 if (hybridMenu["WEQ"].Cast<KeyBind>().CurrentValue)
                 {
-                    canCast = E.IsReady() && Q.IsReady(100)
-                              && Player.Mana >= E.Instance.SData.Mana + (Q.Instance.SData.Mana - 10) + W.Instance.SData.Mana
-                              && target.DistanceToPlayer() < W.Range + E.Range - 20;
+                    bool canQ = Q.Level > 0, canE = E.Level > 0;
+                    if (canQ || canE)
+                    {
+                        canCast = (!canE || E.IsReady()) && (!canQ || Q.IsReady(100))
+                                  && Player.Mana
+                                  >= (canE ? E.Instance.SData.Mana : 0) + ((canQ ? Q.Instance.SData.Mana : 0) - 10)
+                                  + W.Instance.SData.Mana && Q.IsInRange(target);
+                    }
                 }
                 if (canCast)
                 {
