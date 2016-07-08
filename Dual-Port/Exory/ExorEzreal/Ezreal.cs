@@ -120,17 +120,6 @@ namespace ExorAIO.Champions.Ezreal
         /// <param name="args">The <see cref="Obj_AI_BaseBuffAddEventArgs" /> instance containing the event data.</param>
         public static void OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffGainEventArgs args)
         {
-            if (sender.IsMe &&
-                Vars.E.IsReady() &&
-                args.Buff.Caster as AIHeroClient != null &&
-                Vars.getCheckBoxItem(Vars.EMenu, "antigrab"))
-            {
-                if (args.Buff.Name.Equals("ThreshQ") ||
-                    args.Buff.Name.Equals("rocketgrab2"))
-                {
-                    Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend((args.Buff.Caster as AIHeroClient).ServerPosition, -Vars.E.Range));
-                }
-            }
         }
 
         /// <summary>

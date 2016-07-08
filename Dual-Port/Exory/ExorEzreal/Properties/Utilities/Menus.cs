@@ -54,7 +54,6 @@ namespace ExorAIO.Champions.Ezreal
             /// </summary>
             Vars.EMenu = Vars.Menu.AddSubMenu("Use E to:");
             {
-                Vars.EMenu.Add("antigrab", new CheckBox("Anti-Grab", true));
                 Vars.EMenu.Add("gapcloser", new CheckBox("Anti-Gapcloser", true));
             }
 
