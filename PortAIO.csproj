@@ -269,6 +269,9 @@
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\SmartCaster.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Loader.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Program.cs" />
+    <Compile Include="Dual-Port\Asuvril\Thresh - As the Chain Warden\Extensions.cs" />
+    <Compile Include="Dual-Port\Asuvril\Thresh - As the Chain Warden\SpellQ.cs" />
+    <Compile Include="Dual-Port\Asuvril\Thresh - As the Chain Warden\Thresh.cs" />
     <Compile Include="Dual-Port\ChewyMoon\MoonDraven\MoonDraven.cs" />
     <Compile Include="Dual-Port\Danz\Thresh - The Chain Warden\Program.cs" />
     <Compile Include="Dual-Port\Danz\Zac - The Secret Flubber\Program.cs" />
