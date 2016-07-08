@@ -76,6 +76,8 @@ namespace KurisuNidalee
             eHMenu.Add("ndheon", new CheckBox("Enable Healing"));
             eHMenu.Add("ndhemana", new Slider("-> Minumum Mana", 55, 1));
             eHMenu.Add("ndhesw", new CheckBox("Switch Forms if Heal", false));
+            eHMenu.AddSeparator();
+            eHMenu.AddGroupLabel("Auto Heal Champion Settings : ");
             foreach (var hero in HeroManager.Allies)
             {
                 eHMenu.Add("xx" + hero.NetworkId, new CheckBox("Heal on " + hero.ChampionName));
