@@ -1458,6 +1458,9 @@ namespace PortAIO
                             case 5:
                                 Dark_Star_Thresh.Program.OnLoad();
                                 break;
+                            case 6:
+                                Thresh.Thresh.OnLoad();
+                                break;
                             default:
                                 SebbyLib.Program.GameOnOnGameLoad();
                                 break;
