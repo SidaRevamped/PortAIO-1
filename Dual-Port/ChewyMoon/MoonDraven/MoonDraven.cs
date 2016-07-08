@@ -270,12 +270,12 @@ namespace MoonDraven
                 }
                 else
                 {
-                    Orbwalker.OrbwalkTo(Game.CursorPos);
+                    //Orbwalker.OrbwalkTo(Game.CursorPos);
                 }
             }
             else
             {
-                Orbwalker.OrbwalkTo(Game.CursorPos);
+                //Orbwalker.OrbwalkTo(Game.CursorPos);
             }
         }
 
