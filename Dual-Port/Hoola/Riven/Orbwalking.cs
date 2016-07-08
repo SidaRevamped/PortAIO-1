@@ -1619,7 +1619,7 @@ namespace HoolaRiven
                     }
 
                     var target = GetTarget();
-                    Orbwalk(target, _orbwalkingPoint.LSTo2D().IsValid() ? _orbwalkingPoint : Game.CursorPos, EloBuddy.Game.Ping * 1.5f, Math.Max(getSliderItem(misc, "HoldPosRadius"), 30));
+                    Orbwalk(target, _orbwalkingPoint.LSTo2D().IsValid() ? _orbwalkingPoint : Game.CursorPos, getSliderItem(_config, "ExtraWindup"), Math.Max(getSliderItem(misc, "HoldPosRadius"), 30));
                 }
                 catch (Exception e)
                 {
