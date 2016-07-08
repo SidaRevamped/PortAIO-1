@@ -875,6 +875,9 @@ namespace PortAIO
                             case 3:
                                 ExorAIO.AIO.OnLoad();
                                 break;
+                            case 4:
+                                new MoonDraven.MoonDraven().Load();
+                                break;
                             default:
                                 RevampedDraven.Program.OnLoad();
                                 break;
