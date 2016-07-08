@@ -92,22 +92,24 @@ namespace SebbyLib
                 return;
             }
 
-            var target = (Obj_AI_Base) args.Target;
+            var target = (Obj_AI_Base)args.Target;
             ActiveAttacks.Remove(sender.NetworkId);
 
             var attackData = new PredictedDamage(
                 sender,
                 target,
-                Utils.GameTimeTickCount - Game.Ping/2,
-                sender.AttackCastDelay*1000,
-                sender.AttackDelay*1000 - (sender is Obj_AI_Turret ? 70 : 0),
-                sender.IsMelee ? int.MaxValue : (int) args.SData.MissileSpeed,
+                Utils.GameTimeTickCount - Game.Ping / 2,
+                sender.AttackCastDelay * 1000,
+                sender.AttackDelay * 1000 - (sender is Obj_AI_Turret ? 70 : 0),
+                sender.IsMelee ? int.MaxValue : (int)args.SData.MissileSpeed,
                 sender.GetAutoAttackDamage(target, true));
             ActiveAttacks.Add(sender.NetworkId, attackData);
         }
 
         public static float GetHealthPrediction(Obj_AI_Base unit, int time, int delay = 70)
         {
+            return EloBuddy.SDK.Prediction.Health.GetPrediction(unit, time);
+            /*
             var predictedDamage = 0f;
 
             foreach (var attack in ActiveAttacks.Values)
@@ -120,7 +122,7 @@ namespace SebbyLib
                                    1000*Math.Max(0, unit.LSDistance(attack.Source) - attack.Source.BoundingRadius)/
                                    attack.ProjectileSpeed + delay;
 
-                    if ( /*Utils.GameTimeTickCount < landTime - delay &&*/ landTime < Utils.GameTimeTickCount + time)
+                    if ( Utils.GameTimeTickCount < landTime - delay && landTime < Utils.GameTimeTickCount + time)
                     {
                         attackDamage = attack.Damage;
                     }
@@ -130,10 +132,13 @@ namespace SebbyLib
             }
 
             return unit.Health - predictedDamage;
+            */
         }
 
         public static float LaneClearHealthPrediction(Obj_AI_Base unit, int time, int delay = 70)
         {
+            return EloBuddy.SDK.Prediction.Health.GetPrediction(unit, time);
+            /*
             var predictedDamage = 0f;
 
             foreach (var attack in ActiveAttacks.Values)
@@ -150,18 +155,19 @@ namespace SebbyLib
                     {
                         if (fromT >= Utils.GameTimeTickCount &&
                             (fromT + attack.Delay +
-                             Math.Max(0, unit.LSDistance(attack.Source) - attack.Source.BoundingRadius)/
+                             Math.Max(0, unit.LSDistance(attack.Source) - attack.Source.BoundingRadius) /
                              attack.ProjectileSpeed < toT))
                         {
                             n++;
                         }
-                        fromT += (int) attack.AnimationTime;
+                        fromT += (int)attack.AnimationTime;
                     }
                 }
-                predictedDamage += n*attack.Damage;
+                predictedDamage += n * attack.Damage;
             }
 
             return unit.Health - predictedDamage;
+            */
         }
 
         /// <summary>
