@@ -19,7 +19,7 @@ namespace Dark_Star_Thresh.Update
         {
             var pos = Spells.Q.GetPrediction(Target).CastPosition.To2D();
 
-            if (Spells.Q.MinHitChance >= HitChance.VeryHigh)
+            if (Spells.Q.MinHitChance >= HitChance.High)
             {
                 return pos.To3D2();
             }
@@ -211,11 +211,12 @@ namespace Dark_Star_Thresh.Update
 
         public static void LastHit()
         {
-            var minions = MinionManager.GetMinions(150f);
+            var minions = MinionManager.GetMinions(1050f);
+            if (Dmg.TalentReaper == 0) return;
 
             foreach (var m in minions)
             {
-                if (m.LSIsValidTarget(150) && m != null && !m.IsDead)
+                if (m.LSIsValidTarget(1050) && m != null && !m.IsDead)
                 {
                     var range = Player.GetAlliesInRange(Spells.W.Range).Where(x => !x.IsMe).Where(x => !x.IsDead).Where(x => x.LSDistance(Player.Position) <= 1050).FirstOrDefault();
 
@@ -224,8 +225,15 @@ namespace Dark_Star_Thresh.Update
                         if (MenuConfig.Debug)
                         {
                             Chat.Print("Damage = " + (float)Player.GetAutoAttackDamage(m, true) + " | Minion Hp = " + m.Health);
+                            if (m.Distance(Player) <= 225f)
+                            {
+                                Render.Circle.DrawCircle(m.Position, 75, System.Drawing.Color.Green);
+                            }
+                            else
+                            {
+                                Render.Circle.DrawCircle(m.Position, 75, System.Drawing.Color.Red);
+                            }
                         }
-                        Render.Circle.DrawCircle(m.Position, 75, System.Drawing.Color.MediumVioletRed);
                     }
                 }
             }
@@ -244,22 +252,23 @@ namespace Dark_Star_Thresh.Update
             if (qTarget != null && qTarget.LSIsValidTarget())
             {
                 var qPrediction = Spells.Q.GetPrediction(qTarget);
-                if (qPrediction.Hitchance >= HitChance.VeryHigh)
-                {
-                    var wAlly = Player.GetAlliesInRange(Spells.W.Range).Where(x => !x.IsMe).Where(x => !x.IsDead).Where(x => x.LSDistance(Player.Position) <= Spells.W.Range + 250).FirstOrDefault();
-                    if (wAlly != null)
-                    {
-                        Spells.W.Cast(wAlly);
-                    }
 
-                    if (Spells.Flash != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(Spells.Flash) == SpellState.Ready)
-                    {
-                        Player.Spellbook.CastSpell(Spells.Flash, qPrediction.CastPosition);
-                        Spells.Q.Cast(qPrediction.CastPosition);
-                    }
+                var wAlly = Player.GetAlliesInRange(Spells.W.Range).Where(x => !x.IsMe).Where(x => !x.IsDead).Where(x => x.LSDistance(Player.Position) <= Spells.W.Range + 250).FirstOrDefault();
+
+                if (wAlly != null)
+                {
+                    Spells.W.Cast(wAlly);
+                }
+                if (qPrediction.Hitchance == HitChance.Collision) return;
+
+                if (Spells.Flash != SpellSlot.Unknown && Player.Spellbook.CanUseSpell(Spells.Flash) == SpellState.Ready)
+                {
+                    Player.Spellbook.CastSpell(Spells.Flash, qPrediction.CastPosition);
+                    Spells.Q.Cast(qPrediction.CastPosition);
                 }
             }
         }
+    
         public static void Flee() // Snippet From Nechrito Diana
         {
             if (!MenuConfig.Flee) return;
