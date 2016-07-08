@@ -1126,10 +1126,9 @@
                     && Common.CanFlash;
 
             private static bool IsRecent
-                =>
-                    IsRecentWardJump
-                    || (getCheckBoxItem(insecMenu, "Flash") && (IsRecentRFlash || Variables.TickCount - lastFlashRTime < 5000));
+                => IsRecentWardJump || (getCheckBoxItem(insecMenu, "Flash") && Variables.TickCount - lastFlashRTime < 5000);
 
+               
             private static bool IsRecentWardJump
                 =>
                     Variables.TickCount - WardManager.LastInsecWardTime < 5000
@@ -1141,7 +1140,7 @@
 
             internal static Vector3 GetPositionKickTo(AIHeroClient target)
             {
-                if (lastEndPos.IsValid() && target.Distance(lastEndPos) <= RKickRange + 700)
+                if (lastEndPos.IsValid())
                 {
                     return lastEndPos;
                 }
@@ -1152,7 +1151,7 @@
                         var turret =
                             GameObjects.AllyTurrets.Where(
                                 i =>
-                                target.Distance(i) <= RKickRange + 500 && i.Distance(target) - RKickRange <= 950
+                                target.Distance(i) <= 1400 && i.Distance(target) - RKickRange <= 950
                                 && i.Distance(target) > 225).MinOrDefault(i => i.DistanceToPlayer());
                         if (turret != null)
                         {
@@ -1165,7 +1164,7 @@
                                     i =>
                                     i.IsValidTarget(RKickRange + 700, false, target.ServerPosition) && !i.IsMe
                                     && i.HealthPercent > 10 && i.Distance(target) > 325)
-                                    .MaxOrDefault(i => new Priority().GetDefaultPriority(i));
+                                    .MaxOrDefault(i => i.CountAllyHeroesInRange(600));
                             if (hero != null)
                             {
                                 pos = hero.ServerPosition;
@@ -1226,10 +1225,11 @@
                             {
                                 var posTarget = target.Position;
                                 var posEnd = GetPositionKickTo(target);
-                                Render.Circle.DrawCircle(posTarget, target.BoundingRadius * 1.35f, Color.BlueViolet);
+                                var radius = target.BoundingRadius * 1.35f;
+                                Render.Circle.DrawCircle(posTarget, radius, Color.BlueViolet);
                                 Render.Circle.DrawCircle(
-                                    GetPositionBehind(target, posEnd),
-                                    target.BoundingRadius * 1.35f,
+                                    GetPositionBehind(target, posEnd, posTarget),
+                                    radius,
                                     Color.BlueViolet);
                                 Drawing.DrawLine(
                                     Drawing.WorldToScreen(posTarget),
@@ -1388,6 +1388,8 @@
                 if (Orbwalker.CanMove)
                 {
                     lastMoveTime = Variables.TickCount;
+                    Orbwalker.OrbwalkTo(
+                        posBehind.LSExtend(GetPositionKickTo(target), -(GetDistance(target) + Player.BoundingRadius / 2)));
                 }
                 lastFlashPos = posBehind;
                 lastEndPos = GetPositionAfterKick(target);
@@ -1488,7 +1490,7 @@
                     {
                         return new Tuple<Vector3, bool>(new Vector3(), true);
                     }
-                    if (flashMode > 0)
+                    if (flashMode != 0)
                     {
                         var posBehind = posTarget.LSExtend(posEnd, -GetDistance(target));
                         var posFlash = posPlayer.LSExtend(posBehind, FlashRange);
@@ -1514,16 +1516,16 @@
                 return target.ServerPosition.LSExtend(GetPositionKickTo(target), RKickRange);
             }
 
-            private static Vector3 GetPositionBehind(AIHeroClient target, Vector3 to)
+            private static Vector3 GetPositionBehind(AIHeroClient target, Vector3 to, Vector3 from = default(Vector3))
             {
-                return target.ServerPosition.LSExtend(to, -GetDistance(target));
+                return (from.IsValid() ? from : target.ServerPosition).LSExtend(to, -GetDistance(target));
             }
 
             private static float GetRange(AIHeroClient target, bool isWardFlash = false)
             {
                 return !isWardFlash
                            ? (WardManager.CanWardJump ? WardManager.WardRange : FlashRange) - GetDistance(target)
-                           : WardManager.WardRange + R.Range - ((target?.BoundingRadius ?? Player.BoundingRadius) + 20);
+                           : WardManager.WardRange + R.Range - ((target ?? Player).BoundingRadius + 20);
             }
 
             #endregion

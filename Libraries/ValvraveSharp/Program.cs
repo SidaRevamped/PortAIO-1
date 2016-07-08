@@ -37,15 +37,16 @@
 
         internal static Spell Q, Q2, Q3, W, E, E2, R, R2;
 
-        private static readonly Dictionary<string, Func<object>> Plugins = new Dictionary<string, Func<object>>
-                                                                               {
-                                                                                   //{ "DrMundo", () => new DrMundo() },
-                                                                                   //{ "Kennen", () => new Kennen() },
-                                                                                   { "LeeSin", () => new LeeSin() },
-                                                                                   //{ "Lucian", () => new Lucian() },
-                                                                                   { "Yasuo", () => new Yasuo() },
-                                                                                   { "Zed", () => new Zed() }
-                                                                               };
+        private static readonly Dictionary<string, Tuple<Func<object>, int>> Plugins =
+            new Dictionary<string, Tuple<Func<object>, int>>
+                {
+                   // { "DrMundo", new Tuple<Func<object>, int>(() => new DrMundo(), 9) },
+                   // { "Kennen", new Tuple<Func<object>, int>(() => new Kennen(), 6) },
+                    { "LeeSin", new Tuple<Func<object>, int>(() => new LeeSin(), 10) },
+                    //{ "Vladimir", new Tuple<Func<object>, int>(() => new Vladimir(), 7) },
+                    { "Yasuo", new Tuple<Func<object>, int>(() => new Yasuo(), 3) },
+                    { "Zed", new Tuple<Func<object>, int>(() => new Zed(), 3) }
+};
 
         #endregion
 
@@ -63,7 +64,7 @@
             }
             if (isSupport)
             {
-                Plugins[Player.ChampionName].Invoke();
+                Plugins[Player.ChampionName].Item1.Invoke();
             }
         }
 
