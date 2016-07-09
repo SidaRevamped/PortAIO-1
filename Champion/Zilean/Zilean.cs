@@ -423,11 +423,6 @@
 
             if (getCheckBoxItem(comboMenu, "ElZilean.Combo.W") && getCheckBoxItem(comboMenu, "ElZilean.Combo.W2") && W.IsReady() && !Q.IsReady())
             {
-                if (HeroManager.Enemies.Any(x => x.Health > Q.GetDamage(x) && x.LSIsValidTarget(Q.Range)))
-                {
-                    return;
-                }
-
                 W.Cast();
             }
 
