@@ -73,16 +73,40 @@ namespace Azir_Creator_of_Elo
 
 
             var drawLane = Menu._drawSettingsMenu["dsl"].Cast<CheckBox>().CurrentValue;
+            int x = 0;
             if (drawLane)
-                foreach (Obj_AI_Minion m in soldierManager.ActiveSoldiers)
+
+                foreach (Obj_AI_Minion m in soldierManager.Soldiers)
                 {
-                    //     Drawing.DrawCircle(m.Position, 325, System.Drawing.Color.GreenYellow);
-                    var wts = Drawing.WorldToScreen(m.Position);
-                    var wtssxt = Drawing.WorldToScreen(HeroManager.Player.ServerPosition);
-                    if (m.LSDistance(HeroManager.Player) < 950)
-                        Drawing.DrawLine(wts[0], wts[1], wtssxt[0], wtssxt[1], 5f, System.Drawing.Color.GreenYellow);
-                    else
-                        Drawing.DrawLine(wts[0], wts[1], wtssxt[0], wtssxt[1], 5f, System.Drawing.Color.PaleVioletRed);
+                    //m.tim
+                    if (!m.IsDead)
+                    {
+                        foreach (AIHeroClient h in HeroManager.Enemies)
+                        {
+                            if (m.LSDistance(h) < 335)
+                            {
+                                x++;
+
+                            }
+
+                        }
+                        if (x > 0)
+                        {
+                            Render.Circle.DrawCircle(m.Position, 315, System.Drawing.Color.GreenYellow);
+                        }
+                        else
+                        {
+                            Render.Circle.DrawCircle(m.Position, 315, System.Drawing.Color.PaleVioletRed);
+                        }
+                        var wts = Drawing.WorldToScreen(m.Position);
+                        var wtssxt = Drawing.WorldToScreen(HeroManager.Player.ServerPosition);
+
+                        if (m.Distance(HeroManager.Player) < 950)
+                            Drawing.DrawLine(wts[0], wts[1], wtssxt[0], wtssxt[1], 5f, System.Drawing.Color.GreenYellow);
+                        else
+                            Drawing.DrawLine(wts[0], wts[1], wtssxt[0], wtssxt[1], 5f,
+                                System.Drawing.Color.PaleVioletRed);
+                    }
                 }
             if (drawFleeMaxRange)
             {
@@ -92,8 +116,8 @@ namespace Azir_Creator_of_Elo
             }
 
 
-
         }
+
 
         private void OnUpdate(EventArgs args)
         {

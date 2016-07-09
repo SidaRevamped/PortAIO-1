@@ -83,25 +83,14 @@ namespace Azir_Creator_of_Elo
                 }
                 else
                 {
-                    if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady())
-                        if ((!savew && (savew && (wCount > 0))))
-                            if (useW)
-                                azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
+                    //    if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady())
+                    //      if((!savew &&(savew&& (wCount > 0))))
+                    if (useW)
+                        azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
                 }
-                azir.Spells.castQ(azir, target, useQ, nSoldiersToQ);
-                if (Menu._comboMenu["CR"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (target.Health < azir.Spells.R.GetDamage(target))
-                    {
-                        var pred = azir.Spells.R.GetPrediction(target);
-                        if (pred.Hitchance >= HitChance.High)
-                        {
+                if (azir.soldierManager.SoldiersAttackingn(azir) <= nSoldiersToQ)
+                    azir.Spells.castQ(azir, target, useQ, nSoldiersToQ);
 
-                            azir.Spells.R.Cast(pred.CastPosition);
-                        }
-                    }
-                    azir.Spells.R.Cast(target);
-                }
             }
         }
         public override void Laneclear(AzirMain azir)
@@ -161,32 +150,51 @@ namespace Azir_Creator_of_Elo
             var nSoldiersToQ = Menu._comboMenu["SoldiersToQ"].Cast<Slider>().CurrentValue;
             base.Combo(azir);
             var target = TargetSelector.GetTarget(900, DamageType.Magical);
-            if (target != null)
+            if (target == null) return;
+
+            if (target.Distance(azir.Hero.ServerPosition) < 450)
             {
-                if (target.Distance(azir.Hero.ServerPosition) < 450)
+                if (target.isRunningOfYou())
                 {
-                    if (target.isRunningOfYou())
-                    {
-                        var pos = LeagueSharp.Common.Prediction.GetPrediction(target, 0.8f).UnitPosition;
-                        azir.Spells.W.Cast(pos);
-                    }
-                    else
-                    {
-                        var pred = azir.Spells.W.GetPrediction(target);
-                        if (pred.Hitchance >= HitChance.Medium)
-                        {
-                            if (useW)
-                                azir.Spells.W.Cast(pred.CastPosition);
-                        }
-                    }
+                    var pos = LeagueSharp.Common.Prediction.GetPrediction(target, 0.5f).UnitPosition;
+                    azir.Spells.W.Cast(pos);
                 }
                 else
                 {
-                    if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady())
+                    var pred = azir.Spells.W.GetPrediction(target);
+                    if (pred.Hitchance >= HitChance.Medium)
+                    {
                         if (useW)
-                            azir.Spells.W.Cast(azir.Hero.Position.LSExtend(target.ServerPosition, 450));
+                            azir.Spells.W.Cast(pred.CastPosition);
+                    }
                 }
+            }
+            else
+            {
+                if (azir.Spells.Q.Level > 0 && azir.Spells.Q.IsReady())
+                    if (useW)
+                        if (target.Distance(HeroManager.Player) <= 750)
+                            azir.Spells.W.Cast(azir.Hero.Position.Extend(target.ServerPosition, 450));
+            }
+            //Q
+            if (azir.soldierManager.SoldiersAttackingn(azir) >= nSoldiersToQ)
+            {
+
                 azir.Spells.castQ(azir, target, useQ, nSoldiersToQ);
+            }
+
+            if (Menu._comboMenu["CR"].Cast<CheckBox>().CurrentValue)
+            {
+                if (target.Health < azir.Spells.R.GetDamage(target))
+                {
+                    var pred = azir.Spells.R.GetPrediction(target);
+                    if (pred.Hitchance >= HitChance.High)
+                    {
+
+                        azir.Spells.R.Cast(pred.CastPosition);
+                    }
+                }
+                azir.Spells.R.Cast(target);
 
             }
 
