@@ -516,8 +516,8 @@
     <Compile Include="Dual-Port\Hoes\OAnnie\Tibbers.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\MenuConfig.cs" />
     <Compile Include="Dual-Port\Hoes\SluttyThresh\Program.cs" />
-    <Compile Include="Dual-Port\Hoola\HpBarIndicator.cs" />
-    <Compile Include="Dual-Port\Hoola\Program.cs" />
+    <Compile Include="Dual-Port\Hoola\Lucian\HpBarIndicator.cs" />
+    <Compile Include="Dual-Port\Hoola\Lucian\Program.cs" />
     <Compile Include="Dual-Port\Hoola\Riven\HpBarIndicator.cs" />
     <Compile Include="Dual-Port\Hoola\Riven\Orbwalking.cs" />
     <Compile Include="Dual-Port\Hoola\Riven\Program.cs" />
