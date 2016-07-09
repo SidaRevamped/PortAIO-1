@@ -17,7 +17,7 @@ namespace ExorAIO.Champions.Cassiopeia
         public static void Harass(EventArgs args)
         {
             if (!Targets.Target.LSIsValidTarget() ||
-                Invulnerable.Check(Targets.Target))
+                Invulnerable.Check(Targets.Target, EloBuddy.DamageType.Magical, false))
             {
                 return;
             }
@@ -38,18 +38,18 @@ namespace ExorAIO.Champions.Cassiopeia
             /// <summary>
             ///     The W Combo Logic.
             /// </summary>
-            DelayAction.Add(1000, () =>
-            {
-                if (Vars.W.IsReady() &&
-                    !Vars.Q.IsReady() &&
-                    Targets.Target.LSIsValidTarget(Vars.W.Range) &&
-                    GameObjects.Player.ManaPercent >
-                        ManaManager.GetNeededMana(Vars.W.Slot, Vars.getSliderItem(Vars.WMenu, "harass")) &&
-                    Vars.getSliderItem(Vars.WMenu, "harass") != 101)
+            DelayAction.Add(1000,
+                () =>
                 {
-                    Vars.W.Cast(Vars.W.GetPrediction(Targets.Target).CastPosition);
-                }
-            });
+                    if (Vars.W.IsReady() &&
+                        Targets.Target.LSIsValidTarget(Vars.W.Range) &&
+                        GameObjects.Player.ManaPercent >
+                            ManaManager.GetNeededMana(Vars.W.Slot, Vars.getSliderItem(Vars.WMenu, "harass")) &&
+                        Vars.getSliderItem(Vars.WMenu, "harass") != 101)
+                    {
+                        Vars.W.Cast(Vars.W.GetPrediction(Targets.Target).CastPosition);
+                    }
+                });
         }
     }
 }

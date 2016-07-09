@@ -32,11 +32,12 @@ namespace ExorAIO.Champions.Karma
                         !Invulnerable.Check(t, DamageType.Magical) &&
                         Vars.GetRealHealth(t) <
                             (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.Q) +
-                                (Vars.R.IsReady()
+                                (Vars.R.IsReady() &&
+                                Vars.getCheckBoxItem(Vars.RMenu, "empq")
                                     ? (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.Q, DamageStage.Empowered)
                                     : 0)))
                 {
-                    if (!Vars.Q.GetPrediction(target).CollisionObjects.Any(c => Targets.Minions.Contains(c)))
+                    if (!Vars.Q.GetPrediction(target).CollisionObjects.Any())
                     {
                         if (Vars.R.IsReady() &&
                             Vars.getCheckBoxItem(Vars.RMenu, "empq"))
