@@ -40,6 +40,8 @@ namespace Slutty_Thresh
             comboMenu = Config.AddSubMenu("Combo", "Combo");
             comboMenu.Add("useE", new CheckBox("Use [E] (Flay)", true));
             comboMenu.Add("combooptions", new ComboBox("Set [E] Mode", 1, "Push", "Pull"));
+            comboMenu.Add("FlayPush", new KeyBind("Flay Push Key", false, KeyBind.BindTypes.HoldActive, 'T'));
+            comboMenu.Add("FlayPull", new KeyBind("Flay Pull Key", false, KeyBind.BindTypes.HoldActive, 'H'));
             comboMenu.Add("useR", new CheckBox("Use [R] (The Box)", true));
             comboMenu.Add("rslider", new Slider("Use [R] Only if X Target(s) in Range", 3, 1, 5));
 

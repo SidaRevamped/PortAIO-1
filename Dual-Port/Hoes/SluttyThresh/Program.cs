@@ -90,9 +90,28 @@ namespace Slutty_Thresh
 
         private static void Game_OnUpdate(EventArgs args)
         {
+            var Etarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+
             if (getKeyBindItem(lanternMenu, "ThrowLantern"))
             {
                 ThrowLantern();
+            }
+
+            if (getKeyBindItem(comboMenu, "FlayPush") || getKeyBindItem(comboMenu, "FlayPull"))
+            {
+                Orbwalker.OrbwalkTo(Game.CursorPos);
+            }
+
+            if (getKeyBindItem(comboMenu, "FlayPush") && Etarget != null &&
+                E.IsReady())
+            {
+                Push(Etarget);
+            }
+
+            if (getKeyBindItem(comboMenu, "FlayPull") && Etarget != null &&
+                E.IsReady())
+            {
+                Pull(Etarget);
             }
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
@@ -223,6 +242,17 @@ namespace Slutty_Thresh
                 }
         }
 
+        static void Pull(Obj_AI_Base target)
+        {
+            var pos = target.Position.LSExtend(Player.Position, Player.LSDistance(target.Position) + 200);
+            E.Cast(pos);
+        }
+
+        static void Push(Obj_AI_Base target)
+        {
+            var pos = target.Position.LSExtend(Player.Position, Player.LSDistance(target.Position) - 200);
+            E.Cast(pos);
+        }
 
         private static void Combo()
         {
