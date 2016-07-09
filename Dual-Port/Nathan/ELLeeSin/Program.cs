@@ -289,7 +289,7 @@
         {
             try
             {
-                var jumpRange = 265;
+                var jumpRange = 230;
 
                 if (ClicksecEnabled && getCheckBoxItem(InitMenu.insecMenu, "clickInsec"))
                 {
