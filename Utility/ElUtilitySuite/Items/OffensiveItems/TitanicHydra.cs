@@ -48,7 +48,16 @@
         /// <returns></returns>
         public override bool ShouldUseItem()
         {
+            if (getCheckBoxItem(this.Menu, "Titanic Hydraaa"))
+            {
+                return false;
+            }
             return getCheckBoxItem(this.Menu, "Titanic Hydracombo") && this.ComboModeActive && !Orbwalker.CanAutoAttack && (EloBuddy.SDK.Item.HasItem(this.Id) && EloBuddy.SDK.Item.CanUseItem(this.Id));
+        }
+
+        public override bool AfterOrb()
+        {
+            return getCheckBoxItem(this.Menu, "Titanic Hydraaa") && this.ComboModeActive && (EloBuddy.SDK.Item.HasItem(this.Id) && EloBuddy.SDK.Item.CanUseItem(this.Id));
         }
 
         #endregion

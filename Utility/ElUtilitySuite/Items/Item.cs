@@ -7,9 +7,10 @@ namespace ElUtilitySuite.Items
     using EloBuddy;
     using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-    using EloBuddy.SDK;/// <summary>
-                       ///     Represents an item.
-                       /// </summary>
+    using EloBuddy.SDK;
+    using System;/// <summary>
+                 ///     Represents an item.
+                 /// </summary>
     internal abstract class Item
     {
         #region Public Properties
@@ -89,6 +90,10 @@ namespace ElUtilitySuite.Items
         {
             this.Menu.AddGroupLabel(Name);
             this.Menu.Add(this.Name + "combo", new CheckBox("Use in Combo"));
+            if (Id == (ItemId)3053 || Id == ItemId.Tiamat_Melee_Only || Id == ItemId.Ravenous_Hydra_Melee_Only)
+            {
+                this.Menu.Add(this.Name + "aa", new CheckBox("Use only after AA"));
+            }
             this.Menu.AddSeparator();
         }
 
@@ -97,6 +102,11 @@ namespace ElUtilitySuite.Items
         /// </summary>
         /// <returns></returns>
         public virtual bool ShouldUseItem()
+        {
+            return false;
+        }
+
+        public virtual bool AfterOrb()
         {
             return false;
         }

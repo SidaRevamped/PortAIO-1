@@ -47,10 +47,18 @@
         /// <returns></returns>
         public override bool ShouldUseItem()
         {
+            if (getCheckBoxItem(this.Menu, "Hydraaa"))
+            {
+                return false;
+            }
             return getCheckBoxItem(this.Menu, "Hydracombo") && this.ComboModeActive
                    && HeroManager.Enemies.Any(x => x.LSDistance(this.Player) < 400 && !x.IsDead && !x.IsZombie) && (EloBuddy.SDK.Item.HasItem(this.Id) && EloBuddy.SDK.Item.CanUseItem(this.Id));
         }
 
+        public override bool AfterOrb()
+        {
+            return getCheckBoxItem(this.Menu, "Hydraaa") && this.ComboModeActive && (EloBuddy.SDK.Item.HasItem(this.Id) && EloBuddy.SDK.Item.CanUseItem(this.Id));
+        }
         #endregion
     }
 }

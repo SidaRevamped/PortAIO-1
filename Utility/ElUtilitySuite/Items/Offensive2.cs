@@ -10,6 +10,7 @@
     using LeagueSharp.Common;
     using EloBuddy.SDK.Menu;
     using EloBuddy;
+    using EloBuddy.SDK;
     internal class Offensive2 : IPlugin
     {
         #region Fields
@@ -71,6 +72,15 @@
         public void Load()
         {
             Game.OnUpdate += this.Game_OnUpdate;
+            Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+        }
+
+        private void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
+        {
+            foreach (var item in this.offensiveItems.Where(x => x.AfterOrb() && EloBuddy.SDK.Item.CanUseItem((int)x.Id) && EloBuddy.SDK.Item.HasItem((int)x.Id)))
+            {
+                item.UseItem();
+            }
         }
 
         #endregion
