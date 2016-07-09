@@ -21,8 +21,6 @@ namespace Challenger_Series
 
         private static bool UseEKSBool;
 
-        private static bool UseRComboBool;
-
         private static int QGapcloseModeStringList;
 
         private static int MinDistForQGapcloser;
@@ -105,8 +103,6 @@ namespace Challenger_Series
             UseEComboStringList = getBoxItem(config, "useecombo");
 
             UseEKSBool = getCheckBoxItem(config, "useeks");
-
-            UseRComboBool = getKeyBindItem(config, "usercombo");
 
             QGapcloseModeStringList = getBoxItem(config, "qgc");
 

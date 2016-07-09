@@ -134,7 +134,7 @@ namespace PortAIO.Champion.Annie
                         SebbyLib.Program.Enemies.Where(
                             enemy => enemy.LSIsValidTarget(realRange) && OktwCommon.ValidUlt(enemy)))
                 {
-                    if (enemy.LSIsValidTarget(R.Range))
+                    if (enemy.LSIsValidTarget(R.Range) && enemy.IsVisible && enemy.IsHPBarRendered)
                     {
                         var Rmode = getSliderItem(RMenu, "UM" + enemy.NetworkId);
 
