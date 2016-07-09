@@ -52,25 +52,23 @@ namespace HastaKalistaBaby
 
         public static float GetHealth(Obj_AI_Base target)
         {
-            if (target.HasBuff("BlackShield") && (target is AIHeroClient))
+            var debuffer = 0f;
+
+            /// <summary>
+            ///     Gets the predicted reduction from Blitzcrank Shield.
+            /// </summary>
+            if (target is AIHeroClient)
             {
-                return target.Health;
+                if ((target as AIHeroClient).ChampionName.Equals("Blitzcrank") &&
+                    !(target as AIHeroClient).HasBuff("BlitzcrankManaBarrierCD"))
+                {
+                    debuffer += target.Mana / 2;
+                }
             }
 
-            if (target.HasBuff("EyeOfTheStorm") || target.HasBuff("KarmaSolKimShield") || target.HasBuff("blindmonkwoneshield") || target.HasBuff("lulufarieshield") ||
-                target.HasBuff("luxprismaticwaveshieldself") || target.HasBuff("orianaredactshield") || target.HasBuff("manabarrier") ||
-                target.HasBuff("ShenStandUnited") || target.HasBuff("Shenstandunitedshield") || target.HasBuff("RivenFeint") || target.HasBuff("udyrturtleactivation") ||
-                target.HasBuff("malphiteshieldeffect") || target.HasBuff("JarvanIVGoeldenAegis") || target.HasBuff("evelynnrshield") || target.HasBuff("rumbleshieldbuff") ||
-                target.HasBuff("sionwshieldstacks") || target.HasBuff("SkarnerExoskeleton") || target.HasBuff("vipassivebuff") || target.HasBuff("tahmkencheshield") || target.HasBuff("dianashield")
-                || target.HasBuff("mordekaiserironman") || target.HasBuff("nautiluspiercinggazeshield") || target.HasBuff("UrgotTerrorCapacitorActive2") || target.HasBuff("ViktorPowerTransfer") ||
-                target.HasBuff("summonerbarrier") || target.HasBuff("ItemSeraphsEmbrace"))
-            {
-                return (target.Health + target.AllShield);
-            }
-            else
-            {
-                return target.Health;
-            }
+            return target.Health +
+                target.HPRegenRate +
+                debuffer;
         }
 
         public static bool Unkillable(AIHeroClient target) //asuna op

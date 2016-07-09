@@ -485,7 +485,23 @@ namespace Challenger_Series.Plugins
 
         private double GetTotalHealthWithShieldsApplied(Obj_AI_Base target)
         {
-            return target.Health;
+            var debuffer = 0f;
+
+            /// <summary>
+            ///     Gets the predicted reduction from Blitzcrank Shield.
+            /// </summary>
+            if (target is AIHeroClient)
+            {
+                if ((target as AIHeroClient).ChampionName.Equals("Blitzcrank") &&
+                    !(target as AIHeroClient).HasBuff("BlitzcrankManaBarrierCD"))
+                {
+                    debuffer += target.Mana / 2;
+                }
+            }
+
+            return target.Health +
+                target.HPRegenRate +
+                debuffer;
         }
 
         public bool IsRendKillable(Obj_AI_Base target)
@@ -499,45 +515,43 @@ namespace Challenger_Series.Plugins
             }
 
             // Take into account all kinds of shields
-            var totalHealth = GetTotalHealthWithShieldsApplied(target);
 
             var dmg = EDamage(target) - ReduceRendDamageBySlider;
 
-            return dmg > totalHealth;
+            return dmg >= GetTotalHealthWithShieldsApplied(target);
         }
 
         private float EDamage(Obj_AI_Base target)
         {
-            if (target.IsMinion || target.IsMonster)
+            if ((target.IsMinion || target.IsMonster) && !(target is AIHeroClient))
             {
                 int stacksMin = GetMinionStacks(target);
-                var indexMin = E.Level - 1;
 
-                var EDamageMinion = new float[] { 20, 30, 40, 50, 60 }[indexMin] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+                var EDamageMinion = new float[] {20, 30, 40, 50, 60 }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] + (0.6 * ObjectManager.Player.FlatPhysicalDamageMod);
 
                 if (stacksMin > 1)
                 {
-                    EDamageMinion += ((new float[] { 10, 14, 19, 25, 32 }[indexMin] + (new float[] { 0.2f, 0.225f, 0.25f, 0.275f, 0.3f }[indexMin] * ObjectManager.Player.TotalAttackDamage)) * (stacksMin - 1));
+                    EDamageMinion += ((new float[] {10, 14, 19, 25, 32 }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] + (new float[] {0.2f, 0.225f, 0.25f, 0.275f, 0.3f }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] * ObjectManager.Player.FlatPhysicalDamageMod)) * (stacksMin - 1));
                 }
 
-                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageMinion) * 0.9f;
+                return (float)ObjectManager.Player.CalculateDamage(target, DamageType.Physical, EDamageMinion) * 0.9f;
             }
-            else
+            if (target is AIHeroClient)
             {
                 if (GetStacks(target) == 0) return 0;
 
                 int stacksChamps = GetStacks(target);
-                var indexChamp = E.Level - 1;
 
-                var EDamageChamp = new[] { 0, 20, 30, 40, 50, 60 }[indexChamp] + (0.6 * ObjectManager.Player.TotalAttackDamage);
+                var EDamageChamp = new[] {20, 30, 40, 50, 60 }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] + (0.6 * ObjectManager.Player.FlatPhysicalDamageMod);
 
                 if (stacksChamps > 1)
                 {
-                    EDamageChamp += ((new[] { 0, 10, 14, 19, 25, 32 }[indexChamp] + (new[] { 0, 0.2, 0.225, 0.25, 0.275, 0.3 }[indexChamp] * ObjectManager.Player.TotalAttackDamage)) * (stacksChamps - 1));
+                    EDamageChamp += ((new[] {10, 14, 19, 25, 32 }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] + (new[] {0.2, 0.225, 0.25, 0.275, 0.3 }[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level - 1] * ObjectManager.Player.FlatPhysicalDamageMod)) * (stacksChamps - 1));
                 }
 
-                return ObjectManager.Player.CalculateDamageOnUnit(target, DamageType.Physical, (float)EDamageChamp);
+                return (float)ObjectManager.Player.CalculateDamage(target, DamageType.Physical, EDamageChamp);
             }
+            return 0;
         }
 
         private int GetMinionStacks(Obj_AI_Base minion)
@@ -582,7 +596,7 @@ namespace Challenger_Series.Plugins
         public double GetRendDamage(Obj_AI_Base target, int customStacks = -1, BuffInstance rendBuff = null)
         {
             // Calculate the damage and return
-            return ObjectManager.Player.CalculateDamage(target, DamageType.Physical, GetRawRendDamage(target, customStacks, rendBuff));
+            return (float)ObjectManager.Player.CalculateDamage(target, DamageType.Physical, GetRawRendDamage(target, customStacks, rendBuff));
         }
 
         public float GetRawRendDamage(Obj_AI_Base target, int customStacks = -1, BuffInstance rendBuff = null)
@@ -591,9 +605,8 @@ namespace Challenger_Series.Plugins
             var stacks = (customStacks > -1 ? customStacks : rendBuff != null ? rendBuff.Count : 0) - 1;
             if (stacks > -1)
             {
-                var index = E.Level - 1;
-                return RawRendDamage[index] + stacks * RawRendDamagePerSpear[index] +
-                       ObjectManager.Player.TotalAttackDamage * (RawRendDamageMultiplier[index] + stacks * RawRendDamagePerSpearMultiplier[index]);
+                return RawRendDamage[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level-1] + stacks * RawRendDamagePerSpear[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level-1] +
+                       ObjectManager.Player.FlatPhysicalDamageMod * (RawRendDamageMultiplier[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level-1] + stacks * RawRendDamagePerSpearMultiplier[ObjectManager.Player.Spellbook.GetSpell(SpellSlot.E).Level-1]);
             }
 
             return 0;
