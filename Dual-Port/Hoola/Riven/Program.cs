@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using LeagueSharp.Common;
 using SharpDX;
@@ -73,7 +73,7 @@ namespace HoolaRiven
             foreach (
                 var enemy in
                     EloBuddy.ObjectManager.Get<EloBuddy.AIHeroClient>()
-                        .Where(ene => ene.LSIsValidTarget() && !ene.IsZombie))
+                        .Where(ene => ene.LSIsValidTarget() && !ene.IsZombie && ene.IsHPBarRendered))
             {
                 if (Dind)
                 {
@@ -93,6 +93,7 @@ namespace HoolaRiven
                 if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
                 {
                     var Minions = MinionManager.GetMinions(70 + 120 + Player.BoundingRadius);
+                    Minions.AddRange(Minions);
                     if (HasTitan())
                     {
                         CastTitan();
@@ -161,7 +162,7 @@ namespace HoolaRiven
                 var target = (EloBuddy.AIHeroClient)args.Target;
                 if (KillstealR && R.IsReady() && R.Instance.Name == IsSecondR) if (target.Health < (Rdame(target, target.Health) + Player.LSGetAutoAttackDamage(target)) && target.Health > Player.LSGetAutoAttackDamage(target)) R.Cast(target.Position);
                 if (KillstealW && W.IsReady()) if (target.Health < (W.GetDamage(target) + Player.LSGetAutoAttackDamage(target)) && target.Health > Player.LSGetAutoAttackDamage(target)) W.Cast();
-                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && target != null)
                 {
                     if (HasTitan())
                     {
@@ -180,7 +181,7 @@ namespace HoolaRiven
                     }
                     else if (E.IsReady() && !Orbwalking.InAutoAttackRange(target)) E.Cast(target.Position);
                 }
-                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.FastHarass)
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.FastHarass && target != null)
                 {
                     if (HasTitan())
                     {
@@ -377,8 +378,11 @@ namespace HoolaRiven
                 var targets = HeroManager.Enemies.Where(x => x.LSIsValidTarget(R.Range) && !x.IsZombie);
                 foreach (var target in targets)
                 {
-                    if (target.Health < W.GetDamage(target) && InWRange(target))
-                        W.Cast();
+                    if (target != null)
+                    {
+                        if (target.Health < W.GetDamage(target) && InWRange(target))
+                            W.Cast();
+                    }
                 }
             }
             if (KillstealR && R.IsReady() && R.Instance.Name == IsSecondR)
@@ -458,59 +462,63 @@ namespace HoolaRiven
         private static void Combo()
         {
             var targetR = LSTargetSelector.GetTarget(250 + Player.AttackRange + 70, EloBuddy.DamageType.Physical);
-            if (R.IsReady() && R.Instance.Name == IsFirstR && Orbwalker.InAutoAttackRange(targetR) && AlwaysR && targetR != null) ForceR();
-            if (R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && InWRange(targetR) && ComboW && AlwaysR && targetR != null)
+            if (targetR != null)
             {
-                ForceR();
-                Utility.DelayAction.Add(1, ForceW);
-            }
-            if (W.IsReady() && InWRange(targetR) && ComboW && targetR != null) W.Cast();
-            if (UseHoola && R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && targetR != null && E.IsReady() && targetR.LSIsValidTarget() && !targetR.IsZombie && (IsKillableR(targetR) || AlwaysR))
-            {
-                if (!InWRange(targetR))
+                if (R.IsReady() && R.Instance.Name == IsFirstR && Orbwalker.InAutoAttackRange(targetR) && AlwaysR && targetR != null) ForceR();
+                if (R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && InWRange(targetR) && ComboW && AlwaysR && targetR != null)
                 {
-                    E.Cast(targetR.Position);
                     ForceR();
-                    Utility.DelayAction.Add(200, ForceW);
-                    Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
+                    Utility.DelayAction.Add(1, ForceW);
                 }
-            }
-            else if (!UseHoola && R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && targetR != null && E.IsReady() && targetR.LSIsValidTarget() && !targetR.IsZombie && (IsKillableR(targetR) || AlwaysR))
-            {
-                if (!InWRange(targetR))
+                if (W.IsReady() && InWRange(targetR) && ComboW && targetR != null) W.Cast();
+                if (UseHoola && R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && targetR != null && E.IsReady() && targetR.LSIsValidTarget() && !targetR.IsZombie && (IsKillableR(targetR) || AlwaysR))
                 {
-                    E.Cast(targetR.Position);
-                    ForceR();
-                    Utility.DelayAction.Add(200, ForceW);
+                    if (!InWRange(targetR))
+                    {
+                        E.Cast(targetR.Position);
+                        ForceR();
+                        Utility.DelayAction.Add(200, ForceW);
+                        Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
+                    }
                 }
-            }
-            else if (UseHoola && W.IsReady() && E.IsReady())
-            {
-                if (targetR.LSIsValidTarget() && targetR != null && !targetR.IsZombie && !InWRange(targetR))
+                else if (!UseHoola && R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && targetR != null && E.IsReady() && targetR.LSIsValidTarget() && !targetR.IsZombie && (IsKillableR(targetR) || AlwaysR))
                 {
-                    E.Cast(targetR.Position);
-                    Utility.DelayAction.Add(10, ForceItem);
-                    Utility.DelayAction.Add(200, ForceW);
-                    Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
+                    if (!InWRange(targetR))
+                    {
+                        E.Cast(targetR.Position);
+                        ForceR();
+                        Utility.DelayAction.Add(200, ForceW);
+                    }
                 }
-            }
-            else if (!UseHoola && W.IsReady() && targetR != null && E.IsReady())
-            {
-                if (targetR.LSIsValidTarget() && targetR != null && !targetR.IsZombie && !InWRange(targetR))
+                else if (UseHoola && W.IsReady() && E.IsReady())
                 {
-                    E.Cast(targetR.Position);
-                    Utility.DelayAction.Add(10, ForceItem);
-                    Utility.DelayAction.Add(240, ForceW);
+                    if (targetR.LSIsValidTarget() && targetR != null && !targetR.IsZombie && !InWRange(targetR))
+                    {
+                        E.Cast(targetR.Position);
+                        Utility.DelayAction.Add(10, ForceItem);
+                        Utility.DelayAction.Add(200, ForceW);
+                        Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
+                    }
                 }
-            }
-            else if (E.IsReady())
-            {
-                if (targetR.LSIsValidTarget() && !targetR.IsZombie && !InWRange(targetR))
+                else if (!UseHoola && W.IsReady() && targetR != null && E.IsReady())
                 {
-                    E.Cast(targetR.Position);
+                    if (targetR.LSIsValidTarget() && targetR != null && !targetR.IsZombie && !InWRange(targetR))
+                    {
+                        E.Cast(targetR.Position);
+                        Utility.DelayAction.Add(10, ForceItem);
+                        Utility.DelayAction.Add(240, ForceW);
+                    }
+                }
+                else if (E.IsReady())
+                {
+                    if (targetR.LSIsValidTarget() && !targetR.IsZombie && !InWRange(targetR))
+                    {
+                        E.Cast(targetR.Position);
+                    }
                 }
             }
         }
+
 
         private static void Burst()
         {
@@ -557,7 +565,7 @@ namespace HoolaRiven
             if (Q.IsReady() && E.IsReady())
             {
                 var target = LSTargetSelector.GetTarget(450 + Player.AttackRange + 70, EloBuddy.DamageType.Physical);
-                if (target.LSIsValidTarget() && !target.IsZombie)
+                if (target.LSIsValidTarget() && !target.IsZombie && target != null)
                 {
                     if (!Orbwalking.InAutoAttackRange(target) && !InWRange(target)) E.Cast(target.Position);
                     Utility.DelayAction.Add(10, ForceItem);
@@ -595,7 +603,7 @@ namespace HoolaRiven
                             ? 70 + 195 + Player.BoundingRadius
                             : 70 + 120 + Player.BoundingRadius) && W.IsReady());
             var x = Player.Position.LSExtend(EloBuddy.Game.CursorPos, 300);
-            if (W.IsReady() && enemy.Any()) foreach (var target in enemy) if (InWRange(target)) W.Cast();
+            if (W.IsReady() && enemy.Any()) foreach (var target in enemy)if(target != null) if (InWRange(target)) W.Cast();
             if (Q.IsReady() && !Player.LSIsDashing()) Q.Cast(EloBuddy.Game.CursorPos);
             if (E.IsReady() && !Player.LSIsDashing()) E.Cast(x);
         }
@@ -658,10 +666,8 @@ namespace HoolaRiven
             EloBuddy.Player.IssueOrder(EloBuddy.GameObjectOrder.MoveTo, Player.Position.LSExtend(EloBuddy.Game.CursorPos, Player.LSDistance(EloBuddy.Game.CursorPos) + 10));
         }
 
-        private static bool InWRange(EloBuddy.GameObject target) => (Player.HasBuff("RivenFengShuiEngine") && target != null) ?
+        private static bool InWRange(EloBuddy.GameObject target) =>(Player.HasBuff("RivenFengShuiEngine") && target != null) ?
                       330 >= Player.LSDistance(target.Position) : 265 >= Player.LSDistance(target.Position);
-
-
         private static void ForceSkill()
         {
             if (forceQ && QTarget != null && QTarget.LSIsValidTarget(E.Range + Player.BoundingRadius + 70) && Q.IsReady()) Q.Cast(QTarget.Position);
@@ -749,7 +755,7 @@ namespace HoolaRiven
                     }
                     if (args.SData.Name.Contains("IreliaEquilibriumStrike"))
                     {
-                        if (args.Target.NetworkId == Player.NetworkId)
+                        if (args.Target.NetworkId == Player.NetworkId && sender != null)
                         {
                             if (W.IsReady() && InWRange(sender)) W.Cast();
                             else if (E.IsReady()) E.Cast(epos);
