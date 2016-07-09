@@ -460,9 +460,9 @@
 
                 var prediction = spells[Spells.Q].GetPrediction(target);
 
-                if (prediction.Hitchance >= HitChance.High)
+                if (prediction.Hitchance >= HitChance.VeryHigh)
                 {
-                    spells[Spells.Q].Cast(target);
+                    spells[Spells.Q].Cast(prediction.CastPosition);
                 }
                 else if (getCheckBoxItem(InitMenu.miscMenu, "ElLeeSin.Smite.Q") && spells[Spells.Q].IsReady()
                          && target.LSIsValidTarget(spells[Spells.Q].Range)
@@ -653,10 +653,10 @@
                 return;
             }
 
-            igniteSlot = Player.GetSpellSlot("SummonerDot");
+            igniteSlot = Player.GetSpellSlot("summonerdot");
             flashSlot = Player.GetSpellSlot("summonerflash");
 
-            spells[Spells.Q].SetSkillshot(0.275f, 60f, 1850f, true, SkillshotType.SkillshotLine);
+            spells[Spells.Q].SetSkillshot(0.250f, 65f, 1800f, true, SkillshotType.SkillshotLine);
             spells[Spells.E].SetTargetted(0.275f, float.MaxValue);
 
             JumpHandler.Load();
@@ -812,21 +812,22 @@
 
                 if (getCheckBoxItem(InitMenu.kickMenu, "ElLeeSin.Combo.New"))
                 {
-                    float leeSinRKickDistance = 700;
-                    float leeSinRKickWidth = 100;
+                    const float LeeSinRKickDistance = 700;
+                    const float LeeSinRKickWidth = 100;
                     var minREnemies = getSliderItem(InitMenu.kickMenu, "ElLeeSin.Combo.R.Count");
                     foreach (var enemy in HeroManager.Enemies)
                     {
                         var startPos = enemy.ServerPosition;
                         var endPos = Player.ServerPosition.ELExtend(
                             startPos,
-                            Player.ELDistance(enemy) + leeSinRKickDistance);
-                        var rectangle = new Geometry.Polygon.Rectangle(startPos, endPos, leeSinRKickWidth);
+                            Player.ELDistance(enemy) + LeeSinRKickDistance);
 
+                        var rectangle = new Geometry.Polygon.Rectangle(startPos, endPos, LeeSinRKickWidth);
                         if (HeroManager.Enemies.Count(x => rectangle.IsInside(x)) >= minREnemies)
                         {
                             spells[Spells.R].Cast(enemy);
                         }
+
                     }
                 }
             }
@@ -999,144 +1000,137 @@
 
         private static void InsecCombo(AIHeroClient target)
         {
-            try
+            if (target != null && target.IsVisible)
             {
-                if (target != null && target.IsVisible)
+                if (Player.ELDistance(GetInsecPos(target)) < 200)
                 {
-                    if (Player.ELDistance(GetInsecPos(target)) < 200)
-                    {
-                        insecComboStep = InsecComboStepSelect.Pressr;
-                    }
-                    else if (insecComboStep == InsecComboStepSelect.None
-                             && GetInsecPos(target).ELDistance(Player.Position) < 600)
-                    {
-                        insecComboStep = InsecComboStepSelect.Wgapclose;
-                    }
-                    else if (insecComboStep == InsecComboStepSelect.None
-                             && target.ELDistance(Player) < spells[Spells.Q].Range)
-                    {
-                        insecComboStep = InsecComboStepSelect.Qgapclose;
-                    }
+                    insecComboStep = InsecComboStepSelect.Pressr;
+                }
+                else if (insecComboStep == InsecComboStepSelect.None
+                         && GetInsecPos(target).ELDistance(Player.Position) < 600)
+                {
+                    insecComboStep = InsecComboStepSelect.Wgapclose;
+                }
+                else if (insecComboStep == InsecComboStepSelect.None
+                         && target.ELDistance(Player) < spells[Spells.Q].Range)
+                {
+                    insecComboStep = InsecComboStepSelect.Qgapclose;
+                }
 
-                    switch (insecComboStep)
-                    {
-                        case InsecComboStepSelect.Qgapclose:
-                            if (QState)
+                switch (insecComboStep)
+                {
+                    case InsecComboStepSelect.Qgapclose:
+                        if (QState)
+                        {
+                            var pred1 = spells[Spells.Q].GetPrediction(target);
+                            if (pred1.Hitchance >= HitChance.High)
                             {
-                                var pred1 = spells[Spells.Q].GetPrediction(target);
-                                if (pred1.Hitchance >= HitChance.High)
+                                if (pred1.CollisionObjects.Count == 0)
                                 {
-                                    if (pred1.CollisionObjects.Count == 0)
+                                    if (spells[Spells.Q].Cast(pred1.CastPosition))
                                     {
-                                        if (spells[Spells.Q].Cast(pred1.CastPosition))
-                                        {
-                                            return;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        CastQ(target);
-                                    }
-                                }
-
-                                if (!getCheckBoxItem(InitMenu.insecMenu, "checkOthers1"))
-                                {
-                                    return;
-                                }
-
-                                var insecObjects =
-                                    HeroManager.Enemies.Where(
-                                        x => x.LSIsValidTarget(spells[Spells.Q].Range) && x.ELDistance(target) < 550f)
-                                        .Concat(MinionManager.GetMinions(Player.ServerPosition, spells[Spells.Q].Range))
-                                        .Where(
-                                            m =>
-                                            m.LSIsValidTarget(spells[Spells.Q].Range)
-                                            && spells[Spells.Q].GetDamage(m) < m.Health + 15
-                                            && m.ELDistance(target) < 400f)
-                                        .ToList();
-
-                                if (insecObjects.Count > 0)
-                                {
-                                    foreach (var insectObject in
-                                        insecObjects.Select(i => spells[Spells.Q].GetPrediction(i))
-                                            .Where(i => i.Hitchance >= HitChance.High)
-                                            .OrderByDescending(i => i.Hitchance))
-                                    {
-                                        spells[Spells.Q].Cast(insectObject.CastPosition);
-                                        break;
+                                        return;
                                     }
                                 }
                                 else
                                 {
-                                    return;
+                                    CastQ(target);
                                 }
                             }
 
-                            if (!(target.HasQBuff()) && QState)
+                            if (!getCheckBoxItem(InitMenu.insecMenu, "checkOthers1"))
                             {
-                                CastQ(target);
+                                return;
                             }
-                            else if (target.HasQBuff())
+
+                            var insecObjects =
+                                HeroManager.Enemies.Where(
+                                    x => x.LSIsValidTarget(spells[Spells.Q].Range) && x.ELDistance(target) < 550f)
+                                    .Concat(MinionManager.GetMinions(Player.ServerPosition, spells[Spells.Q].Range))
+                                    .Where(
+                                        m =>
+                                        m.LSIsValidTarget(spells[Spells.Q].Range)
+                                        && spells[Spells.Q].GetDamage(m) < m.Health + 15
+                                        && m.ELDistance(target) < 400f)
+                                    .ToList();
+
+                            if (insecObjects.Count > 0)
                             {
-                                spells[Spells.Q].Cast();
-                                insecComboStep = InsecComboStepSelect.Wgapclose;
+                                foreach (var insectObject in
+                                    insecObjects.Select(i => spells[Spells.Q].GetPrediction(i))
+                                        .Where(i => i.Hitchance >= HitChance.High)
+                                        .OrderByDescending(i => i.Hitchance))
+                                {
+                                    spells[Spells.Q].Cast(insectObject.CastPosition);
+                                    break;
+                                }
                             }
                             else
                             {
-                                if (spells[Spells.Q].Instance.Name.Equals(
-                                    "blindmonkqtwo",
-                                    StringComparison.InvariantCultureIgnoreCase)
-                                    && ReturnQBuff()?.ELDistance(target) <= 600)
+                                return;
+                            }
+                        }
+
+                        if (!(target.HasQBuff()) && QState)
+                        {
+                            CastQ(target);
+                        }
+                        else if (target.HasQBuff())
+                        {
+                            spells[Spells.Q].Cast();
+                            insecComboStep = InsecComboStepSelect.Wgapclose;
+                        }
+                        else
+                        {
+                            if (spells[Spells.Q].Instance.Name.Equals(
+                                "blindmonkqtwo",
+                                StringComparison.InvariantCultureIgnoreCase)
+                                && ReturnQBuff()?.ELDistance(target) <= 600)
+                            {
+                                spells[Spells.Q].Cast();
+                            }
+                        }
+                        break;
+
+                    case InsecComboStepSelect.Wgapclose:
+
+                        if (Player.ELDistance(target) < WardRange)
+                        {
+                            WardJump(GetInsecPos(target), false, true, true);
+
+                            if (FindBestWardItem() == null && spells[Spells.R].IsReady()
+                                && getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Flash.Insec")
+                                && Player.Spellbook.CanUseSpell(flashSlot) == SpellState.Ready)
+                            {
+                                if ((GetInsecPos(target).ELDistance(Player.Position) < FlashRange
+                                     && LastWard + 1000 < Environment.TickCount) || !spells[Spells.W].IsReady())
                                 {
-                                    spells[Spells.Q].Cast();
+                                    Player.Spellbook.CastSpell(flashSlot, GetInsecPos(target));
                                 }
                             }
-                            break;
+                        }
+                        else if (Player.ELDistance(target) < WardFlashRange)
+                        {
+                            WardJump(target.Position);
 
-                        case InsecComboStepSelect.Wgapclose:
-
-                            if (Player.ELDistance(target) < WardRange)
+                            if (spells[Spells.R].IsReady() && getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Flash.Insec")
+                                && Player.Spellbook.CanUseSpell(flashSlot) == SpellState.Ready)
                             {
-                                WardJump(GetInsecPos(target), false, true, true);
-
-                                if (FindBestWardItem() == null && spells[Spells.R].IsReady()
-                                    && getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Flash.Insec")
-                                    && Player.Spellbook.CanUseSpell(flashSlot) == SpellState.Ready)
+                                if (Player.ELDistance(target) < FlashRange - 25)
                                 {
-                                    if ((GetInsecPos(target).ELDistance(Player.Position) < FlashRange
-                                         && LastWard + 1000 < Environment.TickCount) || !spells[Spells.W].IsReady())
+                                    if (FindBestWardItem() == null || LastWard + 1000 < Environment.TickCount)
                                     {
                                         Player.Spellbook.CastSpell(flashSlot, GetInsecPos(target));
                                     }
                                 }
                             }
-                            else if (Player.ELDistance(target) < WardFlashRange)
-                            {
-                                WardJump(target.Position);
+                        }
+                        break;
 
-                                if (spells[Spells.R].IsReady() && getCheckBoxItem(InitMenu.insecMenu, "ElLeeSin.Flash.Insec")
-                                    && Player.Spellbook.CanUseSpell(flashSlot) == SpellState.Ready)
-                                {
-                                    if (Player.ELDistance(target) < FlashRange - 25)
-                                    {
-                                        if (FindBestWardItem() == null || LastWard + 1000 < Environment.TickCount)
-                                        {
-                                            Player.Spellbook.CastSpell(flashSlot, GetInsecPos(target));
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-
-                        case InsecComboStepSelect.Pressr:
-                            spells[Spells.R].CastOnUnit(target);
-                            break;
-                    }
+                    case InsecComboStepSelect.Pressr:
+                        spells[Spells.R].CastOnUnit(target);
+                        break;
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("An error occurred: '{0}'", e);
             }
         }
 
