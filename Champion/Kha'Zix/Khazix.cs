@@ -351,7 +351,7 @@ namespace SephKhazix
                 target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
             }
 
-            if ((target != null))
+            if ((target != null) && target.IsVisible && target.IsHPBarRendered)
             {
                 var dist = Khazix.LSDistance(target);
 
@@ -377,7 +377,7 @@ namespace SephKhazix
                 if (E.IsReady() && !Jumping && dist <= E.Range && getCheckBoxItem(combo, "UseECombo") && dist > Q.Range + (0.7 * Khazix.MoveSpeed))
                 {
                     PredictionOutput pred = E.GetPrediction(target);
-                    if (target.IsValid && !target.IsDead && ShouldJump(pred.CastPosition))
+                    if (target.IsValid &&&& target.IsVisible && target.IsHPBarRendered !target.IsDead && ShouldJump(pred.CastPosition))
                     {
                         E.Cast(pred.CastPosition);
                     }
@@ -389,7 +389,7 @@ namespace SephKhazix
                     getCheckBoxItem(combo, "UseEGapcloseW")))
                 {
                     PredictionOutput pred = E.GetPrediction(target);
-                    if (target.IsValid && !target.IsDead && ShouldJump(pred.CastPosition))
+                    if (target.IsValid && target.IsVisible && target.IsHPBarRendered && !target.IsDead && ShouldJump(pred.CastPosition))
                     {
                         E.Cast(pred.CastPosition);
                     }
@@ -430,7 +430,7 @@ namespace SephKhazix
                     getCheckBoxItem(combo, "UseECombo") && E.IsReady())
                 {
                     PredictionOutput pred = E.GetPrediction(target);
-                    if (target.IsValid && !target.IsDead && ShouldJump(pred.CastPosition))
+                    if (target.IsValid && target.IsVisible && target.IsHPBarRendered && !target.IsDead && ShouldJump(pred.CastPosition))
                     {
                         E.Cast(pred.CastPosition);
                     }
@@ -557,7 +557,7 @@ namespace SephKhazix
                         LeagueSharp.Common.Utility.DelayAction.Add(getSliderItem(ks, "Edelay"), delegate
                         {
                             PredictionOutput pred = E.GetPrediction(target);
-                            if (target.LSIsValidTarget() && !target.IsZombie && ShouldJump(pred.CastPosition))
+                            if (target.LSIsValidTarget() && !target.IsZombie && target.IsVisible && target.IsHPBarRendered && ShouldJump(pred.CastPosition))
                             {
                                 if (getCheckBoxItem(ks, "Ksbypass") || ShouldJump(pred.CastPosition))
                                 {
@@ -580,7 +580,7 @@ namespace SephKhazix
                         LeagueSharp.Common.Utility.DelayAction.Add(getSliderItem(ks, "Edelay"), delegate
                         {
                             PredictionOutput pred = E.GetPrediction(target);
-                            if (target.IsValid && !target.IsDead && ShouldJump(pred.CastPosition))
+                            if (target.IsValid && !target.IsDead && target.IsVisible && target.IsHPBarRendered && ShouldJump(pred.CastPosition))
                             {
                                 if (getCheckBoxItem(ks, "Ksbypass") || ShouldJump(pred.CastPosition))
                                 {
@@ -764,7 +764,7 @@ namespace SephKhazix
 
             if (Q.IsReady() && E.IsReady())
             {
-                var CheckQKillable = Targets.FirstOrDefault(x => Vector3.Distance(Khazix.ServerPosition, x.ServerPosition) < Q.Range - 25 && GetQDamage(x) > x.Health);
+                var CheckQKillable = Targets.FirstOrDefault(x => Vector3.Distance(Khazix.ServerPosition, x.ServerPosition) < Q.Range - 25 && GetQDamage(x) > x.Health && x.IsVisible && x.IsHPBarRendered);
 
                 if (CheckQKillable != null)
                 {
