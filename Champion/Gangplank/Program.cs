@@ -236,7 +236,7 @@ namespace UnderratedAIO.Champions
                         }
                         else
                         {
-                            if (Orbwalking.CanMove(100))
+                            if (Orbwalker.CanMove)
                             {
                                 Orbwalker.DisableMovement = false;
                                 Orbwalker.MoveTo(Game.CursorPos);
@@ -246,7 +246,7 @@ namespace UnderratedAIO.Champions
                 }
                 else
                 {
-                    if (Orbwalking.CanMove(100))
+                    if (Orbwalker.CanMove)
                     {
                         Orbwalker.DisableMovement = false;
                         Orbwalker.MoveTo(Game.CursorPos);
@@ -255,7 +255,7 @@ namespace UnderratedAIO.Champions
             }
             else if (menuC["EQtoCursor"].Cast<KeyBind>().CurrentValue)
             {
-                if (Orbwalking.CanMove(100))
+                if (Orbwalker.CanMove)
                 {
                     Orbwalker.DisableMovement = false;
                     Orbwalker.MoveTo(Game.CursorPos);
@@ -270,7 +270,7 @@ namespace UnderratedAIO.Champions
                             o =>
                                 o.Health > 1 && o.LSDistance(player) < Orbwalking.GetRealAutoAttackRange(o) &&
                                 !KillableBarrel(o, true));
-                if (meleeRangeBarrel != null && Orbwalking.CanAttack())
+                if (meleeRangeBarrel != null && Orbwalker.CanAutoAttack)
                 {
                     Orbwalker.DisableMovement = true;
                     EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, meleeRangeBarrel);
@@ -536,7 +536,7 @@ namespace UnderratedAIO.Champions
 
             if (menuC["useeAlways"].Cast<CheckBox>().CurrentValue && E.IsReady() && player.LSDistance(target) < E.Range &&
                 !justE && target.Health > Q.GetDamage(target) + player.GetAutoAttackDamage(target) &&
-                Orbwalking.CanMove(100) && menuC["eStacksC"].Cast<Slider>().CurrentValue < E.Instance.Ammo)
+                Orbwalker.CanMove && menuC["eStacksC"].Cast<Slider>().CurrentValue < E.Instance.Ammo)
             {
                 CastE(target, barrels);
             }
@@ -550,7 +550,7 @@ namespace UnderratedAIO.Champions
             {
                 dontQ = true;
             }
-            if (menuC["useq"].Cast<CheckBox>().CurrentValue && Q.CanCast(target) && Orbwalking.CanMove(100) && !justE &&
+            if (menuC["useq"].Cast<CheckBox>().CurrentValue && Q.CanCast(target) && Orbwalker.CanMove && !justE &&
                 (!menuC["useqBlock"].Cast<CheckBox>().CurrentValue || !dontQ))
             {
                 CastQonHero(target, barrels);
@@ -572,7 +572,7 @@ namespace UnderratedAIO.Champions
                 if (bestBarrelMelee != null && shouldAAbarrel)
                 {
                     Orbwalker.DisableMovement = true;
-                    if (Orbwalking.CanAttack())
+                    if (Orbwalker.CanAutoAttack)
                     {
                         if (Orbwalking.GetRealAutoAttackRange(bestBarrelMelee) < player.LSDistance(bestBarrelMelee))
                         {

@@ -16,25 +16,28 @@ using Challenger_Series.Utils;
 using LeagueSharp.SDK;
 using SharpDX;
 using Color = System.Drawing.Color;
-using EloBuddy.SDK.Menu;
 using SpellDatabase = LeagueSharp.SDK.SpellDatabase;
+using LeagueSharp.Data.Enumerations;
+using Geometry = Challenger_Series.Utils.Geometry;
 
 namespace Challenger_Series.Plugins
 {
+    using EloBuddy;
+    using EloBuddy.SDK.Menu;
     using EloBuddy.SDK.Menu.Values;
-    using LeagueSharp.Data.Enumerations;
-    using Geometry = Challenger_Series.Utils.Geometry;
+    using LeagueSharp.Common;
 
     public class Vayne : CSPlugin
     {
+        private static LSOrbwalker Orbwalker = PortAIO.Init.LSOrbwalker;
 
         #region ctor
         public Vayne()
         {
-            base.Q = new Spell(EloBuddy.SpellSlot.Q, 300);
-            base.W = new Spell(EloBuddy.SpellSlot.W);
-            base.E = new Spell(EloBuddy.SpellSlot.E, 550);
-            base.R = new Spell(EloBuddy.SpellSlot.R);
+            base.Q = new LeagueSharp.SDK.Spell(EloBuddy.SpellSlot.Q, 300);
+            base.W = new LeagueSharp.SDK.Spell(EloBuddy.SpellSlot.W);
+            base.E = new LeagueSharp.SDK.Spell(EloBuddy.SpellSlot.E, 550);
+            base.R = new LeagueSharp.SDK.Spell(EloBuddy.SpellSlot.R);
 
             base.E.SetSkillshot(0.42f, 50f, 1300f, false, LeagueSharp.SDK.Enumerations.SkillshotType.SkillshotLine);
             CachedGapclosers = new List<Tuple<string, LeagueSharp.Data.DataTypes.SpellDatabaseEntry>>();
@@ -67,8 +70,8 @@ namespace Challenger_Series.Plugins
             }
             InitMenu();
             DelayedOnUpdate += OnUpdate;
-            EloBuddy.SDK.Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
-            EloBuddy.SDK.Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+            LSEvents.BeforeAttack += Orbwalker_OnPreAttack;
+            LSEvents.AfterAttack += Orbwalker_OnPostAttack;
             EloBuddy.Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             EloBuddy.Drawing.OnDraw += OnDraw;
             Events.OnGapCloser += OnGapCloser;
@@ -305,14 +308,14 @@ namespace Challenger_Series.Plugins
                 }
             }
         }
-        private void Orbwalker_OnPostAttack(EloBuddy.AttackableUnit target, EventArgs args)
+        private void Orbwalker_OnPostAttack(AfterAttackArgs args)
         {
-            EloBuddy.SDK.Orbwalker.ForcedTarget = null;
+            Orbwalker.ForceTarget(null);
             var possible2WTarget = ValidTargets.FirstOrDefault(
                 h =>
                     h.ServerPosition.Distance(EloBuddy.ObjectManager.Player.ServerPosition) < 500 &&
                     h.GetBuffCount("vaynesilvereddebuff") == 2);
-            if (!EloBuddy.SDK.Orbwalker.ActiveModesFlags.HasFlag(EloBuddy.SDK.Orbwalker.ActiveModes.Combo))
+            if (Orbwalker.ActiveMode != LSOrbwalker.OrbwalkingMode.Combo)
             {
                 if (possible2WTarget.LSIsValidTarget() && UseEAs3rdWProcBool && LeagueSharp.SDK.Core.Utils.MathUtils.GetWaypoints(possible2WTarget).LastOrDefault().Distance(EloBuddy.ObjectManager.Player.ServerPosition) < 1000)
                 {
@@ -325,11 +328,11 @@ namespace Challenger_Series.Plugins
                     E.CastOnUnit(possible2WTarget);
                 }
             }
-            if (target is EloBuddy.AIHeroClient && UseQBool)
+            if (args.Target is EloBuddy.AIHeroClient && UseQBool)
             {
                 if (Q.IsReady())
                 {
-                    var tg = target as EloBuddy.AIHeroClient;
+                    var tg = args.Target as EloBuddy.AIHeroClient;
                     if (tg != null)
                     {
                         var mode = QModeStringList;
@@ -348,9 +351,9 @@ namespace Challenger_Series.Plugins
                     }
                 }
             }
-            if (target is EloBuddy.Obj_AI_Minion && EloBuddy.SDK.Orbwalker.ActiveModesFlags.HasFlag(EloBuddy.SDK.Orbwalker.ActiveModes.LaneClear))
+            if (args.Target is EloBuddy.Obj_AI_Minion && Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.LaneClear)
             {
-                var tg = target as EloBuddy.Obj_AI_Minion;
+                var tg = args.Target as EloBuddy.Obj_AI_Minion;
                 if (E.IsReady())
                 {
                     if (this.IsMinionCondemnable(tg) && GameObjects.Jungle.Any(m => m.NetworkId == tg.NetworkId) && tg.LSIsValidTarget() && this.UseEJungleFarm)
@@ -389,12 +392,12 @@ namespace Challenger_Series.Plugins
                     }
                 }
             }
-            if (UseQOnlyAt2WStacksBool && !EloBuddy.SDK.Orbwalker.ActiveModesFlags.HasFlag(EloBuddy.SDK.Orbwalker.ActiveModes.Combo) && possible2WTarget.LSIsValidTarget())
+            if (UseQOnlyAt2WStacksBool && Orbwalker.ActiveMode != LSOrbwalker.OrbwalkingMode.Combo && possible2WTarget.LSIsValidTarget())
             {
                 Q.Cast(GetTumblePos(possible2WTarget));
             }
         }
-        private void Orbwalker_OnPreAttack(EloBuddy.AttackableUnit target, EloBuddy.SDK.Orbwalker.PreAttackArgs args)
+        private void Orbwalker_OnPreAttack(BeforeAttackArgs args)
         {
             if (args.Process)
             {
@@ -404,7 +407,7 @@ namespace Challenger_Series.Plugins
             {
                 IsWindingUp = false;
             }
-            if (R.IsReady() && EloBuddy.SDK.Orbwalker.ActiveModesFlags.HasFlag(EloBuddy.SDK.Orbwalker.ActiveModes.Combo) && UseRBool && args.Target is EloBuddy.AIHeroClient && (!(args.Target as EloBuddy.AIHeroClient).IsUnderEnemyTurret() || EloBuddy.ObjectManager.Player.IsUnderEnemyTurret()) && EloBuddy.ObjectManager.Player.CountAllyHeroesInRange(800) >= EloBuddy.ObjectManager.Player.CountEnemyHeroesInRange(800))
+            if (R.IsReady() && Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Combo && UseRBool && args.Target is EloBuddy.AIHeroClient && (!(args.Target as EloBuddy.AIHeroClient).IsUnderEnemyTurret() || EloBuddy.ObjectManager.Player.IsUnderEnemyTurret()) && EloBuddy.ObjectManager.Player.CountAllyHeroesInRange(800) >= EloBuddy.ObjectManager.Player.CountEnemyHeroesInRange(800))
             {
                 R.Cast();
             }
@@ -414,7 +417,7 @@ namespace Challenger_Series.Plugins
                     h.GetBuffCount("vaynesilvereddebuff") == 2);
             if (TryToFocus2WBool && possible2WTarget.LSIsValidTarget())
             {
-                EloBuddy.SDK.Orbwalker.ForcedTarget = possible2WTarget;
+                Orbwalker.ForceTarget(possible2WTarget);
             }
             if (EloBuddy.ObjectManager.Player.HasBuff("vaynetumblefade") && DontAttackWhileInvisibleAndMeelesNearBool)
             {
@@ -425,11 +428,11 @@ namespace Challenger_Series.Plugins
                     args.Process = false;
                 }
             }
-            var possibleTarget = EloBuddy.SDK.TargetSelector.GetTarget(615, EloBuddy.DamageType.Physical);
+            var possibleTarget = LSTargetSelector.GetTarget(615, EloBuddy.DamageType.Physical);
             if (possibleTarget != null && args.Target is EloBuddy.Obj_AI_Minion &&
                 UseQBonusOnEnemiesNotCS && EloBuddy.ObjectManager.Player.HasBuff("vaynetumblebonus"))
             {
-                EloBuddy.SDK.Orbwalker.ForcedTarget = possibleTarget;
+                Orbwalker.ForceTarget(possibleTarget);
                 args.Process = false;
             }
             var possibleNearbyMeleeChampion =
@@ -829,7 +832,7 @@ namespace Challenger_Series.Plugins
             if (!target.IsMelee && EloBuddy.ObjectManager.Player.CountEnemyHeroesInRange(800) == 1) return cursorPos;
 
             var aRC =
-                new Geometry.Circle(EloBuddy.ObjectManager.Player.ServerPosition.ToVector2(), 300).ToPolygon().ToClipperPath();
+                new Challenger_Series.Utils.Geometry.Circle(EloBuddy.ObjectManager.Player.ServerPosition.ToVector2(), 300).ToPolygon().ToClipperPath();
             var targetPosition = target.ServerPosition;
 
 
@@ -847,7 +850,7 @@ namespace Challenger_Series.Plugins
 
         private Vector3 GetTumblePos(EloBuddy.Obj_AI_Base target)
         {
-            if (!EloBuddy.SDK.Orbwalker.ActiveModesFlags.HasFlag(EloBuddy.SDK.Orbwalker.ActiveModes.Combo))
+            if (Orbwalker.ActiveMode != LSOrbwalker.OrbwalkingMode.Combo)
                 return GetAggressiveTumblePos(target);
 
             var cursorPos = EloBuddy.Game.CursorPos;
@@ -866,7 +869,7 @@ namespace Challenger_Series.Plugins
                 return Vector3.Zero;
 
             var aRC =
-                new Geometry.Circle(EloBuddy.ObjectManager.Player.ServerPosition.ToVector2(), 300).ToPolygon().ToClipperPath();
+                new Challenger_Series.Utils.Geometry.Circle(EloBuddy.ObjectManager.Player.ServerPosition.ToVector2(), 300).ToPolygon().ToClipperPath();
             var targetPosition = target.ServerPosition;
             var pList = (from p in aRC
                          select new Vector2(p.X, p.Y).ToVector3()

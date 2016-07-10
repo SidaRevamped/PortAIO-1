@@ -20,6 +20,7 @@ namespace PortAIO
 {
     internal static class Init
     {
+        public static LSOrbwalker LSOrbwalker;
 
         private static void Main()
         {
@@ -83,7 +84,7 @@ namespace PortAIO
                 else
                 {
                     LSTargetSelector.Initialize();
-                    new Orbwalking.Orbwalker();
+                    LSOrbwalker = new LSOrbwalker();
                 }
             }
 
