@@ -7,6 +7,8 @@ using SharpDX;
 using LeagueSharp.Common;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy;
+
 namespace AhriSharp
 {
     internal static class Ahri
@@ -49,6 +51,7 @@ namespace AhriSharp
             DrawM.Add("DamageAfterCombo", new CheckBox("Draw Combo Damage"));
 
             Misc = Main.AddSubMenu("Misc", "Misc");
+            Misc.Add("charmRange", new Slider("Only Charm if Target is greater than X distance : ", 0, 0, 500));
             Misc.Add("autoE", new CheckBox("Auto E on gapclosing targets"));
             Misc.Add("autoEI", new CheckBox("Auto E to interrupt"));
 
@@ -148,18 +151,18 @@ namespace AhriSharp
 
         static bool CastE()
         {
-            if (!_spellE.IsReady())
+            if (!_spellE.IsReady() || !(ObjectManager.Player.Mana - _spellE.ManaCost > _spellR.ManaCost))
             {
                 return false;
             }
 
             var target = EloBuddy.SDK.TargetSelector.GetTarget(_spellE.Range, EloBuddy.DamageType.Magical);
             var predE = _spellQ.GetPrediction(target);
-            if (target !=  null && !target.CanMove && predE.Hitchance >= HitChance.VeryHigh)
+            if (target != null && !target.CanMove && predE.Hitchance >= HitChance.VeryHigh && ObjectManager.Player.LSDistance(target) > Misc["charmRange"].Cast<Slider>().CurrentValue)
             {
                 return _spellE.Cast(target) == Spell.CastStates.SuccessfullyCasted;
             }
-            else if (target != null && predE.Hitchance >=  HitChance.VeryHigh && _spellE.WillHit(target,predE.CastPosition))
+            else if (target != null && predE.Hitchance >=  HitChance.VeryHigh && _spellE.WillHit(target,predE.CastPosition) && ObjectManager.Player.LSDistance(target) > Misc["charmRange"].Cast<Slider>().CurrentValue)
             {
                 return _spellE.Cast(predE.CastPosition);
             }
@@ -188,7 +191,7 @@ namespace AhriSharp
 
         static void CastQ(Vector2 pos)
         {
-            if (!_spellQ.IsReady())
+            if (!_spellQ.IsReady() || !(ObjectManager.Player.Mana - _spellQ.ManaCost > _spellR.ManaCost))
                 return;
 
             _spellQ.Cast(pos);
@@ -196,7 +199,7 @@ namespace AhriSharp
 
        static void CastW(bool ignoreTargetCheck = false)
         {
-            if (!_spellW.IsReady())
+            if (!_spellW.IsReady() || !(ObjectManager.Player.Mana - _spellW.ManaCost > _spellR.ManaCost))
             {
                 return;
             }
@@ -287,7 +290,7 @@ namespace AhriSharp
                 {
                     EloBuddy.AIHeroClient enemy = enemiesNearMouse.FirstOrDefault();
 
-                    bool underTower = Utility.UnderTurret(enemy);
+                    bool underTower = LeagueSharp.Common.Utility.UnderTurret(enemy);
 
                     return GetComboDamage(enemy) / enemy.Health >= (underTower ? 1.25f : 1); //if enemy under tower, only initiate if combo damage is >125% of enemy health
                 }
