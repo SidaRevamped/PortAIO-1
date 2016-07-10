@@ -50,6 +50,17 @@ namespace ExorAIO.Champions.Pantheon
                 return;
             }
 
+            if (GameObjects.Player.HasBuff("pantheonesound"))
+            {
+                Orbwalker.DisableAttacking = true;
+                Orbwalker.DisableMovement = true;
+            }
+            else
+            {
+                Orbwalker.DisableAttacking = false;
+                Orbwalker.DisableMovement = false;
+            }
+
             /// <summary>
             ///     Initializes the Killsteal events.
             /// </summary>
