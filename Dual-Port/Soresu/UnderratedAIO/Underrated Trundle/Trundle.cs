@@ -38,38 +38,67 @@ namespace UnderratedAIO.Champions
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             LeagueSharp.Common.Utility.HpBarDamageIndicator.DamageToUnit = ComboDamage;
             CustomEvents.Unit.OnDash += Unit_OnDash;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+        }
+
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!getCheckBoxItem(miscMenu, "AutoEDash"))
+            {
+                return;
+            }
+            if (!E.IsReady())
+            {
+                return;
+            }
+            var hero = sender as AIHeroClient;
+            if (hero != null && hero.ChampionName == "Tristana" && args.Slot == SpellSlot.W)
+            {
+                var dashIntPoint = sender.Position.Extend(args.End, 300);
+                if (dashIntPoint.Distance(player.Position) < 1000)
+                {
+                    E.Cast(dashIntPoint);
+                }
+            }
         }
 
         private void Unit_OnDash(Obj_AI_Base sender, Dash.DashItem args)
         {
-            if (args.IsBlink)
+            if (!getCheckBoxItem(miscMenu, "AutoEDash"))
             {
                 return;
             }
-            if (!sender.IsEnemy && !(sender is AIHeroClient))
+            if (args.IsBlink || !E.IsReady())
             {
                 return;
             }
-            if (args.StartPos.LSDistance(player) > E.Range && args.EndPos.LSDistance(player) > E.Range)
+            if (!sender.IsEnemy || !(sender is AIHeroClient))
             {
                 return;
             }
-            Console.WriteLine("Dash!");
+            var hero = sender as AIHeroClient;
+            if (hero.ChampionName == "Tristana")
+            {
+                return;
+            }
             var steps = 6f;
             var stepLength = args.StartPos.LSDistance(args.EndPos) / steps;
             for (int i = 1; i < steps + 1; i++)
             {
                 var p = args.StartPos.LSExtend(args.EndPos, stepLength * i);
-                if (p.IsWall() && p.LSDistance(args.StartPos) > args.Speed * 0.25f - E.Width &&
-                    p.LSDistance(player) < E.Range)
+                if (p.IsWall() && p.LSDistance(args.StartPos) > args.Speed * 0.25f - E.Width && p.LSDistance(player) < 1000)
                 {
-                    Console.WriteLine("Casted Cause wall");
-                    E.Cast(p);
+                    E.Cast(p.LSExtend(args.StartPos, E.Width));
                     return;
                 }
             }
+            var predRange = Math.Min(args.Speed * 0.35f, args.StartPos.LSDistance(args.EndPos));
+            var dashIntPoint = args.StartPos.LSExtend(args.EndPos, predRange);
+            if (dashIntPoint.LSDistance(player) < 1000)
+            {
+                E.Cast(dashIntPoint);
+            }
         }
-
 
         private void AfterAttack(AttackableUnit target, EventArgs args)
         {
@@ -167,8 +196,23 @@ namespace UnderratedAIO.Champions
             {
                 Clear();
             }
-        }
 
+            if (false && E.IsReady() && getCheckBoxItem(miscMenu, "AutoEDash"))
+            {
+                foreach (var data in HeroManager.Allies.Select(a => Program.IncDamages.GetAllyData(a.NetworkId)))
+                {
+                    foreach (var skillshot in
+                        data.Damages.Where(
+                            d =>
+                                d.SkillShot != null && d.SkillShot.SkillshotData.Slot == SpellSlot.R &&
+                                d.SkillShot.SkillshotData.ChampionName == "Blitzcrank"))
+                    {
+                        E.Cast(skillshot.Target.Position.LSExtend(skillshot.SkillShot.StartPosition.To3D(), E.Range * 2));
+                    }
+                }
+            }
+        }
+    
         private void Clear()
         {
             float perc = getSliderItem(farmMenu, "minmana") / 100f;
@@ -209,7 +253,8 @@ namespace UnderratedAIO.Champions
                     E.Cast(pos);
                 }
             }
-            if (getCheckBoxItem(comboMenu, "usew") && W.IsReady())
+            if (getCheckBoxItem(comboMenu, "usew") && W.IsReady() &&
+                (!target.UnderTurret(true) || player.UnderTurret(true)))
             {
                 var pos = player.Position.LSExtend(Prediction.GetPrediction(target, 700).UnitPosition, W.Range / 2);
                 if (player.LSDistance(pos) < W.Range)
@@ -271,7 +316,7 @@ namespace UnderratedAIO.Champions
         private Vector3 GetVectorE(AIHeroClient target)
         {
             var pos = Vector3.Zero;
-            var pred = Prediction.GetPrediction(target, 0.25f);
+            var pred = Prediction.GetPrediction(target, 0.28f);
             if (!target.IsMoving)
             {
                 return pos;
@@ -361,7 +406,7 @@ namespace UnderratedAIO.Champions
             miscMenu = config.AddSubMenu("Misc", "Msettings");
             miscMenu.Add("AutoETower", new CheckBox("Use E on tower aggro"));
             miscMenu.Add("AutoEinterrupt", new CheckBox("Use E interrupt"));
-
+            miscMenu.Add("AutoEDash", new CheckBox("Use E ond Dash"));
         }
 
         private static float ComboDamage(AIHeroClient hero)
@@ -392,7 +437,7 @@ namespace UnderratedAIO.Champions
             W.SetSkillshot(0.25f, 1000, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E = new LeagueSharp.Common.Spell(SpellSlot.E, 1000);
             E.SetSkillshot(0.25f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R = new LeagueSharp.Common.Spell(SpellSlot.R, 700);
+            R = new LeagueSharp.Common.Spell(SpellSlot.R, 650);
         }
     }
 }
