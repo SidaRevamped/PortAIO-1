@@ -1211,7 +1211,7 @@ namespace HoolaRiven
                     !misc["PriorizeFarm"].Cast<CheckBox>().CurrentValue)
                 {
                     var target = LSTargetSelector.GetTarget(-1, DamageType.Physical);
-                    if (target != null && InAutoAttackRange(target))
+                    if (target != null && InAutoAttackRange(target) && target.IsVisible && target.IsHPBarRendered)
                     {
                         return target;
                     }
@@ -1319,7 +1319,7 @@ namespace HoolaRiven
                     if (mode != OrbwalkingMode.LaneClear || !ShouldWait())
                     {
                         var target = LSTargetSelector.GetTarget(-1, DamageType.Physical);
-                        if (target.LSIsValidTarget() && InAutoAttackRange(target))
+                        if (target.LSIsValidTarget() && InAutoAttackRange(target) && target.IsVisible && target.IsHPBarRendered)
                         {
                             return target;
                         }
