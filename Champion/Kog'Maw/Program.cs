@@ -19,8 +19,6 @@ namespace KogMaw
         private static EloBuddy.SDK.Spell.Skillshot Q, E, R;
         private static EloBuddy.SDK.Spell.Active W;
 
-        private static int LastAATick;
-
         private static Menu Menu;
 
         private static readonly bool IsZombie = myHero.HasBuff("kogmawicathiansurprise");
@@ -82,15 +80,6 @@ namespace KogMaw
             Drawing.OnDraw += OnDraw;
             Game.OnTick += OnTick;
             LSEvents.BeforeAttack += OnPreAttack;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-        }
-
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsMe)
-            {
-                LastAATick = Environment.TickCount;
-            }
         }
 
         public static float getSpellMana(SpellSlot spell)
