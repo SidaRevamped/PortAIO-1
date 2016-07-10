@@ -6,13 +6,17 @@ using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using LeagueSharp.Common;
 
 namespace KogMaw
 {
     public static class Program
     {
-        private static Spell.Skillshot Q, E, R;
-        private static Spell.Active W;
+
+        private static LSOrbwalker Orbwalker = PortAIO.Init.LSOrbwalker;
+
+        private static EloBuddy.SDK.Spell.Skillshot Q, E, R;
+        private static EloBuddy.SDK.Spell.Active W;
 
         private static int LastAATick;
 
@@ -75,22 +79,15 @@ namespace KogMaw
             Menu.Add("swchz", new Slider("SlowWalk Chase Zone", 650, 0, 710));
             Menu.AddSeparator();
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
-            W = new Spell.Active(SpellSlot.W, (uint)myHero.GetAutoAttackRange());
-            E = new Spell.Skillshot(SpellSlot.E, 650, SkillShotType.Linear, 500, 1400, 120);
-            R = new Spell.Skillshot(SpellSlot.R, 1800, SkillShotType.Circular, 1200, int.MaxValue, 120);
+            Q = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
+            W = new EloBuddy.SDK.Spell.Active(SpellSlot.W, (uint)myHero.GetAutoAttackRange());
+            E = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.E, 650, SkillShotType.Linear, 500, 1400, 120);
+            R = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.R, 1800, SkillShotType.Circular, 1200, int.MaxValue, 120);
 
             Drawing.OnDraw += OnDraw;
             Game.OnTick += OnTick;
-            Orbwalker.OnPreAttack += OnPreAttack;
+            LSEvents.BeforeAttack += OnPreAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-        }
-
-        public static bool CanMove(float extraWindup)
-        {
-            if (LastAATick <= Environment.TickCount)
-                return Environment.TickCount + Game.Ping / 2 >= LastAATick + myHero.AttackCastDelay * 1000 + extraWindup;
-            return false;
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -146,8 +143,8 @@ namespace KogMaw
         {
             if (myHero.IsDead) return;
 
-            W = new Spell.Active(SpellSlot.W, (uint)(565 + 60 + W.Level * 30 + 65));
-            R = new Spell.Skillshot(SpellSlot.R, (uint)(900 + R.Level * 300), SkillShotType.Circular, 1500, int.MaxValue,
+            W = new EloBuddy.SDK.Spell.Active(SpellSlot.W, (uint)(565 + 60 + W.Level * 30 + 65));
+            R = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.R, (uint)(900 + R.Level * 300), SkillShotType.Circular, 1500, int.MaxValue,
                 225);
 
             if (human && wActive)
@@ -157,25 +154,25 @@ namespace KogMaw
                     if (EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swez)) ||
                         !EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swchz)))
                     {
-                        Orbwalker.DisableMovement = false;
-                        Orbwalker.DisableAttacking = !(Environment.TickCount + Game.Ping / 2 + 25 >= LastAATick + 1.0 / Convert.ToSingle(swatk) * 1000 * 100);
+                        Orbwalker.SetAttack(Environment.TickCount + Game.Ping / 2 + 25 >= LastAATick + 1.0 / Convert.ToSingle(swatk) * 1000 * 100);
+                        Orbwalker.SetMovement(true);
                     }
                     else
                     {
-                        Orbwalker.DisableAttacking = false;
-                        Orbwalker.DisableMovement = true;
+                        Orbwalker.SetAttack(true);
+                        Orbwalker.SetMovement(false);
                     }
                 }
                 else
                 {
-                    Orbwalker.DisableAttacking = false;
-                    Orbwalker.DisableMovement = false;
+                    Orbwalker.SetAttack(true);
+                    Orbwalker.SetMovement(true);
                 }
             }
 
-            if (CanMove(100))
+            if (Orbwalker.CanMove(100))
             {
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Combo)
                 {
                     if (useQ)
                     {
@@ -247,7 +244,7 @@ namespace KogMaw
                                 }
                                 else
                                 {
-                                    var killableTarget = EntityManager.Heroes.Enemies.FirstOrDefault(x => x.IsKillableAndValidTarget(myHero.GetSpellDamage(x, SpellSlot.R), DamageType.Magical, R.Range) && R.GetPrediction(x).HitChance >= HitChance.High);
+                                    var killableTarget = EntityManager.Heroes.Enemies.FirstOrDefault(x => x.IsKillableAndValidTarget(myHero.GetSpellDamage(x, SpellSlot.R), DamageType.Magical, R.Range) && R.GetPrediction(x).HitChance >= EloBuddy.SDK.Enumerations.HitChance.High);
                                     if (killableTarget != null)
                                     {
                                         R.Cast(killableTarget);
@@ -257,7 +254,7 @@ namespace KogMaw
                         }
                     }
                 }
-                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                else if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Mixed)
                 {
                     if (useQH)
                     {
@@ -298,8 +295,7 @@ namespace KogMaw
                         }
                     }
                 }
-                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                         Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                else if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.LaneClear)
                 {
                     foreach (
                         var minion in
@@ -477,42 +473,41 @@ namespace KogMaw
             if (dontw)
             {
                 var target = TargetSelector.GetTarget(myHero.GetAutoAttackRange(), DamageType.Physical);
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target != null)
+                if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Combo && target != null)
                 {
-                    Orbwalker.DisableMovement = true;
+                    Orbwalker.SetAttack(false);
                 }
                 else
                 {
-                    Orbwalker.DisableMovement = false;
+                    Orbwalker.SetAttack(true);
                 }
             }
             else
             {
-                Orbwalker.DisableMovement = false;
+                Orbwalker.SetAttack(true);
             }
 
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && dontw)
+            if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Combo && dontw)
             {
                 Drawing.DrawText(Drawing.Width * 0.5f, Drawing.Height * 0.3f, Color.Orange, "Not moving when W is active is on.", 50);
             }
         }
 
-        private static void OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
+        private static void OnPreAttack(BeforeAttackArgs args)
         {
             if (!args.Target.IsMe) return;
 
             if (IsZombie)
                 args.Process = false;
 
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.Combo)
             {
                 if (WIsReadyPerfectly())
                     if (useW)
                         if (args.Target.IsValidTarget(W.Range))
                             W.Cast();
             }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            if (Orbwalker.ActiveMode == LSOrbwalker.OrbwalkingMode.LaneClear)
             {
                 foreach (
                     var jungleMobs in
