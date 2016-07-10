@@ -73,12 +73,6 @@ namespace KogMaw
             Menu.Add("rLimitJG", new Slider("R stack limit", 2, 1, 6));
             Menu.Add("manaJG", new Slider("Do Jungle if mana is greater than :", 60, 1));
             Menu.AddSeparator();
-            Menu.Add("human", new KeyBind("Use Humanizer", false, KeyBind.BindTypes.PressToggle, 'T'));
-            Menu.Add("esw", new Slider("Enable SWalk/NWalk at :", 225, 0, 500));
-            Menu.Add("swatk", new Slider("SlowWalk ATKSPD cap :", 225, 0, 500));
-            Menu.Add("swez", new Slider("SlowWalk Escape Zone :", 250, 0, 710));
-            Menu.Add("swchz", new Slider("SlowWalk Chase Zone", 650, 0, 710));
-            Menu.AddSeparator();
 
             Q = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
             W = new EloBuddy.SDK.Spell.Active(SpellSlot.W, (uint)myHero.GetAutoAttackRange());
