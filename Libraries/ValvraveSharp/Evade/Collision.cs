@@ -63,7 +63,7 @@
             var tDelay = delay / 1000f + (Math.Abs(speed - int.MaxValue) > 0 ? unit.Distance(@from) / speed : 0);
             var d = tDelay * unit.MoveSpeed;
             var path = unit.GetWaypoints();
-            if (path.LSPathLength() > d)
+            if (path.PathLength() > d)
             {
                 return new FastPredResult
                            {

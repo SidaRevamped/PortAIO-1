@@ -69,7 +69,7 @@ namespace Valvrave_Sharp.Core
             {
                 return CastStates.Collision;
             }
-            if (spell.RangeCheckFrom.LSDistanceSquared(pred.CastPosition) > spell.RangeSqr)
+            if (spell.RangeCheckFrom.DistanceSquared(pred.CastPosition) > spell.RangeSqr)
             {
                 return CastStates.OutOfRange;
             }

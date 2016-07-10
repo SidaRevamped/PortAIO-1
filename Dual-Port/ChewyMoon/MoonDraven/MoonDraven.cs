@@ -236,8 +236,10 @@ namespace MoonDraven
                             else
                             {
                                 Orbwalker.DisableMovement = false;
+                                Orbwalker.DisableAttacking = true;
                                 Orbwalker.OrbwalkTo(bestReticle.Position);
                                 Orbwalker.DisableMovement = true;
+                                Orbwalker.DisableAttacking = false;
                             }
                         }
                         else if (!bestReticle.Position.UnderTurret(true))
@@ -249,8 +251,10 @@ namespace MoonDraven
                             else
                             {
                                 Orbwalker.DisableMovement = false;
+                                Orbwalker.DisableAttacking = true;
                                 Orbwalker.OrbwalkTo(bestReticle.Position);
                                 Orbwalker.DisableMovement = true;
+                                Orbwalker.DisableAttacking = false;
                             }
                         }
                     }
@@ -263,8 +267,10 @@ namespace MoonDraven
                         else
                         {
                             Orbwalker.DisableMovement = false;
+                            Orbwalker.DisableAttacking = true;
                             Orbwalker.OrbwalkTo(bestReticle.Position);
                             Orbwalker.DisableMovement = true;
+                            Orbwalker.DisableAttacking = false;
                         }
                     }
                 }

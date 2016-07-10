@@ -87,7 +87,7 @@ namespace Challenger_Series.Utils
             var objects = predefinedObjectList != null ? predefinedObjectList.ToList() : ObjectManager.Get<Obj_AI_Base>().Where(o => o.LSIsValidTarget(ObjectManager.Player.AttackRange)).ToList();
             var apexPoint = ObjectManager.Player.ServerPosition.ToVector2() + (ObjectManager.Player.ServerPosition.ToVector2() - Game.CursorPos.ToVector2()).LSNormalized() * ObjectManager.Player.AttackRange;
 
-            return objects.Where(o => IsLyingInCone(o.ServerPosition.ToVector2(), apexPoint, ObjectManager.Player.ServerPosition.ToVector2(), Math.PI)).OrderBy(o => o.LSDistanceSquared(apexPoint)).ToList();
+            return objects.Where(o => IsLyingInCone(o.ServerPosition.ToVector2(), apexPoint, ObjectManager.Player.ServerPosition.ToVector2(), Math.PI)).OrderBy(o => o.DistanceSquared(apexPoint)).ToList();
         }
     }
 }
