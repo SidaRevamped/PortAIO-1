@@ -395,6 +395,7 @@ namespace SephKayle
             }
 
             HealUltManager();
+            UltManager();
 
             if (getCheckBoxItem(miscMenu, "killsteal"))
             {
@@ -423,6 +424,19 @@ namespace SephKayle
             }
         }
 
+        private static void UltManager()
+        {
+            foreach (var hero in ObjectManager.Get<AIHeroClient>().Where(h => h.IsAlly && R.IsInRange(h) && !h.IsDead && h.IsVisible && h.IsHPBarRendered))
+            {
+                if (getCheckBoxItem(ultMenu, "ult" + hero.NetworkId))
+                {
+                    if (HealthPrediction.GetHealthPrediction(hero, (int)(1000 + Game.Ping / 2f)) <= hero.MaxHealth / 8)
+                    {
+                        R.Cast(hero);
+                    }
+                }
+            }
+        }
 
         private static void LHlogic()
         {

@@ -281,10 +281,10 @@
             {
                 var mode = bkMenu["RMode"].Cast<ComboBox>().CurrentValue;
                 var multiW = WardManager.CanWardJump && mode != 0
-                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"),getSliderItem(bkMenu, "RCountA"), 2)
+                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"), getSliderItem(bkMenu, "RCountA"), 2)
                                  : new Tuple<AIHeroClient, int, Vector3>(null, 0, new Vector3());
                 var multiF = Common.CanFlash && !posBubbaKush.IsValid() && mode != 1
-                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"),getSliderItem(bkMenu, "RCountA"), 1)
+                                 ? GetMultiHit(getCheckBoxItem(bkMenu, "RKill"), getSliderItem(bkMenu, "RCountA"), 1)
                                  : new Tuple<AIHeroClient, int, Vector3>(null, 0, new Vector3());
                 if (multiW.Item1 != null && multiW.Item2 != 0)
                 {
@@ -325,7 +325,8 @@
 
         private static void CastE(List<Obj_AI_Minion> minions = null)
         {
-            if (!E.IsReady() || isDashing || Variables.TickCount - lastW <= 250 || Variables.TickCount - lastW2 <= 150)
+            if (!E.IsReady() || isDashing || IsDashing || Variables.TickCount - lastW <= 250
+                || Variables.TickCount - lastW2 <= 150)
             {
                 return;
             }
@@ -427,7 +428,8 @@
 
         private static void CastW(List<Obj_AI_Minion> minions = null)
         {
-            if (!W.IsReady() || Variables.TickCount - lastW <= 300 || isDashing || Variables.TickCount - lastE2 <= 250)
+            if (!W.IsReady() || Variables.TickCount - lastW <= 300 || isDashing || IsDashing
+                             || Variables.TickCount - lastE2 <= 250)
             {
                 return;
             }
@@ -506,6 +508,14 @@
                 if (IsQOne)
                 {
                     var target = Q.GetTarget(Q.Width / 2);
+                    if (!R.IsReady() && Variables.TickCount - lastR < 5000)
+                    {
+                        var targetR = EntityManager.Heroes.Enemies.Where(x => Q.IsInRange(x) && x.LSIsValidTarget() && x.HasBuff("BlindMonkDragonsRage")).FirstOrDefault();
+                        if (targetR != null)
+                        {
+                            target = targetR;
+                        }
+                    }
                     if (target != null)
                     {
                         Q.CastSpellSmite(target, getCheckBoxItem(comboMenu, "QCol"));
@@ -1128,7 +1138,7 @@
             private static bool IsRecent
                 => IsRecentWardJump || (getCheckBoxItem(insecMenu, "Flash") && Variables.TickCount - lastFlashRTime < 5000);
 
-               
+
             private static bool IsRecentWardJump
                 =>
                     Variables.TickCount - WardManager.LastInsecWardTime < 5000

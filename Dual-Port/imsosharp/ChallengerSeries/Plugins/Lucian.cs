@@ -25,7 +25,7 @@ namespace Challenger_Series.Plugins
         public Lucian()
         {
             Q = new LeagueSharp.SDK.Spell(SpellSlot.Q, 675);
-            Q2 = new LeagueSharp.SDK.Spell(SpellSlot.Q, 900f);
+            Q2 = new LeagueSharp.SDK.Spell(SpellSlot.Q, 1100);
             W = new LeagueSharp.SDK.Spell(SpellSlot.W, 1100);
             E = new LeagueSharp.SDK.Spell(SpellSlot.E, 475f);
             R = new LeagueSharp.SDK.Spell(SpellSlot.R, 1400);

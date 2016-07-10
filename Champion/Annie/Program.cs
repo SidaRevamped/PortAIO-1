@@ -80,7 +80,7 @@ namespace PortAIO.Champion.Annie
             RMenu.AddLabel("1 : Always");
             RMenu.AddLabel("2 : Never");
             RMenu.AddLabel("3 : Always Stun");
-            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
             {
                 RMenu.Add("UM" + enemy.NetworkId, new Slider(enemy.ChampionName, 0, 0, 3));
             }
@@ -129,10 +129,7 @@ namespace PortAIO.Champion.Annie
                 if (flash.IsReady())
                     realRange = FR.Range;
 
-                foreach (
-                    var enemy in
-                        SebbyLib.Program.Enemies.Where(
-                            enemy => enemy.LSIsValidTarget(realRange) && OktwCommon.ValidUlt(enemy)))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(realRange) && OktwCommon.ValidUlt(enemy)))
                 {
                     if (enemy.LSIsValidTarget(R.Range) && enemy.IsVisible && enemy.IsHPBarRendered)
                     {
@@ -254,11 +251,7 @@ namespace PortAIO.Champion.Annie
                 {
                     if (getCheckBoxItem(RMenu, "tibers") && HaveTibers && Tibbers != null && Tibbers.IsValid)
                     {
-                        var enemy =
-                            SebbyLib.Program.Enemies.Where(
-                                x => x.LSIsValidTarget() && Tibbers.LSDistance(x.Position) < 1000 && !x.UnderTurret(true))
-                                .OrderBy(x => x.LSDistance(Tibbers))
-                                .FirstOrDefault();
+                        var enemy = HeroManager.Enemies.Where(x => x.LSIsValidTarget() && Tibbers.LSDistance(x.Position) < 1000 && !x.UnderTurret(true)).OrderBy(x => x.LSDistance(Tibbers)).FirstOrDefault();
                         if (enemy != null)
                         {
                             EloBuddy.Player.IssueOrder(Tibbers.LSDistance(enemy.Position) > 200 ? GameObjectOrder.MovePet : GameObjectOrder.AutoAttackPet, enemy);

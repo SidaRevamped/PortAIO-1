@@ -138,5 +138,23 @@ namespace ExorAIO.Champions.Ezreal
                 Vars.E.Cast(GameObjects.Player.ServerPosition.LSExtend(args.Sender.ServerPosition, -Vars.E.Range));
             }
         }
+
+
+        /// <summary>
+        ///     Called while processing Spelaneclearlearast operations.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The args.</param>
+        public static void OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            /// <summary>
+            ///     The Automatic E Logic.
+            /// </summary>
+            if (Vars.E.IsReady() &&
+                Vars.getCheckBoxItem(Vars.EMenu, "logical"))
+            {
+                Logics.AutoE(sender, args);
+            }
+        }
     }
 }

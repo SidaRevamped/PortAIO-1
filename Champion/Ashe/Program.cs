@@ -70,7 +70,7 @@ namespace PortAIO.Champion.Ashe
             RMenu.Add("Rkscombo", new CheckBox("R KS combo R + W + AA"));
             RMenu.Add("autoRaoe", new CheckBox("Auto R aoe"));
             RMenu.Add("autoRinter", new CheckBox("Auto R OnPossibleToInterrupt"));
-            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -272,13 +272,7 @@ namespace PortAIO.Champion.Ashe
 
             if (Player.HealthPercent < 50)
             {
-                foreach (
-                    var enemy in
-                        SebbyLib.Program.Enemies.Where(
-                            enemy =>
-                                enemy.LSIsValidTarget(300) && enemy.IsMelee &&
-                                getCheckBoxItem(RMenu, "GapCloser" + enemy.NetworkId) && !OktwCommon.ValidUlt(enemy) && enemy.IsHPBarRendered && enemy.IsVisible)
-                    )
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(300) && enemy.IsMelee && getCheckBoxItem(RMenu, "GapCloser" + enemy.NetworkId) && !OktwCommon.ValidUlt(enemy)))
                 {
                     R.Cast(enemy);
                     SebbyLib.Program.debug("R Meele");

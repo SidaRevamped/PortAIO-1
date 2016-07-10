@@ -14,7 +14,8 @@ namespace Firestorm_AIO.Helpers
         public static void SmartCast(this LeagueSharp.SDK.Spell spell, Obj_AI_Base target = null, HitChance hitchance = HitChance.Medium,
             int minimunHits = 0)
         {
-            if (target == null || !spell.CanCast(target)) return;
+            if (target == null) return;
+            if (!spell.CanCast(target)) return;
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {

@@ -9,12 +9,15 @@ using EloBuddy;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK;
+using Firestorm_AIO.DataBases;
 
 namespace Firestorm_AIO.Bases
 {
     public abstract class ChampionBase
     {
         public static AIHeroClient Target;
+
+        public static Firestorm_AIO.Enums.Champion MyChampion = Me.GetChampion();
 
         public static bool HasMana = true;
 

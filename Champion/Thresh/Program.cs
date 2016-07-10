@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Q = new LeagueSharp.Common.Spell(SpellSlot.Q, 1075);
             W = new LeagueSharp.Common.Spell(SpellSlot.W, 950);
-            E = new LeagueSharp.Common.Spell(SpellSlot.E, 460);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 480);
             R = new LeagueSharp.Common.Spell(SpellSlot.R, 420);
             Epush = new LeagueSharp.Common.Spell(SpellSlot.E, 450);
 

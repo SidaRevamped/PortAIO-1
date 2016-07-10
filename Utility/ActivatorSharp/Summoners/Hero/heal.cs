@@ -38,8 +38,7 @@ namespace Activators.Summoners
                             UseSpell(Menu["mode" + Name].Cast<ComboBox>().CurrentValue == 1);
                     }
 
-                    if (hero.IncomeDamage / hero.Player.MaxHealth * 100 >=
-                        Menu["selfmuchhp" + Name + "pct"].Cast<Slider>().CurrentValue)
+                    if (hero.IncomeDamage / hero.Player.MaxHealth * 100 >= Menu["selfmuchhp" + Name + "pct"].Cast<Slider>().CurrentValue)
                     {
                         if (hero.Player.MaxHealth - hero.Player.Health > 75 + 15 * Math.Min(Activator.Player.Level, 18))
                         {

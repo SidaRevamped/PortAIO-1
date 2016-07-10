@@ -27,10 +27,10 @@ namespace Firestorm_AIO
                 case "Illaoi":
                     new Illaoi().Load();
                     break;
-                //TODO
                 case "Anivia":
                     new Anivia().Load();
                     break;
+                //TODO
                 case "Gnar":
                     
                     break;

@@ -101,7 +101,7 @@ namespace PortAIO.Champion.Anivia
             QMenu.Add("autoQ", new CheckBox("Auto Q"));
             QMenu.Add("AGCQ", new CheckBox("Q gapcloser"));
             QMenu.Add("harrasQ", new CheckBox("Harass Q"));
-            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in  HeroManager.Enemies)
             {
                 QMenu.Add("haras" + enemy.NetworkId, new CheckBox("Harass :" + enemy.ChampionName));
             }
@@ -216,7 +216,7 @@ namespace PortAIO.Champion.Anivia
                 }
                 if (!Program.None && Player.Mana > RMANA + EMANA)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.LSIsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
                 }
             }

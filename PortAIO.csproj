@@ -257,12 +257,17 @@
     <Compile Include="Champion\Zilean\IncomingDamageManager.cs" />
     <Compile Include="Champion\Zilean\Zilean.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Bases\ChampionBase.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Bases\SpellBase.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Anivia\Anivia.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Anivia\ObjManager.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Illaoi\Illaoi.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Rumble\Rumble.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Yasuo\DashManager.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Champions\Yasuo\Yasuo.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\DataBases\Champions.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\DataBases\Items.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\DataBases\Spells.cs" />
+    <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Enums\Champions.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\AntiGapcloser.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\Extensions.cs" />
     <Compile Include="Dual-Port\Akkazz\Firestorm AIO\Helpers\Helpers.cs" />

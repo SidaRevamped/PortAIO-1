@@ -28,8 +28,6 @@ namespace Firestorm_AIO.Champions.Anivia
             Q.SetSkillshot(0.25f, 200f, 850f, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.25f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
-            Q.IsAntiGapCloser();
-
             ObjManager.Load();
         }
 

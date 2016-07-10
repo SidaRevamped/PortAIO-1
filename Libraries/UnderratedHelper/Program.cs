@@ -41,7 +41,7 @@ namespace UnderratedAIO
                         Champions.Galio.OnLoad();
                         break;
                     case "gangplank":
-                        Champions.Gangplank.OnLoad();
+                        new Champions.Gangplank();
                         break;
                     case "garen":
                         Champions.Garen.OnLoad();
