@@ -7,6 +7,7 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using LeagueSharp.Common;
+using TargetSelector = LeagueSharp.Common.LSTargetSelector;
 
 namespace KogMaw
 {
@@ -146,29 +147,6 @@ namespace KogMaw
             W = new EloBuddy.SDK.Spell.Active(SpellSlot.W, (uint)(565 + 60 + W.Level * 30 + 65));
             R = new EloBuddy.SDK.Spell.Skillshot(SpellSlot.R, (uint)(900 + R.Level * 300), SkillShotType.Circular, 1500, int.MaxValue,
                 225);
-
-            if (human && wActive)
-            {
-                if (1 / myHero.AttackDelay > Convert.ToSingle(esw) / 100)
-                {
-                    if (EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swez)) ||
-                        !EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swchz)))
-                    {
-                        Orbwalker.SetAttack(Environment.TickCount + Game.Ping / 2 + 25 >= LastAATick + 1.0 / Convert.ToSingle(swatk) * 1000 * 100);
-                        Orbwalker.SetMovement(true);
-                    }
-                    else
-                    {
-                        Orbwalker.SetAttack(true);
-                        Orbwalker.SetMovement(false);
-                    }
-                }
-                else
-                {
-                    Orbwalker.SetAttack(true);
-                    Orbwalker.SetMovement(true);
-                }
-            }
 
             if (Orbwalker.CanMove(100))
             {
@@ -630,31 +608,6 @@ namespace KogMaw
         public static bool useRLC
         {
             get { return Menu["useRLC"].Cast<CheckBox>().CurrentValue; }
-        }
-
-        public static bool human
-        {
-            get { return Menu["human"].Cast<KeyBind>().CurrentValue; }
-        }
-
-        public static int esw
-        {
-            get { return Menu["esw"].Cast<Slider>().CurrentValue; }
-        }
-
-        public static int swatk
-        {
-            get { return Menu["swatk"].Cast<Slider>().CurrentValue; }
-        }
-
-        public static int swez
-        {
-            get { return Menu["swez"].Cast<Slider>().CurrentValue; }
-        }
-
-        public static int swchz
-        {
-            get { return Menu["swchz"].Cast<Slider>().CurrentValue; }
         }
 
         public static bool dontw

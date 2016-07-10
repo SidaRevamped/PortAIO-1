@@ -19,6 +19,7 @@ using Color = System.Drawing.Color;
 using SpellDatabase = LeagueSharp.SDK.SpellDatabase;
 using LeagueSharp.Data.Enumerations;
 using Geometry = Challenger_Series.Utils.Geometry;
+using TargetSelector = LeagueSharp.Common.LSTargetSelector;
 
 namespace Challenger_Series.Plugins
 {
@@ -428,7 +429,7 @@ namespace Challenger_Series.Plugins
                     args.Process = false;
                 }
             }
-            var possibleTarget = LSTargetSelector.GetTarget(615, EloBuddy.DamageType.Physical);
+            var possibleTarget = TargetSelector.GetTarget(615, EloBuddy.DamageType.Physical);
             if (possibleTarget != null && args.Target is EloBuddy.Obj_AI_Minion &&
                 UseQBonusOnEnemiesNotCS && EloBuddy.ObjectManager.Player.HasBuff("vaynetumblebonus"))
             {
