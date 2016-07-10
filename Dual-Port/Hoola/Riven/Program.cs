@@ -92,8 +92,8 @@ namespace HoolaRiven
             {
                 if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear)
                 {
-                    var Minions = MinionManager.GetMinions(70 + 120 + Player.BoundingRadius);
-                    Minions.AddRange(Minions);
+                    var Minions = MinionManager.GetMinions(120 + 70 + Player.BoundingRadius, MinionTypes.All,
+                        MinionTeam.Enemy, MinionOrderTypes.Health); 
                     if (HasTitan())
                     {
                         CastTitan();
@@ -109,6 +109,7 @@ namespace HoolaRiven
                     {
                         ForceItem();
                         Utility.DelayAction.Add(1, ForceW);
+                        WReset();
                     }
                     if ((!Q.IsReady() || (Q.IsReady() && !LaneQ)) && (!W.IsReady() || (W.IsReady() && LaneW == 0) || Minions.Count < LaneW) &&
                         E.IsReady() && LaneE)
@@ -148,6 +149,7 @@ namespace HoolaRiven
                         {
                             ForceItem();
                             Utility.DelayAction.Add(1, ForceW);
+                            WReset();
                         }
                         else if (E.IsReady())
                         {
@@ -178,6 +180,7 @@ namespace HoolaRiven
                     {
                         ForceItem();
                         Utility.DelayAction.Add(1, ForceW);
+                        WReset();
                     }
                     else if (E.IsReady() && !Orbwalking.InAutoAttackRange(target)) E.Cast(target.Position);
                 }
@@ -348,6 +351,7 @@ namespace HoolaRiven
                 if (Player.LSCountEnemiesInRange(GetWRange) >= AutoW)
                 {
                     ForceW();
+                    WReset();
                 }
             }
         }
@@ -469,6 +473,7 @@ namespace HoolaRiven
                 {
                     ForceR();
                     Utility.DelayAction.Add(1, ForceW);
+                    WReset();
                 }
                 if (W.IsReady() && InWRange(targetR) && ComboW && targetR != null) W.Cast();
                 if (UseHoola && R.IsReady() && R.Instance.Name == IsFirstR && W.IsReady() && targetR != null && E.IsReady() && targetR.LSIsValidTarget() && !targetR.IsZombie && (IsKillableR(targetR) || AlwaysR))
@@ -478,6 +483,7 @@ namespace HoolaRiven
                         E.Cast(targetR.Position);
                         ForceR();
                         Utility.DelayAction.Add(200, ForceW);
+                        WReset();
                         Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
                     }
                 }
@@ -488,6 +494,7 @@ namespace HoolaRiven
                         E.Cast(targetR.Position);
                         ForceR();
                         Utility.DelayAction.Add(200, ForceW);
+                        WReset();
                     }
                 }
                 else if (UseHoola && W.IsReady() && E.IsReady())
@@ -497,6 +504,7 @@ namespace HoolaRiven
                         E.Cast(targetR.Position);
                         Utility.DelayAction.Add(10, ForceItem);
                         Utility.DelayAction.Add(200, ForceW);
+                        WReset();
                         Utility.DelayAction.Add(305, () => ForceCastQ(targetR));
                     }
                 }
@@ -507,6 +515,7 @@ namespace HoolaRiven
                         E.Cast(targetR.Position);
                         Utility.DelayAction.Add(10, ForceItem);
                         Utility.DelayAction.Add(240, ForceW);
+                        WReset();
                     }
                 }
                 else if (E.IsReady())
@@ -665,7 +674,11 @@ namespace HoolaRiven
             Orbwalking.LastAATick = 0;
             EloBuddy.Player.IssueOrder(EloBuddy.GameObjectOrder.MoveTo, Player.Position.LSExtend(EloBuddy.Game.CursorPos, Player.LSDistance(EloBuddy.Game.CursorPos) + 10));
         }
-
+        private static void WReset()
+        {
+            Orbwalking.LastAATick = 0;
+            EloBuddy.Player.IssueOrder(EloBuddy.GameObjectOrder.AttackTo, Player.Position.LSExtend(EloBuddy.Game.CursorPos, Player.LSDistance(EloBuddy.Game.CursorPos) + 10));
+        }
         private static bool InWRange(EloBuddy.GameObject target) =>(Player.HasBuff("RivenFengShuiEngine") && target != null) ?
                       330 >= Player.LSDistance(target.Position) : 265 >= Player.LSDistance(target.Position);
         private static void ForceSkill()
