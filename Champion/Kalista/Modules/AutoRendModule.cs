@@ -35,7 +35,7 @@ namespace iKalistaReborn.Modules
         {
             foreach (var source in EntityManager.Heroes.Enemies.Where(x => x.LSIsValidTarget() && x.HasRendBuff() && SpellManager.Spell[SpellSlot.E].IsInRange(x)))
             {
-                if (source.IsRendKillable() || source.GetRendBuffCount() >= getSliderItem(comboMenu, "com.ikalista.combo.stacks"))
+                if (source.IsRendKillable()|| source.GetRendBuffCount() >= getSliderItem(comboMenu, "com.ikalista.combo.stacks"))
                 {
                     SpellManager.Spell[SpellSlot.E].Cast();
                 }

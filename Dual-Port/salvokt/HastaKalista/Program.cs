@@ -31,7 +31,7 @@ namespace HastaKalistaBaby
         public static Font Text;
         public static float grabT = Game.Time, lastecast = 0f;
         public static AIHeroClient soulmate = null;
-        
+
 
         public static void OnGameLoad()
         {

@@ -95,7 +95,7 @@ namespace ExorAIO.Champions.Kalista
                     Targets.Minions.Any(
 						m =>
 							Bools.IsPerfectRendTarget(m) &&
-							Vars.GetRealHealth(m) < EDamage(m)))
+							Vars.GetRealHealth(m) <= EDamage(m)))
                 {
                     /// <summary>
                     ///     Check for Mana Manager if not in combo mode and the killable minion is only one, else do not use it.
