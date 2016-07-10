@@ -125,7 +125,7 @@ namespace SephKhazix
 
         internal static HitChance HarassHitChance(KhazixMenu menu)
         {
-            int hitchance = SephKhazix.Khazix.getSliderItem(SephKhazix.KhazixMenu.harass, "Harass.WHitchance");
+            int hitchance = SephKhazix.Khazix.getBoxItem(SephKhazix.KhazixMenu.harass, "Harass.WHitchance");
             switch (hitchance)
             {
                 case 0:
