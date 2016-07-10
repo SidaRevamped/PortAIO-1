@@ -30,6 +30,7 @@ Utility Ports [Only doing after Champions are completed] :
 - AioCaster
 - AutoSharp - Once working again
 - AutoJungle - Once working again
+- SFX Utility [might be hard]
 
 AIOS in an AIO : 
 - Challenger Series
