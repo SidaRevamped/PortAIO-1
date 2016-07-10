@@ -92,6 +92,10 @@ namespace UnderratedAIO.Champions
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
+                if (ShacoStealth && getCheckBoxItem(menuC, "WaitForStealth"))
+                {
+                    return;
+                }
                 Combo(target);
             }
 
@@ -108,9 +112,7 @@ namespace UnderratedAIO.Champions
 
             if (E.IsReady())
             {
-                var ksTarget =
-                    HeroManager.Enemies.FirstOrDefault(
-                        h => h.LSIsValidTarget() && !CombatHelper.IsInvulnerable2(h) && h.Health < E.GetDamage(h));
+                var ksTarget = HeroManager.Enemies.FirstOrDefault(h => h.LSIsValidTarget() && !CombatHelper.IsInvulnerable2(h) && h.Health < E.GetDamage(h));
                 if (ksTarget != null)
                 {
                     if ((getCheckBoxItem(menuM, "ks") || getCheckBoxItem(menuM, "ksq")) &&
@@ -124,6 +126,7 @@ namespace UnderratedAIO.Champions
                         player.Mana > Q.Instance.SData.Mana + E.Instance.SData.Mana)
                     {
                         Q.Cast(player.Position.LSExtend(ksTarget.Position, Q.Range));
+                        return;
                     }
                 }
             }
@@ -182,21 +185,19 @@ namespace UnderratedAIO.Champions
             {
                 return;
             }
-            if (getCheckBoxItem(menuC, "useq") && Q.IsReady() &&
-                Game.CursorPos.LSDistance(target.Position) < 250 && target.LSDistance(player) < dist &&
-                (target.LSDistance(player) >= getSliderItem(menuC, "useqMin") ||
-                 (cmbDmg > target.Health && player.CountEnemiesInRange(2000) == 1)))
+            if (getCheckBoxItem(menuC, "useq") && Q.IsReady() && Game.CursorPos.LSDistance(target.Position) < 250 && target.LSDistance(player) < dist && (target.LSDistance(player) >= getSliderItem(menuC, "useqMin") || (cmbDmg > target.Health && player.CountEnemiesInRange(2000) == 1)))
             {
                 if (target.LSDistance(player) < Q.Range)
                 {
                     Q.Cast(Prediction.GetPrediction(target, 0.5f).UnitPosition, getCheckBoxItem(config, "packets"));
+                    return;
                 }
                 else
                 {
                     if (!CheckWalls(target) || Helpers.Environment.Map.GetPath(player, target.Position) < dist)
                     {
-                        Q.Cast(
-                            player.Position.LSExtend(target.Position, Q.Range), getCheckBoxItem(config, "packets"));
+                        Q.Cast(player.Position.LSExtend(target.Position, Q.Range), getCheckBoxItem(config, "packets"));
+                        return;
                     }
                 }
             }

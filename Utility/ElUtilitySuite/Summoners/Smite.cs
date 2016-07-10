@@ -52,8 +52,7 @@
         /// </value>
         public bool ComboModeActive
             =>
-                Entry.Menu["usecombo"].Cast<KeyBind>().CurrentValue
-                || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo);
+                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo);
 
         /// <summary>
         ///     Gets or sets the slot.

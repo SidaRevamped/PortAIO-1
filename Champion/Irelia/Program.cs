@@ -120,20 +120,21 @@ namespace Challenger_Series
                     if (UseRComboKeybind)
                     {
                         pressedR = true;
-                        R.Cast(target);
+                        R.Cast(R.GetPrediction(target).UnitPosition);
                     }
                     if (target != null)
                     {
                         if (ObjectManager.Player.HasBuff("ireliatranscendentbladesspell"))
                         {
-                            R.Cast(target);
+                            R.Cast(R.GetPrediction(target).UnitPosition);
                         }
                     }
                     if (ObjectManager.Player.HealthPercent < 15 || target.Health < R.GetDamage(target))
                     {
-                        R.Cast(target);
+                        R.Cast(R.GetPrediction(target).UnitPosition);
                     }
                 }
+
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
                     if (Q.IsReady())
@@ -273,39 +274,39 @@ namespace Challenger_Series
                 switch (farmMode)
                 {
                     case 0:
-                    {
-                        var unkillableMinion =
-                            ObjectManager.Get<Obj_AI_Minion>()
-                                .FirstOrDefault(
-                                    m =>
-                                        m.IsEnemy && m.Position.LSDistance(ObjectManager.Player.ServerPosition) < 650 &&
-                                        m.Position.LSDistance(ObjectManager.Player.Position) >
-                                        ObjectManager.Player.AttackRange && m.LSIsValidTarget() &&
-                                        m.Health < 25);
-                        if (unkillableMinion != null)
                         {
-                            Q.Cast(unkillableMinion);
+                            var unkillableMinion =
+                                ObjectManager.Get<Obj_AI_Minion>()
+                                    .FirstOrDefault(
+                                        m =>
+                                            m.IsEnemy && m.Position.LSDistance(ObjectManager.Player.ServerPosition) < 650 &&
+                                            m.Position.LSDistance(ObjectManager.Player.Position) >
+                                            ObjectManager.Player.AttackRange && m.LSIsValidTarget() &&
+                                            m.Health < 25);
+                            if (unkillableMinion != null)
+                            {
+                                Q.Cast(unkillableMinion);
+                            }
+                            break;
                         }
-                        break;
-                    }
                     case 1:
-                    {
-                        var killableMinion =
-                            ObjectManager.Get<Obj_AI_Minion>()
-                                .FirstOrDefault(
-                                    m =>
-                                        m.IsEnemy && m.Position.LSDistance(ObjectManager.Player.ServerPosition) < 650 &&
-                                        m.LSIsValidTarget() && m.Health < Q.GetDamage(m));
-                        if (killableMinion != null)
                         {
-                            Q.Cast(killableMinion);
+                            var killableMinion =
+                                ObjectManager.Get<Obj_AI_Minion>()
+                                    .FirstOrDefault(
+                                        m =>
+                                            m.IsEnemy && m.Position.LSDistance(ObjectManager.Player.ServerPosition) < 650 &&
+                                            m.LSIsValidTarget() && m.Health < Q.GetDamage(m));
+                            if (killableMinion != null)
+                            {
+                                Q.Cast(killableMinion);
+                            }
+                            break;
                         }
-                        break;
-                    }
                     case 2:
-                    {
-                        break;
-                    }
+                        {
+                            break;
+                        }
                 }
             }
         }
