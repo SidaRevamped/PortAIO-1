@@ -1,48 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using EloBuddy;
-using EloBuddy.SDK;
-using EloBuddy.SDK.Menu;
-using EloBuddy.SDK.Menu.Values;
+using LeagueSharp;
 using LeagueSharp.Common;
-using SebbyLib;
 using SharpDX;
-using Color = System.Drawing.Color;
-using HealthPrediction = SebbyLib.HealthPrediction;
-using Orbwalking = SebbyLib.Orbwalking;
-using Prediction = LeagueSharp.Common.Prediction;
-using Spell = LeagueSharp.Common.Spell;
-using Utility = LeagueSharp.Common.Utility;
+using SebbyLib;
+using EloBuddy;
+using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Menu;
+using EloBuddy.SDK;
 
 namespace OneKeyToWin_AIO_Sebby
 {
-    internal class Jinx
+
+    class Jinx
     {
-        private static readonly Menu Config = Program.Config;
-        public static Spell Q, W, E, R;
-        public static float QMANA, WMANA, EMANA, RMANA;
+        private Menu Config = Program.Config;
+        public LeagueSharp.Common.Spell Q, W, E, R;
+        public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
 
-        public static double lag = 0, WCastTime, QCastTime = 0, DragonTime, grabTime;
-        public static float DragonDmg;
+        public double lag = 0, WCastTime = 0, QCastTime = 0, DragonTime = 0, grabTime = 0;
+        public float DragonDmg = 0;
 
-        public static Menu drawMenu, wMenu, qMenu, eMenu, rMenu, farmMenu;
+        public AIHeroClient Player { get { return ObjectManager.Player; } }
 
-        public static AIHeroClient Player
+        public void LoadOKTW()
         {
-            get { return ObjectManager.Player; }
-        }
-
-        private static bool FishBoneActive
-        {
-            get { return Player.HasBuff("JinxQ"); }
-        }
-
-        public static void LoadOKTW()
-        {
-            Q = new Spell(SpellSlot.Q);
-            W = new Spell(SpellSlot.W, 1500f);
-            E = new Spell(SpellSlot.E, 920f);
-            R = new Spell(SpellSlot.R, 3000f);
+            Q = new LeagueSharp.Common.Spell(SpellSlot.Q);
+            W = new LeagueSharp.Common.Spell(SpellSlot.W, 1500f);
+            E = new LeagueSharp.Common.Spell(SpellSlot.E, 920f);
+            R = new LeagueSharp.Common.Spell(SpellSlot.R, 3000f);
 
             W.SetSkillshot(0.6f, 60f, 3300f, true, SkillshotType.SkillshotLine);
             E.SetSkillshot(1.2f, 100f, 1750f, false, SkillshotType.SkillshotCircle);
@@ -50,35 +37,61 @@ namespace OneKeyToWin_AIO_Sebby
 
             LoadMenuOKTW();
             Game.OnUpdate += Game_OnUpdate;
-            Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
+            Orbwalker.OnPreAttack += BeforeAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
         }
 
-        public static bool getCheckBoxItem(Menu m, string item)
+        public static Menu qMenu, wMenu, eMenu, rMenu, farmMenu, drawMenu;
+
+        private void LoadMenuOKTW()
         {
-            return m[item].Cast<CheckBox>().CurrentValue;
+            drawMenu = Config.AddSubMenu("Drawings");
+            drawMenu.Add("noti", new CheckBox("Show notification", false));
+            drawMenu.Add("semi", new CheckBox("Semi-manual R target", false));
+            drawMenu.Add("qRange", new CheckBox("Q range", false));
+            drawMenu.Add("wRange", new CheckBox("W range", false));
+            drawMenu.Add("eRange", new CheckBox("E range", false));
+            drawMenu.Add("rRange", new CheckBox("R range", false));
+            drawMenu.Add("onlyRdy", new CheckBox("Draw only ready spells", true));
+
+            wMenu = Config.AddSubMenu("W Config");
+            wMenu.Add("autoW", new CheckBox("Auto W", true));
+            wMenu.AddGroupLabel("Harass : ");
+            foreach (var enemy in HeroManager.Enemies)
+                wMenu.Add("haras" + enemy.ChampionName, new CheckBox(enemy.ChampionName));
+
+            qMenu = Config.AddSubMenu("Q Config");
+            qMenu.Add("autoQ", new CheckBox("Auto Q", true));
+            qMenu.Add("Qharras", new CheckBox("Harass Q", true));
+
+            eMenu = Config.AddSubMenu("E Config");
+            eMenu.Add("autoE", new CheckBox("Auto E on CC", true));
+            eMenu.Add("comboE", new CheckBox("Auto E in Combo BETA", true));
+            eMenu.Add("AGC", new CheckBox("AntiGapcloserE", true));
+            eMenu.Add("opsE", new CheckBox("OnProcessSpellCastE", true));
+            eMenu.Add("telE", new CheckBox("Auto E teleport", true));
+
+            rMenu = Config.AddSubMenu("R Config");
+            rMenu.Add("autoR", new CheckBox("Auto R", true));
+            rMenu.Add("Rjungle", new CheckBox("R Jungle stealer", true));
+            rMenu.Add("Rdragon", new CheckBox("Dragon", true));
+            rMenu.Add("Rbaron", new CheckBox("Baron", true));
+            rMenu.Add("hitchanceR", new Slider("Hit Chance R", 2, 0, 3));
+            rMenu.Add("useR", new KeyBind("OneKeyToCast R", false, KeyBind.BindTypes.HoldActive, 'T'));
+            rMenu.Add("Rturrent", new CheckBox("Don't R under turret", true));
+
+            farmMenu = Config.AddSubMenu("Farm Menu");
+            farmMenu.Add("farmQout", new CheckBox("Q farm out range AA", true));
+            farmMenu.Add("farmQ", new CheckBox("Q LaneClear Q", true));
+            farmMenu.Add("Mana", new Slider("LaneClear Q Mana", 80, 30, 100));
+
         }
 
-        public static int getSliderItem(Menu m, string item)
+        private void BeforeAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            return m[item].Cast<Slider>().CurrentValue;
-        }
-
-        public static bool getKeyBindItem(Menu m, string item)
-        {
-            return m[item].Cast<KeyBind>().CurrentValue;
-        }
-
-        public static int getBoxItem(Menu m, string item)
-        {
-            return m[item].Cast<ComboBox>().CurrentValue;
-        }
-
-        private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
-        {
-            if (!Q.IsReady() || !getCheckBoxItem(qMenu, "autoQ") || !FishBoneActive)
+            if (!Q.IsReady() || !qMenu["autoQ"].Cast<CheckBox>().CurrentValue || !FishBoneActive)
                 return;
 
             var t = args.Target as AIHeroClient;
@@ -86,9 +99,9 @@ namespace OneKeyToWin_AIO_Sebby
             if (t != null)
             {
                 var realDistance = GetRealDistance(t) - 50;
-                if (Program.Combo && (!HeroManager.Enemies.Any(a => a.LSIsValidTarget(Player.BoundingRadius + 525f)) && HeroManager.Enemies.Any(t2 => t2.LSIsValidTarget(Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) ? Player.BoundingRadius + 525f + (50f + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level) : 1350f)) || (Player.Mana < RMANA + 20 && Player.GetAutoAttackDamage(t) * 3 < t.Health)))
+                if (Program.Combo && (realDistance < GetRealPowPowRange(t) || (Player.Mana < RMANA + 20 && Player.GetAutoAttackDamage(t) * 3 < t.Health)))
                     Q.Cast();
-                else if (Program.Farm && getCheckBoxItem(qMenu, "Qharras") && (realDistance > bonusRange() || realDistance < GetRealPowPowRange(t) || Player.Mana < RMANA + EMANA + WMANA + WMANA))
+                else if (Program.Farm && qMenu["Qharras"].Cast<CheckBox>().CurrentValue && (realDistance > bonusRange() || realDistance < GetRealPowPowRange(t) || Player.Mana < RMANA + EMANA + WMANA + WMANA))
                     Q.Cast();
             }
 
@@ -97,68 +110,28 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var realDistance = GetRealDistance(minion);
 
-                if (realDistance < GetRealPowPowRange(minion) || Player.ManaPercent < getSliderItem(farmMenu, "Mana"))
+                if (realDistance < GetRealPowPowRange(minion) || Player.ManaPercent < farmMenu["Mana"].Cast<Slider>().CurrentValue)
                 {
                     Q.Cast();
                 }
             }
         }
 
-        private static void LoadMenuOKTW()
+        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            drawMenu = Config.AddSubMenu("Draw");
-            drawMenu.Add("noti", new CheckBox("Show notification", false));
-            drawMenu.Add("semi", new CheckBox("Semi-manual R target", false));
-            drawMenu.Add("qRange", new CheckBox("Q range", false));
-            drawMenu.Add("wRange", new CheckBox("W range", false));
-            drawMenu.Add("eRange", new CheckBox("E range", false));
-            drawMenu.Add("rRange", new CheckBox("R range", false));
-            drawMenu.Add("onlyRdy", new CheckBox("Draw only ready spells"));
-
-            wMenu = Config.AddSubMenu("W Config");
-            wMenu.Add("autoW", new CheckBox("Auto W"));
-            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
-                wMenu.Add("haras" + enemy.NetworkId, new CheckBox(enemy.ChampionName));
-
-            qMenu = Config.AddSubMenu("Q Config");
-            qMenu.Add("autoQ", new CheckBox("Auto Q"));
-            qMenu.Add("Qharras", new CheckBox("Harass Q"));
-
-            eMenu = Config.AddSubMenu("E Config");
-            eMenu.Add("autoE", new CheckBox("Auto E on CC"));
-            eMenu.Add("comboE", new CheckBox("Auto E in Combo BETA"));
-            eMenu.Add("AGC", new CheckBox("AntiGapcloserE"));
-            eMenu.Add("opsE", new CheckBox("OnProcessSpellCastE"));
-            eMenu.Add("telE", new CheckBox("Auto E teleport"));
-
-            rMenu = Config.AddSubMenu("R Config");
-            rMenu.Add("autoR", new CheckBox("Auto R"));
-            rMenu.Add("Rjungle", new CheckBox("R Jungle stealer"));
-            rMenu.Add("Rdragon", new CheckBox("Dragon"));
-            rMenu.Add("Rbaron", new CheckBox("Baron"));
-            rMenu.Add("hitchanceR", new Slider("Hit Chance R", 2, 0, 3));
-            rMenu.Add("useR", new KeyBind("OneKeyToCast R", false, KeyBind.BindTypes.HoldActive, 'T')); //32 == space
-            rMenu.Add("Rturrent", new CheckBox("Don't R under turret"));
-
-            farmMenu = Config.AddSubMenu("Farm");
-            farmMenu.Add("farmQout", new CheckBox("Q farm out range AA"));
-            farmMenu.Add("farmQ", new CheckBox("Q LaneClear Q"));
-            farmMenu.Add("Mana", new Slider("LaneClear Q Mana", 80, 30));
-        }
-
-        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-        {
-            if (getCheckBoxItem(eMenu, "AGC") && E.IsReady() && Player.Mana > RMANA + EMANA && gapcloser.Sender.IsEnemy)
+            if (eMenu["AGC"].Cast<CheckBox>().CurrentValue && E.IsReady() && Player.Mana > RMANA + EMANA)
             {
                 var Target = gapcloser.Sender;
                 if (Target.LSIsValidTarget(E.Range))
                 {
                     E.Cast(gapcloser.End);
                 }
+                return;
             }
+            return;
         }
 
-        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs args)
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs args)
         {
             if (unit.IsMinion)
                 return;
@@ -170,8 +143,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (E.IsReady())
             {
-                if (unit.IsEnemy && getCheckBoxItem(eMenu, "opsE") && unit.LSIsValidTarget(E.Range) &&
-                    ShouldUseE(args.SData.Name))
+                if (unit.IsEnemy && eMenu["opsE"].Cast<CheckBox>().CurrentValue && unit.LSIsValidTarget(E.Range) && ShouldUseE(args.SData.Name))
                 {
                     E.Cast(unit.ServerPosition, true);
                 }
@@ -180,19 +152,20 @@ namespace OneKeyToWin_AIO_Sebby
                     grabTime = Game.Time;
                 }
             }
+
         }
 
-        private static void Game_OnUpdate(EventArgs args)
+        private void Game_OnUpdate(EventArgs args)
         {
             if (R.IsReady())
             {
-                if (getKeyBindItem(rMenu, "useR"))
+                if (rMenu["useR"].Cast<KeyBind>().CurrentValue)
                 {
                     var t = TargetSelector.GetTarget(R.Range, DamageType.Physical);
-                    if (t.LSIsValidTarget() && t.IsVisible && t.IsHPBarRendered)
+                    if (t.LSIsValidTarget())
                         R.Cast(t, true, true);
                 }
-                if (getCheckBoxItem(rMenu, "Rjungle"))
+                if (rMenu["Rjungle"].Cast<CheckBox>().CurrentValue)
                 {
                     KsJungle();
                 }
@@ -206,28 +179,27 @@ namespace OneKeyToWin_AIO_Sebby
             if (E.IsReady())
                 LogicE();
 
-            if (Program.LagFree(2) && Q.IsReady() && getCheckBoxItem(qMenu, "autoQ"))
+            if (Program.LagFree(2) && Q.IsReady() && qMenu["autoQ"].Cast<CheckBox>().CurrentValue)
                 LogicQ();
 
-            if (Program.LagFree(3) && W.IsReady() && !Orbwalker.IsAutoAttacking && getCheckBoxItem(wMenu, "autoW"))
+            if (Program.LagFree(3) && W.IsReady() && !Orbwalker.IsAutoAttacking && wMenu["autoW"].Cast<CheckBox>().CurrentValue)
                 LogicW();
 
             if (Program.LagFree(4) && R.IsReady())
                 LogicR();
         }
 
-        private static void LogicQ()
+        private void LogicQ()
         {
-            if (Program.Farm && !FishBoneActive && !Orbwalker.IsAutoAttacking && Orbwalker.LastTarget == null &&
-                Orbwalking.CanAttack() && getCheckBoxItem(farmMenu, "farmQout") &&
-                Player.Mana > RMANA + WMANA + EMANA + 10)
+            if (Program.Farm && !FishBoneActive && !Orbwalker.IsAutoAttacking && Orbwalker.LastTarget == null && SebbyLib.Orbwalking.CanAttack() && farmMenu["farmQout"].Cast<CheckBox>().CurrentValue && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
-                foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(minion => !Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
+                foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(
+                minion => !SebbyLib.Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
                 {
-                    var hpPred = HealthPrediction.GetHealthPrediction(minion, 400);
+                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 400, 70);
                     if (hpPred < Player.GetAutoAttackDamage(minion) * 1.1 && hpPred > 5)
                     {
-                        Orbwalker.ForcedTarget = minion;
+                        Orbwalker.ForcedTarget = (minion);
                         Q.Cast();
                         return;
                     }
@@ -237,41 +209,41 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(bonusRange() + 60, DamageType.Physical);
             if (t.LSIsValidTarget())
             {
-                if (!FishBoneActive && (!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) > 2) && Orbwalker.LastTarget == null)
+                if (!FishBoneActive && (!SebbyLib.Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) > 2) && Orbwalker.LastTarget == null)
                 {
                     var distance = GetRealDistance(t);
                     if (Program.Combo && (Player.Mana > RMANA + WMANA + 10 || Player.GetAutoAttackDamage(t) * 3 > t.Health))
                         Q.Cast();
-                    else if (Program.Farm && !Orbwalker.IsAutoAttacking && Orbwalking.CanAttack() && getCheckBoxItem(qMenu, "Qharras") && !ObjectManager.Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + 20 && distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
+                    else if (Program.Farm && !Orbwalker.IsAutoAttacking && SebbyLib.Orbwalking.CanAttack() && qMenu["Qharras"].Cast<CheckBox>().CurrentValue && !ObjectManager.Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + 20 && distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
                         Q.Cast();
                 }
             }
-            else if (!FishBoneActive && Program.Combo && Player.Mana > RMANA + WMANA + 20 && Player.CountEnemiesInRange(2000) > 0)
+            else if (!FishBoneActive && Program.Combo && Player.Mana > RMANA + WMANA + 20 && Player.LSCountEnemiesInRange(2000) > 0)
                 Q.Cast();
             else if (FishBoneActive && Program.Combo && Player.Mana < RMANA + WMANA + 20)
                 Q.Cast();
-            else if (FishBoneActive && Program.Combo && Player.CountEnemiesInRange(2000) == 0)
+            else if (FishBoneActive && Program.Combo && Player.LSCountEnemiesInRange(2000) == 0)
                 Q.Cast();
             else if (FishBoneActive && (Program.Farm || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))
             {
                 Q.Cast();
             }
-            Orbwalker.ForcedTarget = null;
         }
 
-        private static void LogicW()
+        private void LogicW()
         {
             var t = TargetSelector.GetTarget(W.Range, DamageType.Physical);
-            if (t.LSIsValidTarget() && t.IsVisible && t.IsHPBarRendered)
+            if (t.LSIsValidTarget() && t.IsHPBarRendered && t.IsVisible)
             {
-                foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && enemy.LSDistance(Player) > bonusRange())) // KS check
+
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && enemy.LSDistance(Player) > bonusRange() && enemy.IsHPBarRendered && enemy.IsVisible))
                 {
                     var comboDmg = OktwCommon.GetKsDamage(enemy, W);
                     if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
                     {
                         comboDmg += R.GetDamage(enemy, 1);
                     }
-                    if (comboDmg > enemy.Health && OktwCommon.ValidUlt(enemy) && W.IsInRange(enemy))
+                    if (comboDmg > enemy.Health && OktwCommon.ValidUlt(enemy))
                     {
                         Program.CastSpell(W, enemy);
                         return;
@@ -279,36 +251,32 @@ namespace OneKeyToWin_AIO_Sebby
                 }
 
 
-                if (Player.CountEnemiesInRange(bonusRange()) == 0) // Combo Check
+                if (Player.LSCountEnemiesInRange(bonusRange()) == 0)
                 {
                     if (Program.Combo && Player.Mana > RMANA + WMANA + 10)
                     {
-                        foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && GetRealDistance(enemy) > bonusRange() && W.IsInRange(enemy)).OrderBy(enemy => enemy.Health))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && GetRealDistance(enemy) > bonusRange()).OrderBy(enemy => enemy.Health))
                             Program.CastSpell(W, enemy);
                     }
                     else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + WMANA + 40 && OktwCommon.CanHarras())
                     {
-                        foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && getCheckBoxItem(wMenu, "haras" + enemy.NetworkId) && W.IsInRange(enemy)))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && wMenu["haras" + enemy.ChampionName].Cast<CheckBox>().CurrentValue))
                             Program.CastSpell(W, enemy);
                     }
                 }
-
-
-                if (!Program.None && Player.Mana > RMANA + WMANA && Player.CountEnemiesInRange(GetRealPowPowRange(t)) == 0) // Immobile Check
+                if (!Program.None && Player.Mana > RMANA + WMANA && Player.LSCountEnemiesInRange(GetRealPowPowRange(t)) == 0)
                 {
-                    foreach (var enemy in EntityManager.Heroes.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && W.IsInRange(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && enemy.IsHPBarRendered && enemy.IsVisible))
                         W.Cast(enemy, true);
                 }
             }
         }
 
-        private static void LogicE()
+        private void LogicE()
         {
-            if (Player.Mana > RMANA + EMANA && getCheckBoxItem(eMenu, "autoE") && Game.Time - grabTime > 1)
+            if (Player.Mana > RMANA + EMANA && eMenu["autoE"].Cast<CheckBox>().CurrentValue && Game.Time - grabTime > 1)
             {
-                foreach (
-                    var enemy in
-                        Program.Enemies.Where(enemy => enemy.LSIsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.LSIsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                 {
                     E.Cast(enemy.Position);
                     return;
@@ -316,19 +284,17 @@ namespace OneKeyToWin_AIO_Sebby
                 if (!Program.LagFree(1))
                     return;
 
-                if (getCheckBoxItem(eMenu, "telE"))
+                if (eMenu["telE"].Cast<CheckBox>().CurrentValue)
                 {
                     var trapPos = OktwCommon.GetTrapPos(E.Range);
                     if (!trapPos.IsZero)
                         E.Cast(trapPos);
                 }
 
-                if (Program.Combo && Player.IsMoving && getCheckBoxItem(eMenu, "comboE") &&
-                    Player.Mana > RMANA + EMANA + WMANA)
+                if (Program.Combo && Player.IsMoving && eMenu["comboE"].Cast<CheckBox>().CurrentValue && Player.Mana > RMANA + EMANA + WMANA)
                 {
                     var t = TargetSelector.GetTarget(E.Range, DamageType.Physical);
-                    if (t.LSIsValidTarget(E.Range) && E.GetPrediction(t).CastPosition.LSDistance(t.Position) > 200 &&
-                        (int)E.GetPrediction(t).Hitchance == 5)
+                    if (t.LSIsValidTarget(E.Range) && E.GetPrediction(t).CastPosition.LSDistance(t.Position) > 200 && (int)E.GetPrediction(t).Hitchance == 5)
                     {
                         E.CastIfWillHit(t, 2);
                         if (t.HasBuffOfType(BuffType.Slow))
@@ -341,14 +307,12 @@ namespace OneKeyToWin_AIO_Sebby
                             {
                                 if (Player.Position.LSDistance(t.ServerPosition) > Player.Position.LSDistance(t.Position))
                                 {
-                                    if (t.Position.LSDistance(Player.ServerPosition) <
-                                        t.Position.LSDistance(Player.Position))
+                                    if (t.Position.LSDistance(Player.ServerPosition) < t.Position.LSDistance(Player.Position))
                                         Program.CastSpell(E, t);
                                 }
                                 else
                                 {
-                                    if (t.Position.LSDistance(Player.ServerPosition) >
-                                        t.Position.LSDistance(Player.Position))
+                                    if (t.Position.LSDistance(Player.ServerPosition) > t.Position.LSDistance(Player.Position))
                                         Program.CastSpell(E, t);
                                 }
                             }
@@ -358,28 +322,28 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private static void LogicR()
+        private void LogicR()
         {
-            if (Player.UnderTurret(true) && getCheckBoxItem(rMenu, "Rturrent"))
+            if (Player.UnderTurret(true) && rMenu["Rturrent"].Cast<CheckBox>().CurrentValue)
                 return;
-            if (Game.Time - WCastTime > 0.9 && getCheckBoxItem(rMenu, "autoR"))
+            if (Game.Time - WCastTime > 0.9 && rMenu["autoR"].Cast<CheckBox>().CurrentValue)
             {
-                foreach (
-                    var target in
-                        Program.Enemies.Where(target => target.LSIsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.IsHPBarRendered && target.IsVisible))
+                foreach (var target in HeroManager.Enemies.Where(target => target.LSIsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
+                    if (!target.IsVisible || !target.IsHPBarRendered)
+                    {
+                        return;
+                    }
                     var predictedHealth = target.Health - OktwCommon.GetIncomingDamage(target);
                     var Rdmg = R.GetDamage(target, 1);
 
-                    if (Rdmg > predictedHealth && !OktwCommon.IsSpellHeroCollision(target, R) &&
-                        GetRealDistance(target) > bonusRange() + 200)
+                    if (Rdmg > predictedHealth && !OktwCommon.IsSpellHeroCollision(target, R) && GetRealDistance(target) > bonusRange() + 200)
                     {
-                        if (GetRealDistance(target) > bonusRange() + 300 + target.BoundingRadius &&
-                            target.CountAlliesInRange(600) == 0 && Player.CountEnemiesInRange(400) == 0)
+                        if (GetRealDistance(target) > bonusRange() + 300 + target.BoundingRadius && target.CountAlliesInRange(600) == 0 && Player.CountEnemiesInRange(400) == 0)
                         {
                             castR(target);
                         }
-                        else if (target.CountEnemiesInRange(200) > 2)
+                        else if (target.LSCountEnemiesInRange(200) > 2)
                         {
                             R.Cast(target, true, true);
                         }
@@ -388,13 +352,13 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private static void castR(AIHeroClient target)
+        private void castR(AIHeroClient target)
         {
             if (!target.IsVisible || !target.IsHPBarRendered)
             {
                 return;
             }
-            var inx = getSliderItem(rMenu, "hitchanceR");
+            var inx = rMenu["hitchanceR"].Cast<Slider>().CurrentValue;
             if (inx == 0)
             {
                 R.Cast(R.GetPrediction(target).CastPosition);
@@ -409,28 +373,30 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (inx == 3)
             {
-                var waypoints = target.GetWaypoints();
-                if (Player.LSDistance(waypoints.Last().To3D()) - Player.LSDistance(target.Position) > 400)
+                List<Vector2> waypoints = target.GetWaypoints();
+                if ((Player.LSDistance(waypoints.Last<Vector2>().To3D()) - Player.LSDistance(target.Position)) > 400)
                 {
                     Program.CastSpell(R, target);
                 }
             }
         }
 
-        private static float bonusRange() { return 670f + Player.BoundingRadius + 25 * Player.Spellbook.GetSpell(SpellSlot.Q).Level; }
+        private float bonusRange() { return 670f + Player.BoundingRadius + 25 * Player.Spellbook.GetSpell(SpellSlot.Q).Level; }
 
+        private bool FishBoneActive { get { return Player.HasBuff("JinxQ"); } }
 
-        private static float GetRealPowPowRange(GameObject target)
+        private float GetRealPowPowRange(GameObject target)
         {
             return 650f + Player.BoundingRadius + target.BoundingRadius;
+
         }
 
-        private static float GetRealDistance(Obj_AI_Base target)
+        private float GetRealDistance(Obj_AI_Base target)
         {
-            return Player.ServerPosition.LSDistance(Prediction.GetPrediction(target, 0.05f).CastPosition) + Player.BoundingRadius + target.BoundingRadius;
+            return Player.ServerPosition.LSDistance(EloBuddy.SDK.Prediction.Position.PredictUnitPosition(target, (int)0.05f).To3D()) + Player.BoundingRadius + target.BoundingRadius;
         }
 
-        public static bool ShouldUseE(string SpellName)
+        public bool ShouldUseE(string SpellName)
         {
             switch (SpellName)
             {
@@ -460,13 +426,16 @@ namespace OneKeyToWin_AIO_Sebby
             return false;
         }
 
-        private static void KsJungle()
+        private void KsJungle()
         {
             var mobs = Cache.GetMinions(Player.ServerPosition, float.MaxValue, MinionTeam.Neutral);
             foreach (var mob in mobs)
             {
                 //debug(mob.SkinName);
-                if (mob.Health < mob.MaxHealth && ((mob.BaseSkinName == "SRU_Dragon" && getCheckBoxItem(rMenu, "Rdragon")) || (mob.BaseSkinName == "SRU_Baron" && getCheckBoxItem(rMenu, "Rbaron"))) && mob.CountAlliesInRange(1000) == 0 && mob.LSDistance(Player.Position) > 1000)
+                if (mob.Health < mob.MaxHealth && ((mob.BaseSkinName == "SRU_Dragon" && rMenu["Rdragon"].Cast<CheckBox>().CurrentValue)
+                    || (mob.BaseSkinName == "SRU_Baron" && rMenu["Rbaron"].Cast<CheckBox>().CurrentValue))
+                    && mob.CountAlliesInRange(1000) == 0
+                    && mob.LSDistance(Player.Position) > 1000 && mob.IsVisible && mob.IsHPBarRendered)
                 {
                     if (DragonDmg == 0)
                         DragonDmg = mob.Health;
@@ -487,9 +456,8 @@ namespace OneKeyToWin_AIO_Sebby
                         if (DragonDmg - mob.Health > 0)
                         {
                             var timeTravel = GetUltTravelTime(Player, R.Speed, R.Delay, mob.Position);
-                            var timeR = (mob.Health -
-                                         Player.CalcDamage(mob, DamageType.Physical,
-                                             250 + 100 * R.Level + Player.FlatPhysicalDamageMod + 300)) / (DmgSec / 4);
+                            var timeR = (mob.Health - Player.CalcDamage(mob, DamageType.Physical, (250 + (100 * R.Level)) + Player.FlatPhysicalDamageMod + 300)) / (DmgSec / 4);
+                            //debug("timeTravel " + timeTravel + "timeR " + timeR + "d " + ((150 + (100 * R.Level + 200) + Player.FlatPhysicalDamageMod)));
                             if (timeTravel > timeR)
                                 R.Cast(mob.Position);
                         }
@@ -503,10 +471,10 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private static float GetUltTravelTime(AIHeroClient source, float speed, float delay, Vector3 targetpos)
+        private float GetUltTravelTime(AIHeroClient source, float speed, float delay, Vector3 targetpos)
         {
-            var distance = Vector3.Distance(source.ServerPosition, targetpos);
-            var missilespeed = speed;
+            float distance = Vector3.Distance(source.ServerPosition, targetpos);
+            float missilespeed = speed;
             if (source.ChampionName == "Jinx" && distance > 1350)
             {
                 const float accelerationrate = 0.3f; //= (1500f - 1350f) / (2200 - speed), 1 unit = 0.3units/second
@@ -514,15 +482,14 @@ namespace OneKeyToWin_AIO_Sebby
                 if (acceldifference > 150f) //it only accelerates 150 units
                     acceldifference = 150f;
                 var difference = distance - 1500f;
-                missilespeed = (1350f * speed + acceldifference * (speed + accelerationrate * acceldifference) +
-                                difference * 2200f) / distance;
+                missilespeed = (1350f * speed + acceldifference * (speed + accelerationrate * acceldifference) + difference * 2200f) / distance;
             }
-            return distance / missilespeed + delay;
+            return (distance / missilespeed + delay);
         }
 
-        private static void SetMana()
+        private void SetMana()
         {
-            if ((Program.getCheckBoxItem("manaDisable") && Program.Combo) || Player.HealthPercent < 20)
+            if ((Program.Config["manaDisable"].Cast<CheckBox>().CurrentValue && Program.Combo) || Player.HealthPercent < 20)
             {
                 QMANA = 0;
                 WMANA = 0;
@@ -541,7 +508,7 @@ namespace OneKeyToWin_AIO_Sebby
                 RMANA = R.Instance.SData.Mana;
         }
 
-        public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, Color color)
+        public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, System.Drawing.Color color)
         {
             var wts1 = Drawing.WorldToScreen(pos1);
             var wts2 = Drawing.WorldToScreen(pos2);
@@ -549,50 +516,49 @@ namespace OneKeyToWin_AIO_Sebby
             Drawing.DrawLine(wts1[0], wts1[1], wts2[0], wts2[1], bold, color);
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
+        private void Drawing_OnDraw(EventArgs args)
         {
-            if (getCheckBoxItem(drawMenu, "onlyRdy"))
+
+            if (drawMenu["qRange"].Cast<CheckBox>().CurrentValue)
             {
                 if (FishBoneActive)
-                    Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, Color.DeepPink, 1, 1);
+                    LeagueSharp.Common.Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, System.Drawing.Color.DeepPink, 1, 1);
                 else
-                    Utility.DrawCircle(Player.Position, bonusRange() - 29, Color.DeepPink, 1, 1);
+                    LeagueSharp.Common.Utility.DrawCircle(Player.Position, bonusRange() - 29, System.Drawing.Color.DeepPink, 1, 1);
             }
-            if (getCheckBoxItem(drawMenu, "wRange"))
+            if (drawMenu["wRange"].Cast<CheckBox>().CurrentValue)
             {
-                if (getCheckBoxItem(drawMenu, "onlyRdy"))
+                if (drawMenu["onlyRdy"].Cast<CheckBox>().CurrentValue)
                 {
                     if (W.IsReady())
-                        Utility.DrawCircle(Player.Position, W.Range, Color.Cyan, 1, 1);
+                        LeagueSharp.Common.Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Cyan, 1, 1);
                 }
                 else
-                    Utility.DrawCircle(Player.Position, W.Range, Color.Cyan, 1, 1);
+                    LeagueSharp.Common.Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Cyan, 1, 1);
             }
-            if (getCheckBoxItem(drawMenu, "eRange"))
+            if (drawMenu["eRange"].Cast<CheckBox>().CurrentValue)
             {
-                if (getCheckBoxItem(drawMenu, "onlyRdy"))
+                if (drawMenu["onlyRdy"].Cast<CheckBox>().CurrentValue)
                 {
                     if (E.IsReady())
-                        Utility.DrawCircle(Player.Position, E.Range, Color.Gray, 1, 1);
+                        LeagueSharp.Common.Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
                 }
                 else
-                    Utility.DrawCircle(Player.Position, E.Range, Color.Gray, 1, 1);
+                    LeagueSharp.Common.Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
             }
-            if (getCheckBoxItem(drawMenu, "noti"))
+            if (drawMenu["noti"].Cast<CheckBox>().CurrentValue)
             {
                 var t = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
                 if (R.IsReady() && t.LSIsValidTarget() && R.GetDamage(t, 1) > t.Health)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, Color.Red,
-                        "Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                    drawLine(t.Position, Player.Position, 5, Color.Red);
+                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
+                    drawLine(t.Position, Player.Position, 5, System.Drawing.Color.Red);
                 }
                 else if (t.LSIsValidTarget(2000) && W.GetDamage(t) > t.Health)
                 {
-                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, Color.Red,
-                        "W can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                    drawLine(t.Position, Player.Position, 3, Color.Yellow);
+                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "W can kill: " + t.ChampionName + " have: " + t.Health + "hp");
+                    drawLine(t.Position, Player.Position, 3, System.Drawing.Color.Yellow);
                 }
             }
         }

@@ -184,7 +184,7 @@ namespace SebbyLib
                         OneKeyToWin_AIO_Sebby.Champions.Jayce.LoadOKTW();
                         break;
                     case "Jinx":
-                        Jinx.LoadOKTW();
+                        new Jinx().LoadOKTW();
                         break;
                     case "Karthus":
                         Karthus.LoadOKTW();
