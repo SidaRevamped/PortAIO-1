@@ -26,7 +26,7 @@ namespace Arcane_Ryze.Modes
                     {
                         Spells.Q.Cast(m);
                     }
-                    if (Spells.Q.IsReady() && m.Health > Spells.Q.GetDamage(m) && ObjectManager.Player.GetAutoAttackDamage(m) > m.Health)
+                    if (Spells.Q.IsReady() && m.Health > Spells.Q.GetDamage(m) && ObjectManager.Player.LSGetAutoAttackDamage(m) > m.Health)
                     {
                         Spells.Q.Cast(m);
                     }

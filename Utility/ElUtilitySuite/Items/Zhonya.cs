@@ -626,7 +626,7 @@
         public void Load()
         {
             zhonyaItem = new EloBuddy.SDK.Item(Game.MapId == GameMapId.SummonersRift ? ItemId.Zhonyas_Hourglass : EloBuddy.ItemId.Wooglets_Witchcap);
-            
+
             Game.OnUpdate += this.OnUpdate;
             GameObject.OnCreate += this.GameObjectOnCreate;
             Obj_AI_Base.OnProcessSpellCast += this.ObjAiBaseOnProcessSpellCast;
@@ -778,14 +778,11 @@
                     return;
                 }
 
-                var enemies = Player.LSCountEnemiesInRange(875f);
+                var enemies = Player.LSCountEnemiesInRange(1000f);
 
                 if (Player.HealthPercent <= this.ZhonyaBelowHp && enemies >= 1)
                 {
-                    if (Player.HealthPercent < this.ZhonyaBelowHp)
-                    {
-                        zhonyaItem.Cast();
-                    }
+                    zhonyaItem.Cast();
                 }
 
             }

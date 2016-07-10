@@ -21,11 +21,11 @@ namespace Arcane_Ryze.Modes
             {
                 foreach (var m in minions)
                 {
-                    if(m.Health < Spells.Q.GetDamage(m) && m.Health > (float)ObjectManager.Player.GetAutoAttackDamage(m) && !ObjectManager.Player.Spellbook.IsAutoAttacking)
+                    if(m.Health < Spells.Q.GetDamage(m) && m.Health > (float)ObjectManager.Player.LSGetAutoAttackDamage(m) && !ObjectManager.Player.Spellbook.IsAutoAttacking)
                     {
                         Spells.Q.Cast(m);
                     }
-                    if (m.Health < Spells.W.GetDamage(m) && m.Health > (float)ObjectManager.Player.GetAutoAttackDamage(m) && !ObjectManager.Player.Spellbook.IsAutoAttacking)
+                    if (m.Health < Spells.W.GetDamage(m) && m.Health > (float)ObjectManager.Player.LSGetAutoAttackDamage(m) && !ObjectManager.Player.Spellbook.IsAutoAttacking)
                     {
                         Spells.W.Cast(m);
                     }

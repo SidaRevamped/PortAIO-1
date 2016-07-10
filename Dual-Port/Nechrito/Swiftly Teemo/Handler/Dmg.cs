@@ -23,7 +23,7 @@ namespace Swiftly_Teemo.Handler
                     damage = damage + IgniteDmg;
                 }
             }
-            if (Player.CanAttack) damage = damage + (float)Player.GetAutoAttackDamage(enemy);
+            if (Player.CanAttack) damage = damage + (float)Player.LSGetAutoAttackDamage(enemy);
 
             if (Spells.E.IsReady()) damage = damage + Spells.E.GetDamage(enemy);
 

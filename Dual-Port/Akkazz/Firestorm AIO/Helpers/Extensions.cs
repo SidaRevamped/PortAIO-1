@@ -185,13 +185,13 @@ namespace Firestorm_AIO.Helpers
         {
             var predictedHealth = Health.GetPrediction(target,
                 customDelay == 0 ? (int)(spell.Delay * 1000f) : customDelay);
-            return predictedHealth < spell.GetDamage(target) && predictedHealth >= Me.GetAutoAttackDamage(target);
+            return predictedHealth < spell.GetDamage(target) && predictedHealth >= Me.LSGetAutoAttackDamage(target);
         }
 
         public static bool CanKillTarget(this Obj_AI_Base target, float damage, int delay)
         {
             var predictedHealth = Health.GetPrediction(target, (int)(delay * 1000f));
-            return predictedHealth < damage && predictedHealth >= Me.GetAutoAttackDamage(target);
+            return predictedHealth < damage && predictedHealth >= Me.LSGetAutoAttackDamage(target);
         }
 
         #endregion Damage

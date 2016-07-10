@@ -32,7 +32,7 @@ namespace ExorAIO.Champions.Lucian
             {
                 if (!Game.CursorPos.IsUnderEnemyTurret() ||
                     (args.Target as AIHeroClient).Health <
-                        GameObjects.Player.GetAutoAttackDamage(args.Target as AIHeroClient) * 2)
+                        GameObjects.Player.LSGetAutoAttackDamage(args.Target as AIHeroClient) * 2)
                 {
                     switch (Vars.getBoxItem(Vars.EMenu, "mode"))
                     {

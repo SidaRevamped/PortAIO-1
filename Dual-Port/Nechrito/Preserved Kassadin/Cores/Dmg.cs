@@ -16,7 +16,7 @@ namespace Preserved_Kassadin.Cores
 
             if (Player.Spellbook.CanUseSpell(Spells.Ignite) == SpellState.Ready) Dmg = Dmg + IgniteDmg;
 
-            if (!Player.Spellbook.IsAutoAttacking) Dmg = Dmg + (float)Player.GetAutoAttackDamage(target);
+            if (!Player.Spellbook.IsAutoAttacking) Dmg = Dmg + (float)Player.LSGetAutoAttackDamage(target);
 
             if (Spells.Q.IsReady()) Dmg = Dmg + Spells.Q.GetDamage(target);
 

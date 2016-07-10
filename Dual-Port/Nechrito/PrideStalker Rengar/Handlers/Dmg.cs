@@ -24,15 +24,15 @@ namespace PrideStalker_Rengar.Handlers
                         damage = damage + IgniteDmg;
                     }
                 }
-                if (Player.CanAttack) damage = damage + (float)Player.GetAutoAttackDamage(enemy);
+                if (Player.CanAttack) damage = damage + (float)Player.LSGetAutoAttackDamage(enemy);
 
                 if (Spells.W.IsReady()) damage = damage + Spells.W.GetDamage(enemy);
 
-                if (Spells.Q.IsReady()) damage = damage + Spells.Q.GetDamage(enemy) + (float)Player.GetAutoAttackDamage(enemy);
+                if (Spells.Q.IsReady()) damage = damage + Spells.Q.GetDamage(enemy) + (float)Player.LSGetAutoAttackDamage(enemy);
 
-                if (Spells.Q.IsReady() && Player.Mana == 5) damage = damage + Spells.Q.GetDamage(enemy) + (float)Player.GetAutoAttackDamage(enemy);
+                if (Spells.Q.IsReady() && Player.Mana == 5) damage = damage + Spells.Q.GetDamage(enemy) + (float)Player.LSGetAutoAttackDamage(enemy);
 
-                if (Player.Mana == 5) damage = damage + (float)Player.GetAutoAttackDamage(enemy) * 2;
+                if (Player.Mana == 5) damage = damage + (float)Player.LSGetAutoAttackDamage(enemy) * 2;
 
                 return damage;
             }

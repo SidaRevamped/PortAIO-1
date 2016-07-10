@@ -377,7 +377,7 @@ namespace SephKhazix
                 if (E.IsReady() && !Jumping && dist <= E.Range && getCheckBoxItem(combo, "UseECombo") && dist > Q.Range + (0.7 * Khazix.MoveSpeed))
                 {
                     PredictionOutput pred = E.GetPrediction(target);
-                    if (target.IsValid &&&& target.IsVisible && target.IsHPBarRendered !target.IsDead && ShouldJump(pred.CastPosition))
+                    if (target.IsValid && target.IsVisible && target.IsHPBarRendered && !target.IsDead && ShouldJump(pred.CastPosition))
                     {
                         E.Cast(pred.CastPosition);
                     }

@@ -372,7 +372,7 @@ namespace Challenger_Series.Plugins
                     }
                     if (EloBuddy.ObjectManager.Player.UnderAllyTurret() && GameObjects.EnemyMinions.Count(
                             m =>
-                                m.Position.Distance(EloBuddy.ObjectManager.Player.Position) < 550 && m.Health < EloBuddy.ObjectManager.Player.GetAutoAttackDamage(m) && Health.GetPrediction(m, (int)(100 + (EloBuddy.Game.Ping / 2) + EloBuddy.ObjectManager.Player.AttackCastDelay * 1000)) > 3) > 1 &&
+                                m.Position.Distance(EloBuddy.ObjectManager.Player.Position) < 550 && m.Health < EloBuddy.ObjectManager.Player.LSGetAutoAttackDamage(m) && Health.GetPrediction(m, (int)(100 + (EloBuddy.Game.Ping / 2) + EloBuddy.ObjectManager.Player.AttackCastDelay * 1000)) > 3) > 1 &&
                         !this.IsDangerousPosition(EloBuddy.Game.CursorPos))
                     {
                         Q.Cast(EloBuddy.Game.CursorPos);
@@ -382,7 +382,7 @@ namespace Challenger_Series.Plugins
                         if (GameObjects.EnemyMinions.Count(
                             m =>
                                 m.Position.Distance(EloBuddy.ObjectManager.Player.Position) < 550 &&
-                                m.Health < EloBuddy.ObjectManager.Player.GetAutoAttackDamage(m) + Q.GetDamage(m)) > 0 && !this.IsDangerousPosition(EloBuddy.Game.CursorPos))
+                                m.Health < EloBuddy.ObjectManager.Player.LSGetAutoAttackDamage(m) + Q.GetDamage(m)) > 0 && !this.IsDangerousPosition(EloBuddy.Game.CursorPos))
                         {
                             Q.Cast(EloBuddy.Game.CursorPos);
                         }
@@ -907,7 +907,7 @@ namespace Challenger_Series.Plugins
 
         private bool IsKillable(EloBuddy.AIHeroClient hero)
         {
-            return EloBuddy.ObjectManager.Player.GetAutoAttackDamage(hero) * 2 < hero.Health;
+            return EloBuddy.ObjectManager.Player.LSGetAutoAttackDamage(hero) * 2 < hero.Health;
         }
 
         private bool IsCollisionable(Vector3 pos)

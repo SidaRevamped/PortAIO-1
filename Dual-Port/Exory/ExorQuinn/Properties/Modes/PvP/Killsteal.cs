@@ -52,7 +52,7 @@ namespace ExorAIO.Champions.Quinn
                         t.LSIsValidTarget(Vars.E.Range) &&
                         !t.LSIsValidTarget(Vars.AARange) &&
                         Vars.GetRealHealth(t) <
-                            GameObjects.Player.GetAutoAttackDamage(t)*2 +
+                            GameObjects.Player.LSGetAutoAttackDamage(t)*2 +
                             (float)GameObjects.Player.LSGetSpellDamage(t, SpellSlot.E)))
                 {
                     Vars.E.CastOnUnit(target);

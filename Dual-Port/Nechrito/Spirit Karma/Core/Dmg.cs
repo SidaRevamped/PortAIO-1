@@ -11,7 +11,7 @@ namespace Spirit_Karma.Core
             {
                 float damage = 0;
                 
-                if (Player.CanAttack) damage = damage + (float)Player.GetAutoAttackDamage(enemy);
+                if (Player.CanAttack) damage = damage + (float)Player.LSGetAutoAttackDamage(enemy);
 
                 if (Spells.W.IsReady()) damage = damage + Spells.W.GetDamage(enemy);
 
