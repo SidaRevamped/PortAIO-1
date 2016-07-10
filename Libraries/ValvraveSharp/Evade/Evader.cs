@@ -100,12 +100,12 @@ namespace Valvrave_Sharp.Evade
                 if (goodCandidates.Count > 0)
                 {
                     goodCandidates = new List<Vector2>
-                                         { goodCandidates.MinOrDefault(i => Program.Player.DistanceSquared(i)) };
+                                         { goodCandidates.MinOrDefault(i => Program.Player.LSDistanceSquared(i)) };
                 }
                 if (badCandidates.Count > 0)
                 {
                     badCandidates = new List<Vector2>
-                                        { badCandidates.MinOrDefault(i => Program.Player.DistanceSquared(i)) };
+                                        { badCandidates.MinOrDefault(i => Program.Player.LSDistanceSquared(i)) };
                 }
             }
             return goodCandidates.Count > 0 ? goodCandidates : (onlyGood ? new List<Vector2>() : badCandidates);
