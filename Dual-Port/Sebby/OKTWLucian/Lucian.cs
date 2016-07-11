@@ -133,6 +133,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            passRdy = false;
             if (Player.IsChannelingImportantSpell() && (int)(Game.Time * 10) % 2 == 0)
             {
                 Console.WriteLine("chaneling");
