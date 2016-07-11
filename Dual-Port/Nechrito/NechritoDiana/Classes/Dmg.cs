@@ -36,7 +36,16 @@ namespace Nechrito_Diana
                         damage += Spells.Q.GetDamage(enemy) + Spells.R.GetDamage(enemy) +
                             Spells.R.GetDamage(enemy) + (float)Program.Player.LSGetAutoAttackDamage(enemy);
                 }
-                damage = damage + (float)Program.Player.LSGetAutoAttackDamage(enemy);
+
+                if (Spells.W.IsReady() && Spells.R.IsReady())
+                {
+                    damage = damage + (float)Program.Player.LSGetAutoAttackDamage(enemy) * 3;
+                }
+                else
+                {
+                    damage = damage + (float)Program.Player.LSGetAutoAttackDamage(enemy) * 2;
+                }
+
 
                 if (Spells.Q.IsReady()) damage += Spells.Q.GetDamage(enemy);
                 if (Spells.W.IsReady()) damage += Spells.W.GetDamage(enemy);

@@ -11,54 +11,57 @@ namespace Nechrito_Diana
     {
         public static void ComboLogic()
         {
-            var rTarget = TargetSelector.GetTarget(Spells.R.Range, DamageType.Magical);
+            var Target = TargetSelector.GetTarget(Spells.R.Range, DamageType.Magical);
 
-            var arcPred = Spells.Q.GetArcSPrediction(rTarget).CastPosition;
-
-            var Target = TargetSelector.GetTarget(Spells.Q.Range, DamageType.Magical);
-
-            if (Target.Health < Dmg.ComboDmg(Target) || MenuConfig.Misaya)
+            if (Target.LSIsValidTarget() && !Target.IsDead && !Target.IsInvulnerable && Target != null)
             {
-                if (rTarget.LSIsValidTarget() && !rTarget.IsDead && !rTarget.IsInvulnerable && rTarget != null)
+                var arcPred = Spells.Q.GetArcSPrediction(Target).CastPosition;
+
+                if (Target.Health < Dmg.ComboDmg(Target) || MenuConfig.Misaya)
                 {
-                    if (Spells.Q.IsReady() && arcPred != null && Spells.R.IsReady())
+                    if (Spells.Q.IsReady() && Spells.R.IsReady())
                     {
-                        Spells.Q.Cast(arcPred);
-                        Spells.R.Cast(rTarget);
+                        if (Spells.R.IsInRange(Target))
+                        {
+                            Spells.R.Cast(Target);
+                        }
+
+                        if (Spells.Q.GetPrediction(Target).Hitchance >= HitChance.Medium)
+                        {
+                            Spells.Q.Cast(arcPred);
+                        }
                     }
                 }
-            }
 
-            if (Spells.Q.IsReady())
-            {
-                if (rTarget != null && arcPred != null)
+                if (Spells.Q.IsReady() && Spells.Q.GetPrediction(Target).Hitchance >= HitChance.Medium)
                 {
-                    Spells.Q.Cast(arcPred);
+                    if (true)
+                    {
+                        Spells.Q.Cast(arcPred);
+                    }
                 }
-            }
 
-            if (Spells.R.IsReady() && (ObjectManager.Player.LSDistance(rTarget.Position) <= Spells.R.Range))
-            {
-                if (rTarget != null && rTarget.HasBuff("dianamoonlight") && MenuConfig.ComboR)
+                if (Spells.R.IsReady() && (ObjectManager.Player.LSDistance(Target.Position) <= Spells.R.Range))
                 {
-                    Spells.R.Cast(rTarget);
+                    if (Target.HasBuff("dianamoonlight") && MenuConfig.ComboR)
+                    {
+                        Spells.R.Cast(Target);
+                    }
+                    if (!MenuConfig.ComboR)
+                    {
+                        Spells.R.Cast(Target);
+                    }
                 }
-                if (!MenuConfig.ComboR && rTarget != null)
-                {
-                    Spells.R.Cast(rTarget);
-                }
-            }
 
-            if (Target != null && Target.LSIsValidTarget())
-            {
+
                 if (Spells.W.IsReady() && (ObjectManager.Player.LSDistance(Target.Position) <= ObjectManager.Player.AttackRange + 30))
                 {
                     Spells.W.Cast(Target);
                 }
 
-                if (MenuConfig.ComboE && ObjectManager.Player.ManaPercent > 25)
+                if (MenuConfig.ComboE && ObjectManager.Player.ManaPercent >= 15)
                 {
-                    if (Spells.E.IsReady() && (ObjectManager.Player.LSDistance(Target.Position) <= Spells.E.Range - 45 || Target.CountEnemiesInRange(Spells.E.Range) > 1 || Target.LSIsDashing()))
+                    if (Spells.E.IsReady() && (ObjectManager.Player.LSDistance(Target.Position) <= Spells.E.Range - 30))
                     {
                         Spells.E.Cast(Target);
                     }
@@ -88,16 +91,21 @@ namespace Nechrito_Diana
             {
                 var mobs = MinionManager.GetMinions(800 + ObjectManager.Player.AttackRange, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
                 if (mobs.Count == 0) return;
+                if (ObjectManager.Player.Spellbook.IsAutoAttacking) return;
 
                 if (Spells.Q.IsReady() && Spells.R.IsReady())
                 {
                     var m = MinionManager.GetMinions(800 + ObjectManager.Player.AttackRange, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-                    if (m != null && MenuConfig.jnglQR && (ObjectManager.Player.LSDistance(m[0].Position) <= 700f) && (ObjectManager.Player.LSDistance(m[0].Position) >= 400f) && ObjectManager.Player.ManaPercent > 20)
+
+                    if (m != null && MenuConfig.jnglQR && (ObjectManager.Player.LSDistance(m[0].Position) <= 700f) && (ObjectManager.Player.LSDistance(m[0].Position) >= 400f)
+                        && ObjectManager.Player.ManaPercent > 20)
+
                     {
                         Spells.Q.Cast(m[0]);
                         Spells.R.Cast(m[0]);
                     }
                 }
+
                 if (Spells.W.IsReady() && (ObjectManager.Player.LSDistance(mobs[0].Position) <= 300f) && MenuConfig.jnglW)
                 {
                     Spells.W.Cast();
@@ -140,6 +148,7 @@ namespace Nechrito_Diana
                 }
             }
         }
+
         public static void Flee()
         {
             if (!MenuConfig.FleeMouse)
@@ -153,7 +162,7 @@ namespace Nechrito_Diana
 
             if (jump.Value.IsValid())
             {
-                Player.IssueOrder(GameObjectOrder.MoveTo, jump.Value);
+                EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, jump.Value);
 
                 foreach (var junglepos in Program.JunglePos)
                 {
@@ -166,7 +175,7 @@ namespace Nechrito_Diana
             }
             else
             {
-                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+                EloBuddy.Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
             }
 
             foreach (var junglepos in Program.JunglePos)
