@@ -51,7 +51,7 @@ namespace AhriSharp
             DrawM.Add("DamageAfterCombo", new CheckBox("Draw Combo Damage"));
 
             Misc = Main.AddSubMenu("Misc", "Misc");
-            Misc.Add("charmRange", new Slider("Only Charm if Target is greater than X distance : ", 0, 0, 500));
+            Misc.Add("charmRange", new Slider("Only Charm if Target is in X distance from you : ", 1000, 100, 1000));
             Misc.Add("autoE", new CheckBox("Auto E on gapclosing targets"));
             Misc.Add("autoEI", new CheckBox("Auto E to interrupt"));
 
@@ -158,11 +158,11 @@ namespace AhriSharp
 
             var target = EloBuddy.SDK.TargetSelector.GetTarget(_spellE.Range, EloBuddy.DamageType.Magical);
             var predE = _spellQ.GetPrediction(target);
-            if (target != null && !target.CanMove && predE.Hitchance >= HitChance.VeryHigh && ObjectManager.Player.LSDistance(target) > Misc["charmRange"].Cast<Slider>().CurrentValue)
+            if (target != null && !target.CanMove && predE.Hitchance >= HitChance.VeryHigh && ObjectManager.Player.LSDistance(target) < Misc["charmRange"].Cast<Slider>().CurrentValue)
             {
                 return _spellE.Cast(target) == Spell.CastStates.SuccessfullyCasted;
             }
-            else if (target != null && predE.Hitchance >=  HitChance.VeryHigh && _spellE.WillHit(target,predE.CastPosition) && ObjectManager.Player.LSDistance(target) > Misc["charmRange"].Cast<Slider>().CurrentValue)
+            else if (target != null && predE.Hitchance >=  HitChance.VeryHigh && _spellE.WillHit(target,predE.CastPosition) && ObjectManager.Player.LSDistance(target) < Misc["charmRange"].Cast<Slider>().CurrentValue)
             {
                 return _spellE.Cast(predE.CastPosition);
             }
