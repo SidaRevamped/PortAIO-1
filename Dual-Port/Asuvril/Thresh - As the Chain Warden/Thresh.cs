@@ -22,7 +22,6 @@ namespace ThreshWarden {
 		public static Obj_AI_Base QTarget = null;
 		public static Menu Config;
 //		public static Orbwalking.Orbwalker Orbwalker;
-		public static AIHeroClient DrawTarget;
 		public static List<AIHeroClient> Qignored = new List<AIHeroClient>();
 
 		public static void OnLoad()
@@ -669,15 +668,6 @@ namespace ThreshWarden {
                 }
             }
             #endregion
-
-            if (getCheckBoxItem(DrawConfig, "drawtg"))
-            {
-          //      var target = DrawTarget;
-                if (DrawTarget != null)
-                {
-                    Render.Circle.DrawCircle(DrawTarget.Position, DrawTarget.BoundingRadius, Color.Red, 5);
-                }
-            }
         }
     }
 }

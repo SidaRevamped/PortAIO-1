@@ -1121,7 +1121,6 @@ namespace UnderratedAIO.Champions
     {
         public Obj_AI_Minion barrel;
         public float time;
-        public Vector3 pos;
 
         public Barrel(Obj_AI_Minion objAiBase, int tickCount)
         {

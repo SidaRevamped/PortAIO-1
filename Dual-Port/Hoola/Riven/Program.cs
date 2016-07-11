@@ -17,7 +17,7 @@ namespace HoolaRiven
         private const string IsFirstR = "RivenFengShuiEngine";
         private const string IsSecondR = "RivenIzunaBlade";
         private static readonly EloBuddy.SpellSlot Flash = Player.GetSpellSlot("summonerFlash");
-        private static Spell Q, Q1, W, E, R;
+        private static Spell Q, W, E, R;
         private static int QStack = 1;
         public static Render.Text Timer, Timer2;
         private static bool forceQ;
