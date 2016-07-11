@@ -331,7 +331,7 @@
 
         private static bool IsDashing => (lastE > 0 && Variables.TickCount - lastE <= 100) || Player.IsDashing() || posDash.IsValid();
 
-        private static Spell SpellQ => !haveQ3 ? Q : Q2;
+        private static LeagueSharp.SDK.Spell SpellQ => !haveQ3 ? Q : Q2;
 
         #endregion
 
