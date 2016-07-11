@@ -29,7 +29,7 @@
     {
         #region Constants
 
-        private const float QDelay = 0.38f, Q2Delay = 0.35f, QDelays = 0.19f, Q2Delays = 0.29f;
+        private const float QDelay = 0.38f, Q2Delay = 0.35f, QDelays = 0.19f, Q2Delays = 0.3f;
 
         private const int RWidth = 400;
 
@@ -47,7 +47,7 @@
 
         private static int lastE;
 
-        private static Vector2 posDash;
+        private static Vector3 posDash;
 
         private static MissileClient wallLeft, wallRight;
 
@@ -64,7 +64,7 @@
 
             Q = new LeagueSharp.SDK.Spell(SpellSlot.Q, 505).SetSkillshot(QDelay, 20, float.MaxValue, false, SkillshotType.SkillshotLine);
             Q2 = new LeagueSharp.SDK.Spell(Q.Slot, 1100).SetSkillshot(Q2Delay, 90, 1200, true, Q.Type);
-            Q3 = new LeagueSharp.SDK.Spell(Q.Slot, 250).SetTargetted(0.025f, float.MaxValue);
+            Q3 = new LeagueSharp.SDK.Spell(Q.Slot, 250).SetSkillshot(0.025f, 250, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W = new LeagueSharp.SDK.Spell(SpellSlot.W, 400).SetTargetted(0.25f, float.MaxValue);
             E = new LeagueSharp.SDK.Spell(SpellSlot.E, 475).SetTargetted(0, 1400);
             E2 = new LeagueSharp.SDK.Spell(E.Slot, E.Range).SetTargetted(Q3.Delay, E.Speed);
@@ -164,14 +164,14 @@
                         if (isDash)
                         {
                             isDash = false;
-                            posDash = new Vector2();
+                            posDash = new Vector3();
                         }
                         return;
                     }
                     if (isDash && !Player.IsDashing())
                     {
                         isDash = false;
-                        DelayAction.Add(50, () => posDash = new Vector2());
+                        DelayAction.Add(50, () => posDash = new Vector3());
                     }
                     Q.Delay = GetQDelay(false);
                     Q2.Delay = GetQDelay(true);
@@ -179,21 +179,35 @@
                 };
             Orbwalker.OnPostAttack += (sender, args) =>
                 {
-                    if (!Q.IsReady() || haveQ3 || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    if (!Q.IsReady() || haveQ3)
                     {
                         return;
                     }
                     var tur = Orbwalker.LastTarget as Obj_AI_Turret;
-                    if (tur == null || Q.GetTarget(50) != null
-                        || Common.ListMinions().Count(i => i.LSIsValidTarget(Q.Range + 50)) > 0)
+                    if (tur == null || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) || Q.GetTarget(50) != null
+                        || Common.ListMinions().Count(i => i.IsValidTarget(Q.Range + 50)) > 0)
                     {
                         return;
                     }
-                    if ((Items.HasItem((int)ItemId.Sheen) && Items.CanUseItem((int)ItemId.Sheen)) || (Items.HasItem((int)ItemId.Trinity_Force) && Items.CanUseItem((int)ItemId.Trinity_Force)))
+                    if ((Items.HasItem((int)ItemId.Sheen) && Items.CanUseItem((int)ItemId.Sheen))
+                        || (Items.HasItem((int)ItemId.Trinity_Force)
+                            && Items.CanUseItem((int)ItemId.Trinity_Force)))
                     {
                         Q.Cast(Game.CursorPos);
                     }
                 };
+            Orbwalker.OnPreAttack += (sender, args) =>
+            {
+                if (!Q.IsReady() || haveQ3)
+                {
+                    return;
+                }
+                var hero = args.Target as AIHeroClient;
+                if (hero != null && (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)))
+                {
+                    args.Process = !Q.IsInRange(hero);
+                }
+            };
             Events.OnDash += (sender, args) =>
                 {
                     if (!args.Unit.IsMe)
@@ -201,7 +215,7 @@
                         return;
                     }
                     isDash = true;
-                    posDash = args.EndPos;
+                    posDash = args.EndPos.ToVector3();
                 };
             Obj_AI_Base.OnBuffGain += (sender, args) =>
                 {
@@ -309,13 +323,15 @@
 
         private static bool CanCastQCir => posDash.IsValid() && posDash.DistanceToPlayer() < 150;
 
-        private static List<Obj_AI_Base> GetQCirObj => Common.ListEnemies(true).Where(i => i.LSIsValidTarget() && Q3.GetPredPosition(i).Distance(posDash) < Q3.Range).ToList();
+        private static List<Obj_AI_Base> GetQCirObj => Common.ListEnemies(true).Where(i => i.IsValidTarget() && Q3.WillHit(Q3.GetPredPosition(i), posDash)).ToList();
 
-        private static List<Obj_AI_Base> GetQCirTarget => EntityManager.Heroes.Enemies.Where(i => Q3.GetPredPosition(i).Distance(posDash) < Q3.Range && Q3.IsInRange(i) && i.LSIsValidTarget()).Cast<Obj_AI_Base>().ToList();
+        private static List<Obj_AI_Base> GetQCirTarget => EntityManager.Heroes.Enemies.Where(i => Q3.WillHit(Q3.GetPredPosition(i), posDash) && Q3.IsInRange(i) && i.LSIsValidTarget()).Cast<Obj_AI_Base>().ToList();
 
         private static List<AIHeroClient> GetRTarget => EntityManager.Heroes.Enemies.Where(i => i.LSIsValidTarget(R.Range) && HaveR(i)).ToList();
 
         private static bool IsDashing => (lastE > 0 && Variables.TickCount - lastE <= 100) || Player.IsDashing() || posDash.IsValid();
+
+        private static Spell SpellQ => !haveQ3 ? Q : Q2;
 
         #endregion
 
@@ -379,12 +395,7 @@
                 return true;
             }
             var buff = target.Buffs.FirstOrDefault(i => i.IsValid && i.Type == BuffType.Knockup);
-            if (buff == null)
-            {
-                return false;
-            }
-            var dur = buff.EndTime - buff.StartTime;
-            return buff.EndTime - Game.Time <= (dur <= 0.75 ? 0.3 : 0.235) * dur;
+            return buff != null && Game.Time - buff.StartTime >= 0.95f * (buff.EndTime - buff.StartTime);
         }
 
         private static bool CanDash(
@@ -403,7 +414,7 @@
             }
             var posAfterE = GetPosAfterDash(target);
             return (underTower || !posAfterE.IsUnderEnemyTurret())
-                   && posAfterE.Distance(pos) < (inQCir ? Q3.Range : pos.DistanceToPlayer())
+                   && (inQCir ? Q3.WillHit(pos, posAfterE) : posAfterE.Distance(pos) < pos.DistanceToPlayer())
                    && Evade.IsSafePoint(posAfterE.ToVector2()).IsSafe;
         }
 
@@ -445,8 +456,8 @@
                 var targetR = GetRTarget;
                 if (targetR.Count > 0)
                 {
-                    var targets = (from enemy in targetR let nearEnemy = EntityManager.Heroes.Enemies.Where(i => i.LSIsValidTarget(RWidth, true, enemy.ServerPosition) && HaveR(i)).ToList() where (nearEnemy.Count > 1 && enemy.Health + enemy.AttackShield <= R.GetDamage(enemy)) || nearEnemy.Sum(i => i.HealthPercent) / nearEnemy.Count <= getSliderItem(comboMenu, "RHpU") || nearEnemy.Count >= getSliderItem(comboMenu, "RCountA") orderby nearEnemy.Count descending select enemy).ToList();
-                    if (getCheckBoxItem(comboMenu, "RDelay"))
+                    var targets = (from enemy in targetR let nearEnemy = EntityManager.Heroes.Enemies.Where(i => i.LSIsValidTarget(RWidth, true, enemy.ServerPosition) && HaveR(i)).ToList() where (nearEnemy.Count > 1 && nearEnemy.Any(i => i.Health + i.AttackShield <= R.GetDamage(i) + GetQDmg(i))) || nearEnemy.Sum(i => i.HealthPercent) / nearEnemy.Count < getSliderItem(comboMenu, "RHpU") || nearEnemy.Count >= getSliderItem(comboMenu, "RCountA") orderby nearEnemy.Count descending select enemy).ToList();
+                    if (getCheckBoxItem(comboMenu, "RDelay") && (Player.HealthPercent > 20 || GameObjects.EnemyHeroes.Count(i => i.IsValidTarget(600) && !HaveR(i)) == 0))
                     {
                         targets = targets.Where(CanCastDelayR).ToList();
                     }
@@ -466,11 +477,11 @@
                 var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                 if (target != null && Math.Abs(target.GetProjectileSpeed() - float.MaxValue) > float.Epsilon
                     && (target.HealthPercent > Player.HealthPercent
-                            ? Player.CountAllyHeroesInRange(Q.Range) < target.CountEnemyHeroesInRange(Q.Range)
-                            : Player.HealthPercent < 30))
+                            ? Player.CountAllyHeroesInRange(500) < target.CountEnemyHeroesInRange(700)
+                            : Player.HealthPercent <= 30))
                 {
                     var posPred = W.GetPredPosition(target, true);
-                    if (posPred.DistanceToPlayer() > 100 && posPred.DistanceToPlayer() < 375 && W.Cast(posPred))
+                    if (posPred.DistanceToPlayer() > 100 && posPred.DistanceToPlayer() < 330 && W.Cast(posPred))
                     {
                         return;
                     }
@@ -507,11 +518,11 @@
                 {
                     var listDashObj = GetDashObj(underTower);
 
-                    var target = E.GetTarget(Q3.Range);
+                    var target = E.GetTarget(Q3.Width);
                     if (target != null && haveQ3 && Q.IsReady(50))
                     {
                         var nearObj = GetBestObj(listDashObj, target, true);
-                        if (nearObj != null && (GetPosAfterDash(nearObj).CountEnemyHeroesInRange(Q3.Range) > 1 || Player.CountEnemyHeroesInRange(Q.Range + E.Range / 2) == 1) && E.CastOnUnit(nearObj))
+                        if (nearObj != null && (GetPosAfterDash(nearObj).CountEnemyHeroesInRange(Q3.Width) > 1 || Player.CountEnemyHeroesInRange(Q.Range + E.Range / 2) == 1) && E.CastOnUnit(nearObj))
                         {
                             lastE = Variables.TickCount;
                             return;
@@ -791,7 +802,7 @@
                 }
                 else
                 {
-                    var target = !haveQ3 ? Q.GetTarget(Q.Width / 2) : Q2.GetTarget(Q2.Width / 2);
+                    var target = SpellQ.GetTarget(SpellQ.Width / 2);
                     if (target != null && target.Health + target.AttackShield <= GetQDmg(target))
                     {
                         if (!haveQ3)
@@ -824,12 +835,12 @@
                     }
                     else if (getCheckBoxItem(ksMenu, "Q") && Q.IsReady(50))
                     {
-                        target = targets.Where(i => i.Distance(GetPosAfterDash(i)) < Q3.Range).FirstOrDefault(
-                            i =>
-                                {
-                                    var dmgE = GetEDmg(i) - i.MagicShield;
-                                    return i.Health - (dmgE > 0 ? dmgE : 0) + i.AttackShield <= GetQDmg(i);
-                                });
+                        target =
+                            targets.Where(i => i.Distance(GetPosAfterDash(i)) < Q3.Width)
+                            .FirstOrDefault(
+                                 i =>
+                                     i.Health - Math.Max(GetEDmg(i) - i.MagicShield, 0) + i.AttackShield
+                                    <= GetQDmg(i));
                         if (target != null && E.CastOnUnit(target))
                         {
                             lastE = Variables.TickCount;
@@ -848,8 +859,7 @@
                             i =>
                             getCheckBoxItem(ksMenu, "RCast" + i.NetworkId)
                             && (i.Health + i.AttackShield <= R.GetDamage(i)
-                                || (Q.IsReady(1000) && i.Health + i.AttackShield <= R.GetDamage(i) + GetQDmg(i)))
-                            && !Invulnerable.Check(i, R.DamageType))
+                                || (Q.IsReady(1000) && i.Health + i.AttackShield <= R.GetDamage(i) + GetQDmg(i))))
                             .MaxOrDefault(i => new Priority().GetDefaultPriority(i));
                     if (target != null)
                     {
