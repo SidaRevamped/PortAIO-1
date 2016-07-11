@@ -18,7 +18,7 @@ namespace ExorAIO.Champions.Akali
         public static void Weaving(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!(args.Target is AIHeroClient) ||
-                Invulnerable.Check(args.Target as AIHeroClient, DamageType.Physical))
+                Invulnerable.Check(args.Target as AIHeroClient))
             {
                 return;
             }

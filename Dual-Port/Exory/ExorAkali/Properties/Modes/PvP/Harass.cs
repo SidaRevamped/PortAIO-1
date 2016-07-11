@@ -26,7 +26,6 @@ namespace ExorAIO.Champions.Akali
             ///     The Q Harass Logic.
             /// </summary>
             if (Vars.Q.IsReady() &&
-                !GameObjects.Player.IsUnderEnemyTurret() &&
                 Targets.Target.LSIsValidTarget(Vars.Q.Range) &&
                 GameObjects.Player.ManaPercent >
                     ManaManager.GetNeededMana(Vars.Q.Slot, Vars.getSliderItem(Vars.QMenu, "harass")) &&

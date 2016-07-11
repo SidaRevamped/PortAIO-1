@@ -67,6 +67,7 @@ namespace ExorAIO.Champions.Sivir
                 Vars.EMenu.AddLabel("It has to be used in conjunction with Evade, else it will not shield Skillshots");
                 Vars.EMenu.AddLabel("It it meant to shield what Evade doesn't support, like targetted spells, AoE, etc.");
                 Vars.EMenu.Add("logical", new CheckBox("Logical", true));
+                Vars.EMenu.Add("minions", new CheckBox("Shield Dragon/Baron AAs", true));
                 Vars.EMenu.Add("delay", new Slider("E Delay (ms)", 0, 0, 250));
             }
 

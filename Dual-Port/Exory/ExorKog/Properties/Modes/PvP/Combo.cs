@@ -44,6 +44,9 @@ namespace ExorAIO.Champions.KogMaw
             ///     The Q Combo Logic.
             /// </summary>
             if (Vars.Q.IsReady() &&
+                GameObjects.Player.Mana >
+                    Vars.Q.Instance.SData.Mana +
+                    Vars.W.Instance.SData.Mana &&
                 Targets.Target.LSIsValidTarget(Vars.Q.Range) &&
                 Vars.getCheckBoxItem(Vars.QMenu, "combo"))
             {
@@ -58,6 +61,9 @@ namespace ExorAIO.Champions.KogMaw
             /// </summary>
             if (Vars.E.IsReady() &&
                 Targets.Target.LSIsValidTarget(Vars.E.Range - 100f) &&
+                GameObjects.Player.Mana >
+                    Vars.Q.Instance.SData.Mana +
+                    Vars.W.Instance.SData.Mana &&
                 Vars.getCheckBoxItem(Vars.EMenu, "combo"))
             {
                 Vars.E.Cast(Vars.E.GetPrediction(Targets.Target).UnitPosition);
@@ -69,6 +75,9 @@ namespace ExorAIO.Champions.KogMaw
             if (Vars.R.IsReady() &&
                 Targets.Target.HealthPercent < 50 &&
                 Targets.Target.LSIsValidTarget(Vars.R.Range) &&
+                GameObjects.Player.Mana >
+                    Vars.Q.Instance.SData.Mana +
+                    Vars.W.Instance.SData.Mana &&
                 Vars.getCheckBoxItem(Vars.RMenu, "comboC") &&
                 Vars.getSliderItem(Vars.RMenu, "combo") >
                     GameObjects.Player.GetBuffCount("kogmawlivingartillerycost"))

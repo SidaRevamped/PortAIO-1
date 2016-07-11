@@ -21,7 +21,8 @@ namespace ExorAIO.Champions.Caitlyn
         {
             if (Bools.HasSheenBuff() ||
                 GameObjects.Player.Mana <
-                Vars.E.Instance.SData.Mana + Vars.Q.Instance.SData.Mana)
+                Vars.E.Instance.SData.Mana +
+                Vars.Q.Instance.SData.Mana)
             {
                 return;
             }
